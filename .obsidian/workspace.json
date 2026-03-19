@@ -11,14 +11,10 @@
             "id": "be42622720ea9833",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Price List Updates/delugeUpdateConversionPricing.md",
-                "mode": "preview",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "delugeUpdateConversionPricing"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
         ]
@@ -194,8 +190,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Price List Updates/delugeUpdateConversionPricing.md",
     "Clean-Up",
     "Acquisition and Onboarding/Marketing/ActiveCampaign",
     "Support/Cancellation",
@@ -208,13 +205,11 @@
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Update ActiveCampaign Contact Email/delugeSyncActiveCampaignContactEmail.ds",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Update ActiveCampaign Contact Email",
     "Clean-Up/Delete Visits (> 365 Days)/delugeDeleteVisitsOlderThan365Days.md",
-    "Clean-Up/Delete Visits (> 365 Days)/delugeDeleteVisitsOlderThan365Days.ds",
     "Related Lists/Show Account's Daggers Subscriptions/delugeDaggersSubscriptions.md",
     "Support/Cancellation/Update Ticket with Churn Reason/delugeChurnReasonUpdate.md",
     "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
     "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
-    "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Price List Updates/delugeUpdateConversionPricing.md",
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.md",
     "Related Lists/Sync Products to Price List's Related Products/delugeSyncProductsToRelatedProducts.md",
     "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
