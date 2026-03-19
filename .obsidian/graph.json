@@ -8,10 +8,17 @@
   "collapse-color-groups": false,
   "colorGroups": [
     {
-      "query": " path:",
+      "query": " path:\"Errors and Messages/Send Error Alert to Slack\"  ",
       "color": {
         "a": 1,
         "rgb": 14701138
+      }
+    },
+    {
+      "query": "path:Connectors  ",
+      "color": {
+        "a": 1,
+        "rgb": 369325
       }
     }
   ],
@@ -25,6 +32,6 @@
   "repelStrength": 13.6345486111111,
   "linkStrength": 0.534201388888889,
   "linkDistance": 500,
-  "scale": 0.4366303462547801,
+  "scale": 1.11502408939586,
   "close": false
 }
