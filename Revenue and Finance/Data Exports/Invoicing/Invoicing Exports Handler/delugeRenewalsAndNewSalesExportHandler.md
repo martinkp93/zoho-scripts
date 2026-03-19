@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001307001"
 Name: delugeRenewalsAndNewSalesExportHandler
-Revision Timestamp: 2026-03-19T19:39:37.540Z
+Revision Timestamp: 2026-03-19T20:30:02.120Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -31,7 +31,7 @@ This script orchestrates the following internal functions and external services:
 | --- | --- | --- |
 | [[delugeSendErrorAlert]] | Handles error reporting to administrators if sheet creation or data clearing fails. | High |
 | [[delugePostSuccessMessageToSlack]] | Sends a summary breakdown of processed quantities to Slack. | Low |
-| **Zoho Analytics API** | Source of truth for the processed data records. | Blockers |
+| **Zoho Analytics API** | Source of truth for the processed data records via Export Jobs. | Blockers |
 | **Google Sheets API** | Target destination for data visualization and distribution. | Blockers |
 | **Mailersend API** | Used to deliver XLSX exports to Cropline distributors. | Medium |
 
@@ -95,3 +95,4 @@ The script locates the correct row in the "Master Tracking Dashboard" by matchin
 
 ## Change Log
 - **2026-03-19T19:39:37.540Z:** Initial creation of documentation via DeluluDocu. Added logic for dynamic Year/Month tab targeting and Mailersend integration for Cropline.
+- **2026-03-19T20:30:02.120Z:** Re-validation of script logic. Confirmed identical operational logic for both "Renewals" and "New Sales" modes regarding Google Sheet clearing and dashboard note updates. Verified no functional changes in this revision code block.
