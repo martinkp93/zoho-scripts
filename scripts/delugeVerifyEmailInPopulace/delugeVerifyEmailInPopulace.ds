@@ -1,0 +1,50 @@
+map validation_rule.delugeVerifyEmailInPopulace(String crmAPIRequest)
+{
+// Initialize response map with a default success state.
+response = Map();
+response.put("status","success");
+response.put("message","No Contacts found that match input email address.");
+// Parse the CRM API request to extract email and contact ID.
+// Uncomment the following lines and remove hardcoded values when deploying.
+entityMap = crmAPIRequest.toMap().get("record");
+email = entityMap.get("Email").trim();
+contactId = entityMap.get("id");
+// For testing purposes, hardcoded values are used.
+// email = "martinkp93@gmail.com";
+// contactId = 520877000155014323;
+// Search for contacts with the given email address.
+searchContacts = zoho.crm.searchRecords("Contacts","(Email:equals:" + email + ")");
+info "Search Contacts: " + searchContacts;
+// If no contacts are found, return success.
+if(searchContacts.isEmpty())
+{
+	info "No Contacts found that match the input email address.";
+	return response;
+}
+// Iterate through found contacts to check for conflicts.
+for each  contact in searchContacts
+{
+	matchedContactId = contact.get("id");
+	matchedKanisaUserId = contact.get("Kanisa_User_ID");
+	// If a contact with the same email exists and it's not the current contact being edited,
+	// or if it has a Kanisa_User_ID and it's not the current contact,
+	// then it's a duplicate or an email already in use.
+	if(matchedContactId != contactId)
+	{
+		response.put("status","error");
+		if(matchedKanisaUserId != null)
+		{
+			response.put("message","Existing Contact with input email found. Email is already in use by Populace User ID: " + matchedKanisaUserId);
+			info "Existing Contact with input email found. Email is already in use by Populace User ID: " + matchedKanisaUserId;
+		}
+		else
+		{
+			response.put("message","Contact already exists with this email.");
+			info "Contact ID " + matchedContactId + " matches an existing contact with the same email. Stopping execution.";
+		}
+		return response;
+	}
+}
+// If the loop completes without returning, it means no conflicting contacts were found.
+return response;
+}
