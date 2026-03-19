@@ -184,13 +184,23 @@
               "icon": "lucide-list",
               "title": "Outline of Welcome"
             }
+          },
+          {
+            "id": "dd7d6ab330835f3c",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
+            }
           }
-        ]
+        ],
+        "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -204,7 +214,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
     "Connectors",
     "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
@@ -214,17 +224,17 @@
     "scripts/delugeSendErrorAlert/delugeSendErrorAlert.md",
     "scripts/delugeSendErrorAlert/delugeSendErrorAlert.ds",
     "scripts/delugeSendErrorAlert",
-    "scripts/delugeMailersendConnector/delugeMailersendConnector.md",
-    "scripts/delugeMailersendConnector/delugeMailersendConnector.ds",
-    "scripts/delugeMailersendConnector",
+    "Connectors/delugeMailersendConnector/delugeMailersendConnector.md",
+    "Connectors/delugeMailersendConnector/delugeMailersendConnector.ds",
+    "Connectors/delugeMailersendConnector",
     "scripts/delugeCroplineMembershipHandler/delugeCroplineMembershipHandler.md",
     "scripts/delugeCroplineMembershipHandler/delugeCroplineMembershipHandler.ds",
     "scripts/delugeCroplineMembershipHandler",
     "scripts/delugeActiveCampaignHandler/delugeActiveCampaignHandler.md",
     "scripts/delugeActiveCampaignHandler/delugeActiveCampaignHandler.ds",
     "scripts/delugeActiveCampaignHandler",
-    "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
-    "scripts/delugeTicketsConnector/delugeTicketsConnector.md",
+    "Connectors/delugePopulaceConnector/delugePopulaceConnector.md",
+    "Connectors/delugeTicketsConnector/delugeTicketsConnector.md",
     "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
     "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
     "scripts/Deluge_ Populace Membership Handler.md",
