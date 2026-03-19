@@ -1,0 +1,83 @@
+string standalone.delugeSubscriptionReversalHandler(String crmAPIRequest)
+{
+try 
+{
+	// 1. Initialisation 
+	functionName = "delugeSubscriptionReversalHandler";
+	data = crmAPIRequest.get("params");
+	orgId = 20087400261;
+	subscriptionId = data.get("subscriptionId");
+	payloadForCatch = {"subscriptionId":subscriptionId};
+	// 2. Find the matching Purchase Conversion, if any
+	conversionSearch = zoho.crm.searchRecords("Conversions","(Subscription_ID:equals:" + subscriptionId + ")");
+	if(conversionSearch.isEmpty())
+	{
+		infoMessage = "No Purchase Conversion found for Subscription ID " + subscriptionId + ". Nothing to reverse. Exiting script.";
+		info infoMessage;
+		return infoMessage;
+	}
+	// 3. Delete the Purchase Conversion
+	conversionRecord = conversionSearch.get(0);
+	conversionId = conversionRecord.get("id");
+	salesOrderId = conversionRecord.get("Sales_Order_ID");
+	info "Found Purchase Conversion ID: " + conversionId;
+	// Delete the CRM record 
+	deleteConversionResponse = invokeurl
+	[
+		url :"https://www.zohoapis.eu/crm/v3/Conversions/" + conversionId
+		type :DELETE
+		connection:"zohocrmconnection"
+	];
+	info "Delete Conversion Response: " + deleteConversionResponse;
+	deleteResponseMap = deleteConversionResponse.toMap();
+	if(deleteResponseMap.get("data") == null || deleteResponseMap.get("data").get(0).get("code") != "SUCCESS")
+	{
+		errorMessage = "Failed to delete Purchase Conversion with ID " + conversionId + ". Details: " + deleteResponseMap;
+		standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+		return errorMessage;
+	}
+	info "Successfully deleted Purchase Conversion " + conversionId;
+	// 4. Reverse the Sales Order in Inventory
+	if(salesOrderId == null)
+	{
+		infoMessage = "No Sales Order ID found on the Purchase Conversion. Skipping Inventory reversal.";
+		return infoMessage;
+	}
+	info "Proceeding to reverse Sales Order ID: " + salesOrderId;
+	// 4.1: Mark Sales Order as Unfulfilled 
+	unfulfillResponse = invokeurl
+	[
+		url :"https://www.zohoapis.eu/inventory/v1/salesorders/" + salesOrderId + "/status/unfulfilled?organization_id=" + orgId
+		type :POST
+		connection:"zohoinventory"
+	];
+	info "Unfulfill SO Response: " + unfulfillResponse;
+	if(unfulfillResponse.get("code") != 0)
+	{
+		errorMessage = "Failed to mark Sales Order " + salesOrderId + " as unfulfilled. Reason: " + unfulfillResponse.get("message");
+		standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+		return errorMessage;
+	}
+	// 4.2: Delete the Sales Order 
+	info "Sales Order " + salesOrderId + " marked as unfulfilled. Proceeding to delete.";
+	deleteResponse = invokeurl
+	[
+		url :"https://www.zohoapis.eu/inventory/v1/salesorders/" + salesOrderId + "?organization_id=" + orgId
+		type :DELETE
+		connection:"zohoinventory"
+	];
+	info "Delete SO Response: " + deleteResponse;
+	if(deleteResponse.get("code") != 0)
+	{
+		errorMessage = "Failed to delete Sales Order " + salesOrderId + ". Reason: " + deleteResponse.get("message");
+		standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+		return errorMessage;
+	}
+}
+catch (e)
+{
+	errorMessage = "A critical error occurred in " + functionName + ". Details: " + e;
+	standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+}
+return "Function executed successfully.";
+}
