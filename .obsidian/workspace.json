@@ -218,12 +218,12 @@
     "Environment Lifecycle/Create/Create SectorWeather Series Subscription/delugeTriggerCreateSectorWeatherWorkspaceSeries.md",
     "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.ds",
     "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription",
-    "scripts/delugeTriggerUpdateSectorWeatherWorkspaceSeries/delugeTriggerUpdateSectorWeatherWorkspaceSeries.md",
-    "scripts/delugeTriggerUpdateSectorWeatherWorkspaceSeries/delugeTriggerUpdateSectorWeatherWorkspaceSeries.ds",
-    "scripts/delugeTriggerUpdateSectorWeatherWorkspaceSeries",
-    "scripts/delugeTriggerUpdateSectorWeatherSeries/delugeTriggerUpdateSectorWeatherSeries.md",
-    "scripts/delugeTriggerUpdateSectorWeatherSeries/delugeTriggerUpdateSectorWeatherSeries.ds",
-    "scripts/delugeTriggerUpdateSectorWeatherSeries",
+    "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.md",
+    "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.ds",
+    "Environment Lifecycle/Update/Update SectorWeather Series Subscription",
+    "Environment Lifecycle/Update/Update SectorWeather Series/delugeTriggerUpdateSectorWeatherSeries.md",
+    "Environment Lifecycle/Update/Update SectorWeather Series/delugeTriggerUpdateSectorWeatherSeries.ds",
+    "Environment Lifecycle/Update/Update SectorWeather Series",
     "Environment Lifecycle/Create/Create SectorWeather Series Subscription/delugeTriggerCreateSectorWeatherWorkspaceSeries.ds",
     "Environment Lifecycle/Create/Create SectorWeather Series Subscription",
     "Environment Lifecycle/Create/Create SectorWeather Series/delugeTriggerCreateSectorWeatherSeries.md",
@@ -232,7 +232,7 @@
     "Connectors/SectorWeather/delugeSectorWeatherConnector.md",
     "Connectors/Daggers/delugeDaggersConnector.md",
     "Schlechtwetter Service/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
-    "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.md",
+    "Errors and Messages/Send Success Message to Slack/delugePostSuccessMessageToSlack.md",
     "conflict-files-obsidian-git.md",
     "Schlechtwetter Service/delugeSchlechtwettertageSchedule/delugeSchlechtwettertageSchedule.md",
     "Schlechtwetter Service/delugeSchlechtwetterRestAPI/delugeSchlechtwetterRestAPI.md",
@@ -249,6 +249,6 @@
     "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
     "Acquisition and Onboarding/Inventory/Get Warehouse ID for CRM Account/delugeZohoInventoryGetWarehouseId.md",
     "Acquisition and Onboarding/Order Ingestion/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md",
-    "Errors and Messages/delugeSendErrorAlert/delugeSendErrorAlert.md"
+    "Errors and Messages/Send Error Alert to Slack/delugeSendErrorAlert.md"
   ]
 }
