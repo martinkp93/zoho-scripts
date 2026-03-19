@@ -27,11 +27,11 @@ This is a critical function for provisioning access in the product, as it merges
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service | Purpose | Criticality |
-| --- | --- | --- |
-| Zoho Billing API | Fetches active subscriptions for the specified customer. | High |
-| Zoho CRM (Service_Plans) | Provides the "truth" for features and geometries linked to a billing plan. | High |
-| [[standalone.delugeSendErrorAlert]] | Handles error logging and notifications in case of script failure. | Medium |
+| Function / Service       | Purpose                                                                    | Criticality |
+| ------------------------ | -------------------------------------------------------------------------- | ----------- |
+| Zoho Billing API         | Fetches active subscriptions for the specified customer.                   | High        |
+| Zoho CRM (Service_Plans) | Provides the "truth" for features and geometries linked to a billing plan. | High        |
+| [[delugeSendErrorAlert]] | Handles error logging and notifications in case of script failure.         | Medium      |
 
 ## Logic Flow
 
