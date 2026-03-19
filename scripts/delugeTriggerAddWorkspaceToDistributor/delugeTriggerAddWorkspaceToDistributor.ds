@@ -1,0 +1,22 @@
+void automation.delugeTriggerAddWorkspaceToDistributor(String distributorId, String workspaceId)
+{
+if(distributorId != null && workspaceId != null)
+{
+	payload = {"workspaceId":workspaceId,"distributorId":distributorId};
+	putDistributorResponse = standalone.delugePopulaceConnector("addWorkspaceToDistributor",payload);
+	info putDistributorResponse;
+	if(putDistributorResponse.get("success") == true)
+	{
+		// successfull PUT response
+		info "Workspace with ID " + workspaceId + " was added to Distributor with ID " + distributorId + ".";
+	}
+	else
+	{
+		info "Workspace with ID " + workspaceId + " could not be added to Distributor with ID " + distributorId + ". The Workspace ID does not exist in Populace.";
+	}
+}
+else
+{
+	info "Did not attempt to add Workspace with ID " + workspaceId + " to a Distributor Workspace, as the linked Distributor Account in Zoho CRM does not have any Distributor ID.";
+}
+}
