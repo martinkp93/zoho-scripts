@@ -196,6 +196,8 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "scripts/delugeTieredDiscountsHandler/delugeTieredDiscountsHandler.ds",
+    "scripts/delugeTieredDiscountsHandler",
     "Acquisition and Onboarding/Lead Generation/Zapier",
     "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
     "Support/Chat",
@@ -212,8 +214,6 @@
     "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.ds",
     "Validation Rules/Account Validation (on moving Contact to another Account)",
     "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.ds",
-    "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler",
-    "Acquisition and Onboarding/Marketing/ActiveCampaign/Resolve Request a Quote Pricing (for ActiveCampaign)/delugeResolveRaQPricing.ds",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Resolve Request a Quote Pricing (for ActiveCampaign)/delugeResolveRaQPricing.md",
     "scripts/Subscription Resurrection Handler/Subscriptionresurrection.md",
     "Revenue and Finance/Conversion Pricing/Price List Pricing Handler/delugePriceListPricingHandler.md",
