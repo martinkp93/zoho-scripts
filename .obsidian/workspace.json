@@ -212,6 +212,7 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Acquisition and Onboarding/Order Ingestion",
     "Acquisition and Onboarding/Marketing",
     "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.ds",
@@ -227,7 +228,6 @@
     "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
     "Connectors",
     "Connectors/delugeDaggersConnector/delugeDaggersConnector.md",
-    "Connectors/delugeDaggersConnector/delugeDaggersConnector.ds",
     "scripts/delugeSendErrorAlert/delugeSendErrorAlert.md",
     "Connectors/delugeMailersendConnector/delugeMailersendConnector.md",
     "scripts/delugeCroplineMembershipHandler/delugeCroplineMembershipHandler.md",
