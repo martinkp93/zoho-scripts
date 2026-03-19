@@ -2,7 +2,7 @@ string standalone.delugeConversionCustomPricingHandler(Int subscriptionProductId
 {
 try 
 {
-	// --- 1. Initialize final return map --- 
+	// --- 1. Initialize final return maps --- 
 	relatedProductsList = List();
 	relatedAddonsList = List();
 	// --- 2. Process the main subscription products ---
