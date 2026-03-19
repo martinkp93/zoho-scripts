@@ -1,0 +1,62 @@
+void schedule.delugeMirrorDataExportHandler()
+{
+// --- 2. CONFIGURATION MAP ---
+// Structure: TaskName -> [ViewID, VariableName, Criteria]
+taskConfig = Map();
+taskConfig.put("Renewals",{"viewId":"188580000006748400","varName":"Mirror Renewals Export Job"});
+taskConfig.put("New Sales",{"viewId":"188580000006942075","varName":"Mirror New Sales Export Job"});
+taskConfig.put("KPI",{"viewId":"188580000006594075","varName":"Mirror KPI Export Job"});
+workspaceId = "188580000000003017";
+orgId = "20087400271";
+// --- 3. FETCH & INDEX CRM VARIABLES ---
+variablesFetch = invokeurl
+[
+	url :"https://www.zohoapis.eu/crm/v8/settings/variables"
+	type :GET
+	connection:"zohocrmconnection"
+];
+varNameToId = Map();
+for each  var in variablesFetch.get("variables")
+{
+	varNameToId.put(var.get("name"),var.get("id"));
+}
+// --- 4. EXECUTION LOOP ---
+for each  task in taskConfig.keys()
+{
+	details = taskConfig.get(task);
+	viewId = details.get("viewId");
+	targetVarName = details.get("varName");
+	// Prepare Export
+	configMap = {"responseFormat":"csv"};
+	exportJob = invokeurl
+	[
+		url :"https://analytics.zoho.eu/restapi/v2/bulk/workspaces/" + workspaceId + "/views/" + viewId + "/data"
+		type :GET
+		parameters:{"CONFIG":configMap.toString()}
+		headers:{"ZANALYTICS-ORGID":orgId}
+		connection:"zohooauth"
+	];
+	if(exportJob.get("status") == "success")
+	{
+		newJobId = exportJob.get("data").get("jobId");
+		varId = varNameToId.get(targetVarName);
+		if(varId != null)
+		{
+			updateBody = {"variables":{{"id":varId,"value":newJobId}}};
+			updateResp = invokeurl
+			[
+				url :"https://www.zohoapis.eu/crm/v8/settings/variables"
+				type :PUT
+				parameters:updateBody.toString()
+				connection:"zohocrmconnection"
+			];
+			info "Task: " + task + " | Job ID: " + newJobId + " updated successfully.";
+		}
+	}
+	else
+	{
+		errorMsg = "FAILED " + task + ". Resp: " + exportJob.toString();
+		standalone.delugeSendErrorAlert("ExportHandler",task,errorMsg);
+	}
+}
+}
