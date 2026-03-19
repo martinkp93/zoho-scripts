@@ -1,0 +1,144 @@
+string standalone.delugeConversionPricingHandler(Int conversionId)
+{
+try 
+{
+	// 1. Context & Record Fetching.
+	conv = zoho.crm.getRecordById("Conversions",conversionId);
+	accId = conv.get("Account").get("id");
+	acc = zoho.crm.getRecordById("Accounts",accId);
+	invoicedBy = acc.get("Invoiced_By_Lookup").get("id");
+	stockType = zoho.crm.getRecordById("Accounts",invoicedBy).get("Stock_Type");
+	discountTier = acc.get("Tiered_Discount");
+	priceListRecords = zoho.crm.getRelatedRecords("Related_Price_List","Accounts",invoicedBy.toLong());
+	priceListId = if(priceListRecords.size() > 0,priceListRecords.get(0).get("id"),null);
+	sprint = conv.get("Sales_Sprint_Active");
+	cycle = if(conv.get("Renewal_Cycle") != null,conv.get("Renewal_Cycle"),0);
+	country = acc.get("Billing_Country");
+	orgId = 20087400261;
+	subscription = zoho.billing.retrieve("Subscriptions",orgId,conv.get("Subscription_ID"),"zohobillingconnection");
+	renewalDate = subscription.get("subscription").get("next_billing_at").toDate();
+	// 2. Fetch Data & Safely Initialize Maps
+	// Empty maps to prevent ".get() on null" errors
+	defaultMap = {"initial":Map(),"regular":Map(),"upcoming":Map(),"addon":Map(),"scheduled":Map(),"info":Map()};
+	sprintData = defaultMap;
+	if(sprint != null)
+	{
+		sprintRes = standalone.delugeSalesSprintPricingHandler(sprint.get("id"),cycle,country);
+		if(sprintRes.get("success") == true)
+		{
+			sprintData = sprintRes;
+		}
+	}
+	priceData = defaultMap;
+	if(priceListId != null)
+	{
+		priceRes = standalone.delugePriceListPricingHandler(priceListId,country,conv.get("Product_Code"));
+		if(priceRes.get("success") == true)
+		{
+			priceData = priceRes;
+		}
+	}
+	info sprintData;
+	info priceData;
+	// 3. Logic - Priority: Sprint > PriceList
+	// STARTUP
+	st_Price = ifnull(sprintData.get("initial").get("startup_price"),priceData.get("initial").get("startup_price"));
+	st_EndUserPrice = ifnull(sprintData.get("initial").get("startup_price"),priceData.get("initial").get("startup_end_user_price"));
+	st_Id = ifnull(sprintData.get("initial").get("startup_product_id"),priceData.get("initial").get("startup_product_id"));
+	st_Code = ifnull(sprintData.get("initial").get("startup_product_code"),priceData.get("initial").get("startup_product_code"));
+	// SUBSCRIPTION (Current Cycle)
+	sub_Id = ifnull(sprintData.get("initial").get("subscription_product_id"),priceData.get("initial").get("subscription_product_id"));
+	curr_SubPrice = ifnull(sprintData.get("regular").get("subscription_price"),priceData.get("regular").get("subscription_price"));
+	// SUBSCRIPTION (Upcoming Cycle)
+	upcoming_SubPrice = ifnull(sprintData.get("upcoming").get("subscription_price"),priceData.get("regular").get("subscription_price"));
+	upcoming_EndUserPrice = ifnull(sprintData.get("upcoming").get("subscription_price"),priceData.get("regular").get("subscription_end_user_price"));
+	salesSprint_Pricing_Effective_Current_Cycle = ifnull(sprintData.get("info").get("sales_sprint_pricing_effective_current_cycle"),false);
+	salesSprint_Pricing_Effective_Upcoming_Cycle = ifnull(sprintData.get("info").get("sales_sprint_pricing_effective_upcoming_cycle"),false);
+	// Determine correct code based on cycle
+	sub_Code = ifnull(sprintData.get("initial").get("subscription_product_code"),priceData.get("initial").get("subscription_product_code"));
+	if(cycle > 0)
+	{
+		sub_Code = priceData.get("regular").get("subscription_product_code");
+	}
+	sched = priceData.get("scheduled");
+	// renewalDate = toDate("2026-02-28"); // for testing
+	if(sched.get("subscription_price") != null && sched.get("subscription_effective_date") != null)
+	{
+		effDate = sched.get("subscription_effective_date").toDate();
+		scheduledPrice = sched.get("subscription_price");
+		scheduledPriceEndUser = sched.get("subscription_end_user_price");
+		if(renewalDate >= effDate)
+		{
+			upcoming_SubPrice = ifnull(sprintData.get("upcoming").get("subscription_price"),scheduledPrice);
+			upcoming_EndUserPrice = if(upcoming_EndUserPrice == 0,0,scheduledPriceEndUser);
+			//upcoming_EndUserPrice = ifnull(scheduledPriceEndUser, null);
+			// info "Upcoming End User Price: " + upcoming_EndUserPrice;
+		}
+		else
+		{
+			upcoming_EndUserPrice = ifnull(sprintData.get("upcoming").get("subscription_price"),priceData.get("regular").get("subscription_end_user_price"));
+		}
+	}
+	// ADDON
+	addon_Price = ifnull(sprintData.get("addon").get("subscription_price"),priceData.get("addon").get("price"));
+	addon_Id = ifnull(sprintData.get("addon").get("subscription_product_id"),priceData.get("addon").get("product_id"));
+	//info "Addon ID: " + addon_Id;
+	addon_Code = ifnull(sprintData.get("addon").get("subscription_product_code"),priceData.get("addon").get("product_code"));
+	// 4. Stock Type Credits
+	if(stockType == "Sales" && cycle == 0)
+	{
+		if(sprintData.get("initial").get("startup_price") != null)
+		{
+			st_Price = st_Price - ifnull(priceData.get("initial").get("startup_price"),0);
+			st_Code = priceData.get("initial").get("startup_product_credit_code");
+			//info st_Code;
+		}
+		if(sprintData.get("initial").get("subscription_price") != null)
+		{
+			curr_SubPrice = curr_SubPrice - ifnull(priceData.get("initial").get("subscription_price"),0);
+			sub_Code = priceData.get("initial").get("subscription_product_credit_code");
+		}
+	}
+	curr_EndUserPrice = if(curr_SubPrice > 0,priceData.get("initial").get("subscription_end_user_price"),0);
+	curr_DiscPrice = null;
+	upcoming_DiscPrice = null;
+	// 5. Calculate discount
+	if(discountTier > 0)
+	{
+		if(!salesSprint_Pricing_Effective_Current_Cycle && zoho.currentdate >= effDate)
+		{
+			curr_DiscPrice = (curr_EndUserPrice * discountTier / 100).toLong();
+		}
+		if(!salesSprint_Pricing_Effective_Upcoming_Cycle && renewalDate >= effDate)
+		{
+			upcoming_DiscPrice = (upcoming_EndUserPrice * discountTier / 100).toLong();
+		}
+	}
+	// info "Current Discount Price:" + curr_DiscPrice;
+	// info "Upcoming Discount Price: " + upcoming_DiscPrice;
+	// 5. Build Payload
+	prodSubform = List();
+	addonSubform = List();
+	if(cycle == 0 && st_Id != null)
+	{
+		prodSubform.add({"Products":st_Id,"Current_Cycle_Pricing":st_Price,"Current_Cycle_Pricing_End_User":st_EndUserPrice,"Product_Code":ifnull(st_Code,"").toString()});
+	}
+	if(sub_Id != null)
+	{
+		prodSubform.add({"Products":sub_Id,"Current_Cycle_Pricing":curr_SubPrice,"Current_Cycle_Pricing_End_User":curr_EndUserPrice,"Product_Code":ifnull(sub_Code,"").toString(),"Current_Cycle_Discount":curr_DiscPrice,"Upcoming_Cycle_Pricing":upcoming_SubPrice,"Upcoming_Cycle_Pricing_End_User":upcoming_EndUserPrice,"Upcoming_Cycle_Discount":upcoming_DiscPrice});
+	}
+	if(addon_Id != null)
+	{
+		addonSubform.add({"Addons":addon_Id,"Current_Cycle_Pricing":addon_Price,"Addon_Code":ifnull(addon_Code,"").toString(),"Upcoming_Cycle_Pricing":addon_Price,"Quantity":conv.get("Quantity_Sold")});
+	}
+	updateMap = {"Related_Products":prodSubform,"Related_Addons":addonSubform};
+	info updateMap;
+	return zoho.crm.updateRecord("Conversions",conversionId,updateMap);
+}
+catch (e)
+{
+	info "Error: " + e;
+	return {"success":false,"error":e};
+}
+return "";
+}
