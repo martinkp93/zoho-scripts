@@ -176,8 +176,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -191,8 +190,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Support/Reactivation",
     "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.md",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
     "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
@@ -219,7 +219,7 @@
     "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.md",
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Resolve Request a Quote Pricing (for ActiveCampaign)/delugeResolveRaQPricing.md",
-    "scripts/Subscription Resurrection Handler/Subscriptionresurrection.md",
+    "Support/Reactivation/Subscription Resurrection Handler/Subscriptionresurrection.md",
     "Revenue and Finance/Conversion Pricing/Price List Pricing Handler/delugePriceListPricingHandler.md",
     "Support/Chat/SalseIQ Missed Chat Notification/delugeSalesIQMissedChat.md",
     "Revenue and Finance/Invoicing Automation/Draft Invoicing Handler/delugeProcessRenewalsOrNewSalesForInvoicingV2.md",
@@ -227,7 +227,6 @@
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Handler (Schedule)/delugeInvoicingDataExportHandler.md",
     "Environment Lifecycle/Update/Move User to another Workspace/delugeMoveUserToOtherWorkspace.md",
     "Validation Rules/Contact Email Validation (on creating or editing Contact)/delugeVerifyEmailInPopulace.md",
-    "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md",
-    "scripts/delugeWAT03/delugeWAT03.md"
+    "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md"
   ]
 }
