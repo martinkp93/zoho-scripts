@@ -1,0 +1,116 @@
+void automation.delugeWAT02(String workspace_id, String previous_values, Int distributor_account_id)
+{
+zdesk_org_id = "20087400249";
+current_d_account_id = distributor_account_id;
+prev_d_account_id = previous_values.get("Distributor_Lookup");
+//
+// Find the Customer's Zoho Desk Account ID from Workspace ID
+search_value = Map();
+search_value.put("customField1","Workspace ID:" + workspace_id);
+zoho_desk_account = zoho.desk.searchRecords(zdesk_org_id,"Accounts",search_value,0,5,"zohodesk");
+//info "Zoho Desk Search: " + zoho_desk_account;
+response_data = zoho_desk_account.get("data").toString();
+//info "Response Data: " + response_data;
+customer_zdesk_account_id = response_data.get("id");
+info "Customer ZDesk Account ID: " + customer_zdesk_account_id;
+// If the Customer's current Distributor Account ID is different from the previous Distributor Account ID
+// and the previous ID is not null, we first dissociate any existing links between the Customer and its previous Distributor
+if(current_d_account_id != prev_d_account_id && prev_d_account_id != null)
+{
+	//
+	// Find the Distributor's Contacts in Zoho CRM that should be dissociated from the Customer's Zoho Desk Account
+	distributor_contacts = zoho.crm.getRelatedRecords("Contacts","Accounts",prev_d_account_id);
+	//
+	// Prepare the response data
+	dissociate_data = Map();
+	dissociate_ids = List();
+	dissociate_map = Map();
+	dissociate_ids.add(customer_zdesk_account_id);
+	dissociate_map.put("ids",dissociate_ids);
+	dissociate_data.put("data",dissociate_map);
+	info "Dissociate Data: " + dissociate_data;
+	// info "Zoho CRM Distributor Contacts: " + distributor_contacts;
+	for each  contact in distributor_contacts
+	{
+		if(contact.get("Watchtower") == "Active")
+		{
+			distributor_zcrm_contact_user_id = contact.get("Kanisa_User_ID");
+			info "Distributor ZCRM Contact User ID " + distributor_zcrm_contact_user_id;
+			search_contact_value = Map();
+			search_contact_value.put("customField1","User ID:" + distributor_zcrm_contact_user_id);
+			zoho_desk_contact = zoho.desk.searchRecords(zdesk_org_id,"Contacts",search_contact_value,0,5);
+			info "Zoho Desk Contact: " + zoho_desk_contact;
+			response_data = zoho_desk_contact.get("data").toString();
+			distributor_zdesk_contact_id = response_data.get("id");
+			info "Distributor ZDesk Contact ID: " + distributor_zdesk_contact_id;
+			//
+			// Dissociate each ZDesk Contact with customer's ZDesk Account
+			dissociate_account_from_contacts_url = "https://desk.zoho.eu/api/v1/contacts/" + distributor_zdesk_contact_id + "/dissociateAccounts";
+			info "Dissociate Data: " + dissociate_data;
+			response = invokeurl
+			[
+				url :dissociate_account_from_contacts_url
+				type :POST
+				parameters:dissociate_map.toString()
+				headers:{"Content-Type":"application/json"}
+				detailed:true
+				connection:"zohodesk"
+			];
+			info "Dissociated Distributor ZDesk Contact from Customer's ZDesk Account: " + response;
+			response_code = response.get("responseCode");
+			info "Response Code: " + response_code;
+			if(response_code == 200)
+			{
+				info "Associated Distributor's ZDesk Contact (" + distributor_zdesk_contact_id + ") with Customer's ZDesk Account (" + customer_zdesk_account_id + ").";
+			}
+		}
+	}
+}
+if(current_d_account_id != null && (prev_d_account_id == null || prev_d_account_id != null))
+{
+	//
+	// Find the Distributor's Contacts in Zoho CRM that should be associated with the Customer's Zoho Desk Account
+	distributor_contacts = zoho.crm.getRelatedRecords("Contacts","Accounts",current_d_account_id);
+	//info "Zoho CRM Distributor Contacts: " + distributor_contacts;
+	for each  contact in distributor_contacts
+	{
+		if(contact.get("Watchtower") == "Active")
+		{
+			distributor_zcrm_contact_user_id = contact.get("Kanisa_User_ID");
+			info "Distributor ZCRM Contact User ID " + distributor_zcrm_contact_user_id;
+			search_contact_value = Map();
+			search_contact_value.put("customField1","User ID:" + distributor_zcrm_contact_user_id);
+			zoho_desk_contact = zoho.desk.searchRecords(zdesk_org_id,"Contacts",search_contact_value,0,5);
+			response_data = zoho_desk_contact.get("data").toString();
+			distributor_zdesk_contact_id = response_data.get("id");
+			info "Distributor ZDesk Contact ID: " + distributor_zdesk_contact_id;
+			//
+			// Associate each ZDesk Contact with customer's ZDesk Account
+			associate_account_with_contact_url = "https://desk.zoho.eu/api/v1/contacts/" + distributor_zdesk_contact_id + "/associateAccounts";
+			associate_body = Map();
+			associate_body.put("id",customer_zdesk_account_id);
+			associate_body.put("isAccountTicketsViewable",true);
+			associate_list = List();
+			associate_list.add(associate_body);
+			associate_data = Map();
+			associate_data.put("data",associate_list);
+			response = invokeurl
+			[
+				url :associate_account_with_contact_url
+				type :POST
+				parameters:associate_data.toString()
+				headers:{"Content-Type":"application/json"}
+				detailed:true
+				connection:"zohodesk"
+			];
+			info "Associate Distributor ZDesk Contact with Customer's ZDesk Account: " + response;
+			response_code = response.get("responseCode");
+			info "Associated Response Code: " + response_code;
+			if(response_code == 200)
+			{
+				info "Associated Distributor's ZDesk Contact (" + distributor_zdesk_contact_id + ") with Customer's ZDesk Account (" + customer_zdesk_account_id + ").";
+			}
+		}
+	}
+}
+}
