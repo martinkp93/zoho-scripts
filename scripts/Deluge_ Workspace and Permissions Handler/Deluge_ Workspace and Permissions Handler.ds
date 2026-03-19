@@ -1,0 +1,517 @@
+string standalone.delugeWorkspaceAndPermissionsHandler(String crmAPIRequest)
+{
+// Define variables that need to be available in the catch block
+functionName = "delugeWorkspaceAndPermissionsHandler";
+crmAPIRequestForCatch = if(crmAPIRequest != null,crmAPIRequest,"");
+try 
+{
+	// =============================================================================
+	// SECTION 1: INITIALIZE THE CRM API REQUEST
+	// Retrieve and Validate Webhook Data 
+	// =============================================================================
+	if(crmAPIRequest == null || crmAPIRequest.trim() == "")
+	{
+		errorMessage = "CRITICAL: The incoming request (crmAPIRequest) is null or empty. Halting execution.";
+		standalone.delugeSendErrorAlert(functionName,"",errorMessage);
+		return "{\"crmAPIResponse\":{\"status_code\":400,\"body\":{\"code\":\"failure\",\"message\":\"" + errorMessage + "\"}}}";
+	}
+	crmAPIRequestMap = crmAPIRequest.toMap();
+	body = crmAPIRequestMap.get("body");
+	if(body == null || body.isEmpty())
+	{
+		errorMessage = "CRITICAL: The 'body' of the request is null or empty. Halting execution.";
+		standalone.delugeSendErrorAlert(functionName,crmAPIRequest,errorMessage);
+		return "{\"crmAPIResponse\":{\"status_code\":400,\"body\":{\"code\":\"failure\",\"message\":\"" + errorMessage + "\"}}}";
+	}
+	orgId = body.get("orgId");
+	customerId = body.get("customerId");
+	zcrmAccId = body.get("zcrmAccId");
+	zcrmContactId = body.get("zcrmContactId");
+	activatedSubscriptionId = body.get("activatedSubscriptionId");
+	activatedPlanCode = body.get("activatedPlanCode");
+	activatedPlanStatus = body.get("activatedPlanStatus");
+	newActivation = body.get("newActivation");
+	zcrmAccountResponse = zoho.crm.getRecordById("Accounts",zcrmAccId);
+	accountName = zcrmAccountResponse.get("Account_Name");
+	workspaceId = zcrmAccountResponse.get("Kanisa_Farm_ID");
+	distributorName = zcrmAccountResponse.get("Distributor_Lookup").get("name");
+	vat = zcrmAccountResponse.get("CVR_VAT_number");
+	country = zcrmAccountResponse.get("Billing_Country");
+	accountLanguage = zcrmAccountResponse.get("Language");
+	category = zcrmAccountResponse.get("Category");
+	accountApiRecipient = zcrmAccountResponse.get("Email_API_Recipient");
+	zcrmContactResponse = zoho.crm.getRecordById("Contacts",zcrmContactId);
+	userId = zcrmContactResponse.get("Kanisa_User_ID");
+	email = zcrmContactResponse.get("Email");
+	firstName = zcrmContactResponse.get("First_Name");
+	lastName = zcrmContactResponse.get("Last_Name");
+	phone = zcrmContactResponse.get("Phone");
+	credentialsActive = zcrmContactResponse.get("Credentials_Active");
+	apiKeyActive = zcrmContactResponse.get("API_Key_Active");
+	activeCampaignContactId = zcrmContactResponse.get("ActiveCampaign_Contact_ID");
+	// =============================================================================
+	// SECTION 2: AGGREGATE CUSTOMER FEATURES
+	// This section calls a function to determine the customer's
+	// total entitlements/permissions based on their active subscriptions
+	// =============================================================================
+	aggregatedFeatures = List();
+	demo_start = null;
+	demo_end = null;
+	templatesList = List();
+	daggersPayloadList = List();
+	featureResponse = standalone.delugeFeatureAggregator(orgId,customerId,country);
+	if(featureResponse.get("success"))
+	{
+		info "Feature Response: " + featureResponse;
+		aggregatedFeatures = featureResponse.get("features");
+		demo_start = featureResponse.get("demo_start");
+		demo_end = featureResponse.get("demo_end");
+		category = featureResponse.get("category");
+		language = if(accountLanguage != null,accountLanguage,if(featureResponse.get("language") != null,featureResponse.get("language"),"en"));
+		daggersPayloadList = featureResponse.get("daggers_payload_list");
+		info "Aggregated Features for Customer: " + aggregatedFeatures;
+		info "Found Category: " + category;
+		info "Found Language: " + language;
+	}
+	else
+	{
+		info "Halting workflow because feature aggregation failed. Check Slack for details.";
+		return "{\"crmAPIResponse\":{\"status_code\":500,\"body\":{\"code\":\"failure\",\"message\":\"" + featureResponse.get("error_message") + "\"}}}";
+	}
+	// =============================================================================
+	// SECTION 3: EXECUTE POPULACE ACTIONS
+	// =============================================================================
+	// --- Create User in Populace ---
+	if(userId == null && zcrmContactId != null)
+	{
+		userPayload = {"email":email,"firstName":firstName,"lastName":lastName,"contactId":zcrmContactId,"language":language.toLowerCase()};
+		userResponse = standalone.delugePopulaceConnector("createUser",userPayload);
+		info "User Response: " + userResponse;
+		if(userResponse.get("success"))
+		{
+			userId = userResponse.get("data").get("userId");
+			info "Created Populace user id: " + userId;
+		}
+		else
+		{
+			// The connector already sent the alert. 
+			info "Halting due to Populace user creation failure.";
+			return "";
+		}
+	}
+	else
+	{
+		info "User already exists for customer Contact with user id " + userId;
+	}
+	// --- Create Workspace in Populace ---
+	if(workspaceId == null && userId != null && zcrmAccId != null)
+	{
+		workspacePayload = {"ownerId":userId,"accountId":zcrmAccId};
+		workspaceResponse = standalone.delugePopulaceConnector("createWorkspace",workspacePayload);
+		if(workspaceResponse.get("success"))
+		{
+			workspaceId = workspaceResponse.get("data").get("workspaceId");
+			info "Created Populace workspace id: " + workspaceId;
+		}
+		else
+		{
+			// The connector already sent the alert. 
+			info "Halting due to Populace workspace creation failure.";
+			return "";
+		}
+	}
+	else
+	{
+		info "Workspace already exists for customer Account with workspace id " + workspaceId;
+	}
+	// info aggregatedFeatures;
+	// --- Update features for Populace workspace --- 
+	if(userId != null && workspaceId != null)
+	{
+		// Build the payload for the Populace feature update 
+		featurePayload = Map();
+		featurePayload.put("workspaceId",workspaceId);
+		featurePayload.put("accountId",zcrmAccId);
+		featurePayload.put("cvr",vat);
+		// Create the nested "features" object
+		featuresMap = Map();
+		featuresMap.put("legacyWeather",aggregatedFeatures.contains("legacyWeather"));
+		featuresMap.put("legacySatellite",aggregatedFeatures.contains("legacySatellite"));
+		featuresMap.put("weatherNetwork",aggregatedFeatures.contains("weatherNetwork"));
+		// Only add below features for Denmark
+		if(country == "Denmark")
+		{
+			featuresMap.put("addFieldsByOutlines",aggregatedFeatures.contains("addFieldsByOutlines"));
+			featuresMap.put("addFieldsByCvr",aggregatedFeatures.contains("addFieldsByCvr"));
+			featuresMap.put("heightMapsKortforsyningen",aggregatedFeatures.contains("heightMapsKortforsyningen"));
+		}
+		// Create the nested "trial" object only if weather_demo is true
+		if(aggregatedFeatures.contains("weatherDemo"))
+		{
+			trialMap = Map();
+			// Get demo_start and demo_end from initial data gathering step
+			trialMap.put("start",demo_start);
+			trialMap.put("end",demo_end);
+			trialMap.put("country",country);
+			featuresMap.put("trial",trialMap);
+		}
+		// Add the nested "features" map to the main payload
+		featurePayload.put("features",featuresMap);
+		info "Populace Feature Update Payload: " + featurePayload;
+		// --- Step 4.2: Call the Populace connector ---
+		featureUpdateResponse = standalone.delugePopulaceConnector("updateWorkspace",featurePayload);
+		// --- Step 4.3: Handle the response ---
+		if(featureUpdateResponse.get("success"))
+		{
+			info "Successfully updated features in Populace for workspace: " + workspaceId;
+		}
+		else
+		{
+			// The connector already sent the alert. 
+			info "Halting due to Populace feature update failure. Check Slack for details.";
+			return "";
+		}
+		// --- Step 4.4: Conditionally: Call the Populace connector to set up Cropline Admin memberships ---
+		if(aggregatedFeatures.contains("legacySatellite"))
+		{
+			// --- Step 4.5: Call the Cropline Membership Handler to retrieve Cropline Admin userId ---
+			croplineMembershipResponse = standalone.delugeCroplineMembershipHandler(distributorName);
+			// --- Step 4.6: Handle the response ---
+			if(croplineMembershipResponse.get("success"))
+			{
+				adminUserId = croplineMembershipResponse.get("data").get("userId");
+				action = "addMembership";
+				role = "Admin";
+				payload = {"userId":adminUserId,"workspaceId":workspaceId,"role":role};
+				addCroplineMembershipResponse = standalone.delugePopulaceConnector(action,payload);
+				if(addCroplineMembershipResponse.get("success"))
+				{
+					info "Successfully added Distributor's designated Cropline Admin with userId " + adminUserId + " to workspace " + workspaceId;
+				}
+				else
+				{
+					// The connector already sent the alert. 
+					info "Halting due to Populace membership update failure. Check Slack for details.";
+					return "";
+				}
+			}
+		}
+	}
+	// =============================================================================
+	// SECTION 4: SYNC DAGGERS SUBSCRIPTIONS
+	// =============================================================================
+	if(userId != null && workspaceId != null)
+	{
+		info "Preparing to sync Daggers subscriptions for workspace: " + workspaceId;
+		// --- Build the payload for the daggers_handler function ---
+		finalProcessedSubscriptions = featureResponse.get("daggersPayloadList");
+		info "Daggers Handler Payload: " + finalProcessedSubscriptions;
+		// --- Call the standalone daggers_handler function ---
+		daggersSyncResponse = standalone.delugeDaggersConnector("syncSubscriptions",workspaceId,finalProcessedSubscriptions);
+		// --- Handle the response from the handler ---
+		daggersSyncResponseMap = daggersSyncResponse.toMap();
+		info daggersSyncResponseMap;
+		if(daggersSyncResponseMap.get("success") == true)
+		{
+			info "Successfully synced subscriptions with Daggers.";
+		}
+		else
+		{
+			// The connector already sent the alert. 
+			info "Halting workflow because Daggers sync failed. Check Slack for details.";
+			return "";
+		}
+	}
+	// =============================================================================
+	// SECTION 5: EXECUTE TICKETS ACTIONS
+	// =============================================================================
+	// --- Create Credentials in Tickets ---
+	// Initialize variables to hold the results for the email step later
+	password = null;
+	apiKey = null;
+	info "API Key Active: " + apiKeyActive;
+	if(userId != null && workspaceId != null)
+	{
+		// --- Conditional Call for Credentials (Password) ---
+		// This block runs only if credentials are NOT active AND the customer has an entitled feature.
+		if(!credentialsActive && (aggregatedFeatures.contains("legacyWeather") || aggregatedFeatures.contains("legacySatellite") || aggregatedFeatures.contains("weatherDemo")))
+		{
+			info "Customer is entitled to credentials. Calling Tickets connector...";
+			credentialsPayload = {"userId":userId};
+			// --- Call the standalone tickets_handler function ---
+			credentialsResponse = standalone.delugeTicketsConnector("createCredentials",credentialsPayload);
+			// --- Handle the response from the handler ---
+			if(credentialsResponse.get("success"))
+			{
+				password = credentialsResponse.get("data").get("password");
+				// --- Update the CRM Contact to reflect the new status ---
+				zoho.crm.updateRecord("Contacts",zcrmContactId,{"Credentials_Active":true});
+				info "Password created successfully.";
+			}
+			else
+			{
+				// The connector already sent the alert. 
+				info "Halting due to Tickets credentials creation failure. Check Slack for details.";
+				return "";
+			}
+		}
+		// --- Conditional Call for API Key ---
+		// This block runs independently and only if an API key is needed and not already active.
+		apiRequestAction = null;
+		if(apiKeyActive == FALSE && aggregatedFeatures.contains("weatherDataAPI"))
+		{
+			apiRequestAction = "createApiKey";
+		}
+		else if(apiKeyActive == TRUE && aggregatedFeatures.notContains("weatherDataAPI"))
+		{
+			apiRequestAction = "deleteApiKey";
+		}
+		if(apiRequestAction != null)
+		{
+			info "Calling Tickets Connector with action: '" + apiRequestAction + "'";
+			apiKeyPayload = {"userId":userId,"workspaceId":workspaceId};
+			// --- Call the standalone tickets_handler function ---
+			apiKeyResponse = standalone.delugeTicketsConnector(apiRequestAction,apiKeyPayload);
+			// --- Handle the response from the handler ---
+			info "Tickets Response: " + apiKeyResponse;
+			if(apiKeyResponse.get("success"))
+			{
+				apiKey = ifnull(apiKeyResponse.get("data").get("apiKey"),null);
+				apiKeyActive = if(apiKey != null,true,false);
+				// Update the CRM Contact to reflect the new status
+				info "Updating CRM Contact field 'API_Key_Active' to: " + apiKeyActive;
+				zoho.crm.updateRecord("Contacts",zcrmContactId,{"API_Key_Active":apiKeyActive});
+				apiKeyRecipient = if(accountApiRecipient != null && accountApiRecipient != "",accountApiRecipient,email);
+			}
+			else
+			{
+				// The connector already sent the alert. 
+				info "Halting due to Tickets Connector failure. Check Slack for details.";
+				return "";
+			}
+		}
+	}
+	// =============================================================================
+	// SECTION 6: EXECUTE SCHLECTHWETTER API ACTIONS
+	// =============================================================================
+	if(activatedPlanCode == "13000API")
+	{
+		schlechtwetterPayload = {"workspaceId":workspaceId};
+		schlecthwetterAction = if(activatedPlanStatus == "cancelled" || activatedPlanStatus == "deleted","deleteSchlechtwetter","syncSchlechtwetter");
+		schlechtwetterResponse = standalone.delugeSchlechtwetterConnector(schlecthwetterAction,schlechtwetterPayload);
+		info "Schlechtwetter Response:" + schlechtwetterResponse;
+		if(schlechtwetterResponse.get("success") == true)
+		{
+			info "Workspace synced to Schlecthwetter successfully with action '" + schlecthwetterAction + "'.";
+		}
+		else
+		{
+			// The connector already sent the alert. 
+			info "Halting due to Schlechtwetter API sync failure. Check Slack for details.";
+			return "";
+		}
+	}
+	// =============================================================================
+	// SECTION 7: SYNC TO ACTIVECAMPAIGN
+	// =============================================================================
+	targetListId = if(activatedPlanCode.contains(1200),38,if(activatedPlanCode.contains(1500),39,null));
+	if(targetListId != null && activatedPlanStatus == "live" && newActivation == TRUE)
+	{
+		info "Syncing Contact to ActiveCampaign List: " + targetListId + " with Tag: Onboarding";
+		tags = {"Onboarding"};
+		syncAcContactResp = standalone.delugeActiveCampaignHandler(zcrmContactId.toLong(),zcrmAccId.toLong(),firstName,lastName,email,country,activeCampaignContactId,tags,null,null,null,null,null,null,null,targetListId);
+		activeCampaignContactId = syncAcContactResp.get("acContactId");
+		info "Synced Contact with ActiveCampaign Contact ID: " + activeCampaignContactId;
+	}
+	// =============================================================================
+	// SECTION 8: UPDATE ZOHO CRM RECORDS
+	// =============================================================================
+	if(userId != null && workspaceId != null)
+	{
+		// --- Prepare the update for the Zoho CRM Account ---
+		accountUpdateMap = Map();
+		// Add the new workspace ID and lanaguage
+		accountUpdateMap.put("Kanisa_Farm_ID",workspaceId.toString());
+		accountUpdateMap.put("Language",language.toLowerCase());
+		accountUpdateMap.put("Category",category);
+		// Set all the boolean feature flags based on the aggregated list
+		accountUpdateMap.put("Legacy_Weather",aggregatedFeatures.contains("legacyWeather"));
+		accountUpdateMap.put("Weather_Network",aggregatedFeatures.contains("weatherNetwork"));
+		accountUpdateMap.put("Legacy_Satellite",aggregatedFeatures.contains("legacySatellite"));
+		accountUpdateMap.put("Weather_Demo",aggregatedFeatures.contains("weatherDemo"));
+		accountUpdateMap.put("Weather_Data_API",aggregatedFeatures.contains("weatherDataAPI"));
+		// Add country-specific features
+		if(country == "Denmark")
+		{
+			accountUpdateMap.put("Add_Fields_by_Outline",aggregatedFeatures.contains("addFieldsByOutlines"));
+			accountUpdateMap.put("Add_Fields_by_CVR",aggregatedFeatures.contains("addFieldsByCvr"));
+			accountUpdateMap.put("Height_Maps_Kortforsyningen",aggregatedFeatures.contains("heightMapsKortforsyningen"));
+		}
+		// Add the demo start and end times if they exist
+		if(demo_start != null && demo_end != null)
+		{
+			accountUpdateMap.put("Weather_Demo_Start",demo_start);
+			accountUpdateMap.put("Weather_Demo_End",demo_end);
+		}
+		else
+		{
+			accountUpdateMap.put("Weather_Demo_Start",null);
+			accountUpdateMap.put("Weather_Demo_End",null);
+		}
+		info "Updating Zoho CRM Account with data: " + accountUpdateMap;
+		// Execute the update for the Account record
+		updateAccountResponse = zoho.crm.updateRecord("Accounts",zcrmAccId,accountUpdateMap,{"trigger":{"workflow"}});
+		info "Zoho CRM Account Update Response: " + updateAccountResponse;
+		// Prepare and execute the update for the Zoho CRM Contact ---
+		contactUpdateMap = Map();
+		// Add the ActiveCampaign Contact ID
+		contactUpdateMap.put("ActiveCampaign_Contact_ID",activeCampaignContactId);
+		// Add the new user ID
+		contactUpdateMap.put("Kanisa_User_ID",userId.toString());
+		contactUpdateMap.put("User_Status","Active");
+		contactUpdateMap.put("User_Type","Owner");
+		// Also update the credentials status if password was returned by the Tickets connector
+		info "Updating Zoho CRM Contact with data: " + contactUpdateMap;
+		// Execute the update for the Contact record
+		updateContactResponse = zoho.crm.updateRecord("Contacts",zcrmContactId,contactUpdateMap);
+		info "Zoho CRM Contact Update Response: " + updateContactResponse;
+	}
+	else
+	{
+		info "Skipping Zoho CRM updates because userId or workspaceId is missing.";
+	}
+	// =============================================================================
+	// SECTION 9: SEND ACTIVATION EMAIL
+	// =============================================================================
+	// This section only runs if a password or an API key was successfully created.
+	servicePlanCache = Map();
+	fallbackLanguage = "en";
+	if(password != null || apiKey != null)
+	{
+		info "Preparing to send activation email(s)...";
+		// --- Dynamically determine which email events to send ---
+		eventTypesToSend = List();
+		if(password != null)
+		{
+			eventTypesToSend.add("Account Activation");
+		}
+		if(apiKey != null)
+		{
+			eventTypesToSend.add("API Token Activation");
+		}
+		// --- Define fallback logic and map initialization ---
+		// Language is assumed to be determined correctly in SECTION 3.
+		// We use a map to store the final template ID for each event type.
+		finalTemplateMap = Map();
+		fallbackLanguage = "en";
+		// --- Loop through the required events and find the template for each ---
+		for each  eventType in eventTypesToSend
+		{
+			templateUrl = null;
+			servicePlanRecord = null;
+			// --- Look up the Service Plan record for the current activated subscription ---
+			servicePlanSearch = zoho.crm.searchRecords("Service_Plans","(Zoho_Billing_Plan_Code:equals:" + activatedPlanCode + ")");
+			if(servicePlanSearch.size() > 0)
+			{
+				servicePlanRecord = zoho.crm.getRecordById("Service_Plans",servicePlanSearch.get(0).get("id"));
+				// info servicePlanRecord;
+			}
+			if(servicePlanRecord != null)
+			{
+				templatesSubform = servicePlanRecord.get("Template_Mappings");
+				info templatesSubform;
+				if(templatesSubform != null)
+				{
+					// --- SEARCH TIER 1: Match Specific Language ---
+					for each  templateEntry in templatesSubform
+					{
+						if(templateEntry.get("Language") == language && templateEntry.get("Event_Type") == eventType)
+						{
+							templateUrl = templateEntry.get("Template");
+							info "Specific template found.";
+							break;
+						}
+					}
+					// --- SEARCH TIER 2: Match Fallback Language if no specific match was found ---
+					if(templateUrl == null && language != fallbackLanguage)
+					{
+						for each  templateEntry in templatesSubform
+						{
+							if(templateEntry.get("Language") == fallbackLanguage && templateEntry.get("Event_Type") == eventType)
+							{
+								templateUrl = templateEntry.get("Template");
+								info "Specific template not found. Using fallback template for language 'en'";
+								break;
+							}
+						}
+					}
+				}
+			}
+			if(templateUrl != null)
+			{
+				parts = templateUrl.toList("/");
+				templateId = parts.get(4);
+				// Index 4 of the template url contains the template ID
+				info templateId;
+				info "Template ID: " + templateId;
+			}
+			// Add the found template ID (or null) to the map
+			finalTemplateMap.put(eventType,templateId);
+			// Get the ID from the map
+			if(templateId != null)
+			{
+				info "Found template ID " + templateId + " for event: " + eventType + " and language: " + language;
+				// Determine the recipient
+				finalRecipientEmail = if(eventType == "API Token Activation" && accountApiRecipient != null && accountApiRecipient != "",accountApiRecipient,email);
+				// Build the payload
+				mailerSendPayload = Map();
+				mailerSendPayload.put("from",{"email":"support@cordulus.com"});
+				mailerSendPayload.put("to",{{"email":finalRecipientEmail}});
+				mailerSendPayload.put("bcc",{{"email":"q0dz604t_8u6v36af@mails2.eu.zohocrm.com"}});
+				mailerSendPayload.put("template_id",templateId);
+				personalizationData = Map();
+				personalizationData.put("firstName",firstName);
+				personalizationData.put("lastName",lastName);
+				personalizationData.put("email",finalRecipientEmail);
+				if(eventType == "Account Activation")
+				{
+					personalizationData.put("password",password);
+					personalizationData.put("accountName",accountName);
+				}
+				else if(eventType == "API Token Activation")
+				{
+					personalizationData.put("accountName",accountName);
+					personalizationData.put("apiKey",apiKey);
+				}
+				mailerSendPayload.put("personalization",{{"email":finalRecipientEmail,"data":personalizationData}});
+				// Call the MailerSend connector
+				emailResponse = standalone.delugeMailersendConnector(mailerSendPayload);
+				if(emailResponse.get("success"))
+				{
+					info "Email for '" + eventType + "' sent successfully!";
+				}
+			}
+			else
+			{
+				info "Could not find a template for event type '" + eventType + "'. Skipping email.";
+				errorMessage = "CRITICAL: Could not find a template for event type '" + eventType + "' in " + functionName + ".";
+				standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage);
+			}
+		}
+	}
+	else
+	{
+		info "Skipping activation email: No new password or API key was generated.";
+	}
+}
+catch (e)
+{
+	// Final safety net
+	errorMessage = "CRITICAL: An unexpected, unhandled error occurred in " + functionName + ". Details: " + e;
+	standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage);
+	return "{\"crmAPIResponse\":{\"status_code\":500,\"body\":{\"code\":\"failure\",\"message\":\"" + errorMessage + "\"}}}";
+}
+info "Workflow completed successfully.";
+successMessage = "Workspace and permissions handler completed successfully for customer ID: " + customerId;
+return "{\"crmAPIResponse\":{\"status_code\":200,\"body\":{\"code\":\"success\",\"message\":\"" + successMessage + "\"}}}";
+}
