@@ -1,0 +1,106 @@
+// Define variables
+org_id = organization.get("organization_id");
+subscription_id = subscriptions.get("subscription_id");
+custom_fields = subscriptions.get("custom_fields");
+info "Custom Fields: " + custom_fields;
+for each  custom_field in custom_fields
+{
+	if(custom_field.get("label") == "Partial Cancellation")
+	{
+		partial_cancellation_value = custom_field.get("value_formatted").toNumber();
+	}
+	else if(custom_field.get("label") == "Partial Cancellation Time")
+	{
+		partial_cancellation_time_value = custom_field.get("value_formatted");
+		info "Partial Cancellation Time Value: " + partial_cancellation_time_value;
+		if(partial_cancellation_time_value == "End of Term")
+		{
+			end_of_term = TRUE;
+		}
+	}
+}
+info "Partial Cancellation Value: " + partial_cancellation_value;
+info "Cancel at End: " + end_of_term;
+// Check if the Partial Cancellation field is filled
+if(partial_cancellation_value != null)
+{
+	// Fetch the details of the existing subscription
+	// Extract necessary details from the original subscription
+	plan_code = subscriptions.get("plan").get("plan_code");
+	line_items = subscriptions.get("line_items");
+	for each  line_item in line_items
+	{
+		if(line_item.get("name").contains("Cordulus Farm"))
+		{
+			quantity = line_item.get("quantity").toNumber();
+			info "Quantity: " + quantity;
+		}
+	}
+	activated_at = subscriptions.get("activated_at");
+	new_quantity = quantity - partial_cancellation_value;
+	info "New Quantity: " + new_quantity;
+	update_subscription_data = Map();
+	// Prepare the plan map
+	update_plan_map = Map();
+	update_plan_map.put("plan_code",plan_code);
+	update_plan_map.put("quantity",new_quantity);
+	// Prepare the first custom field
+	update_custom_fields = List();
+	custom_field_1 = Map();
+	custom_field_1.put("label","Partial Cancellation");
+	custom_field_1.put("value","0");
+	update_custom_fields.add(custom_field_1);
+	// Second custom field
+	custom_field_2 = Map();
+	custom_field_2.put("label","Partial Cancellation Time");
+	custom_field_2.put("value",null);
+	update_custom_fields.add(custom_field_2);
+	// Add custom fields to the subscription data
+	update_subscription_data.put("custom_fields",update_custom_fields);
+	// Add plan map to the subscription data
+	update_subscription_data.put("plan",update_plan_map);
+	// Update the subscription
+	update_quantity = zoho.billing.update("subscriptions",org_id,subscription_id,update_subscription_data,"zohobilling");
+	// info "New Subscription ID: " + new_subscription_id;
+	// info "Update Quantity: " + update_quantity;
+	// Prepare the new subscription data
+	new_subscription_data = Map();
+	new_subscription_data.put("customer_id",subscriptions.get("customer_id"));
+	new_subscription_data.put("starts_at",activated_at);
+	new_subscription_data.put("auto_collect",FALSE);
+	new_subscription_data.put("notes","[SYSTEM NOTE] PARTIAL CANCELLATION");
+	new_subscription_data.put("create_backdated_invoice",TRUE);
+	new_plan_map = Map();
+	new_plan_map.put("plan_code",plan_code);
+	new_plan_map.put("quantity",partial_cancellation_value);
+	new_subscription_data.put("plan",new_plan_map);
+	// Create the new subscription
+	create_response = zoho.billing.create("subscriptions",org_id,new_subscription_data,"zohobilling");
+	// info "New Subscription: " + create_response;
+	new_subscription_id = create_response.get("subscription").get("subscription_id");
+	// Move the new subscription to Cancelled
+	headersMap = Map();
+	headersMap.put("Content-Type","application/json");
+	headersMap.put("X-ZOHO-Execute-CustomFunction","true");
+	cancel_response = invokeurl
+	[
+		url :"https://www.zohoapis.eu/billing/v1/subscriptions/" + new_subscription_id + "/cancel"
+		type :POST
+		parameters:{"cancel_at_end":end_of_term}
+		headers:headersMap
+		connection:"zohobilling"
+	];
+	info "Cancel Response: " + cancel_response;
+	if(cancel_response.get("code") == 0)
+	{
+		info "Partial Cancellation handled successfully. New subscription created and cancelled.";
+	}
+	else
+	{
+		info "Error cancelling the new subscription: " + cancel_response.get("message");
+	}
+}
+else
+{
+	info "Error creating the new subscription: " + create_response.get("message");
+}
