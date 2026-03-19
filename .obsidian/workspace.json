@@ -196,6 +196,11 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeResolveRaQPricing/delugeResolveRaQPricing.ds",
+    "scripts/delugeResolveRaQPricing/delugeResolveRaQPricing.md",
+    "scripts/delugeResolveRaQPricing",
+    "scripts/delugeMirrorDataExportHandler/delugeMirrorDataExportHandler.ds",
+    "scripts/delugeMirrorDataExportHandler",
     "scripts/Subscriptionresurrection/Subscriptionresurrection.md",
     "scripts/Subscriptionresurrection/Subscriptionresurrection.ds",
     "scripts/Subscriptionresurrection",
@@ -212,12 +217,9 @@
     "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
     "Validation Rules/Contact Email Validation (on creating or editing Contact)/delugeVerifyEmailInPopulace.md",
     "Revenue and Finance/Invoicing Automation",
-    "Revenue and Finance/Data Exports/KPIs",
-    "Revenue and Finance/Data Exports/Invoicing",
     "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
     "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.md",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
-    "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.ds",
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT03/delugeWAT03.md",
@@ -229,8 +231,6 @@
     "Clean-Up/Delete Visits (> 365 Days)/delugeDeleteVisitsOlderThan365Days.md",
     "Related Lists/Show Account's Daggers Subscriptions/delugeDaggersSubscriptions.md",
     "Support/Cancellation/Update Ticket with Churn Reason/delugeChurnReasonUpdate.md",
-    "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
-    "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
-    "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md"
+    "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md"
   ]
 }
