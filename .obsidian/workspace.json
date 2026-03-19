@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Price List Updates/delugeUpdateConversionPricing.md",
+                "file": "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Renewal Cycle Updates/delugeUpdateConversionPricing.md",
                 "mode": "source",
                 "source": false
               },
@@ -194,9 +194,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
-    "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Price List Updates/delugeUpdateConversionPricing.md",
+    "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Renewal Cycle Updates/delugeUpdateConversionPricing.md",
     "Clean-Up",
     "Acquisition and Onboarding/Marketing/ActiveCampaign",
     "Support/Cancellation",
