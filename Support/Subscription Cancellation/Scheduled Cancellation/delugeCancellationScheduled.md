@@ -24,10 +24,10 @@ The `delugeCancellationScheduled` script is an automation triggered within the Z
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service | Purpose | Criticality |
-| --- | --- | --- |
-| [[Zoho Desk API]] | Used to search for existing contacts and create new tickets. | High |
-| [[Zoho Subscriptions]] | Source of the trigger and subscription metadata. | High |
+| Function / Service | Purpose                                                      | Criticality |
+| ------------------ | ------------------------------------------------------------ | ----------- |
+| Zoho Desk API      | Used to search for existing contacts and create new tickets. | High        |
+| Zoho Subscriptions | Source of the trigger and subscription metadata.             | High        |
 
 ## Logic Flow
 The script follows a linear path from data extraction to external record creation.
