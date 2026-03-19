@@ -1,0 +1,20 @@
+void automation.delugeTriggerDeletePopulaceWorkspace(Int accountId, String workspaceId)
+{
+// 1. Only proceed if a Workspace ID was passed from the workflow 
+if(workspaceId != null && workspaceId != "")
+{
+	// 2. Build the payload for the connector
+	// The payload only needs the workspaceId for the connector to build the URL
+	payload = Map();
+	payload.put("workspaceId",workspaceId);
+	payload.put("accountId",accountId);
+	// 3. Call the standalone connector with the 'deleteWorkspace' action ---
+	info "Triggering Populace workspace deletion for Account ID: " + accountId;
+	response = standalone.delugePopulaceConnector("deleteWorkspace",payload);
+	info "Delete Populace Workspace response: " + response;
+}
+else
+{
+	info "Skipping deletion: No Populace Workspace ID found on deleted Account ID: " + accountId;
+}
+}
