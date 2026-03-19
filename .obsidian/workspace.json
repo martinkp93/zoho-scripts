@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Account)/delugeWAT02.md",
+                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeWAT02"
+              "title": "delugeWorkspaceAndPermissionsHandler"
             }
           }
         ]
@@ -194,8 +194,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Account)/delugeWAT02.md",
     "scripts/delugeWeatherStationQuantityUpdate/delugeWeatherStationQuantityUpdate.ds",
     "scripts/delugeWeatherStationQuantityUpdate/delugeWeatherStationQuantityUpdate.md",
     "scripts/delugeWeatherStationQuantityUpdate",
@@ -205,7 +206,6 @@
     "scripts/delugePostponeTo1JanOnNewOrders/delugePostponeTo1JanOnNewOrders.ds",
     "scripts/delugePostponeTo1JanOnNewOrders",
     "Watchtower/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md",
-    "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Account)/delugeWAT02.md",
     "Support/Subscription Cancellation/Scheduled Cancellation/delugeCancellationScheduled.md",
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
@@ -216,7 +216,6 @@
     "Support/Subscription Cancellation/Partial Cancellation/delugePartialCancellation.md",
     "Support/Subscription Cancellation/Partial Cancellation/delugePartialCancellation.ds",
     "Support/Subscription Cancellation/Partial Cancellation",
-    "Support/Subscription Cancellation/Scheduled Cancellation Removed/delugeCancellationScheduledRemoved.ds",
     "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md",
     "scripts/Deluge_ Partial Cancellation/Deluge_ Partial Cancellation.md",
     "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.md",
