@@ -1,0 +1,16 @@
+void automation.delugeSyncActiveCampaignContact(Int contactId, Int accountId, String firstName, String lastName, String email, String country, String activeCampaignContactId)
+{
+if(activeCampaignContactId == "")
+{
+	tags = {"Customer","Employee"};
+	info "Calling ActiveCampaign Handler";
+	syncAcContactResp = standalone.delugeActiveCampaignHandler(contactId.toLong(),accountId.toLong(),firstName,lastName,email,country,null,tags,null,null,null,null,null,null,null,null);
+	info "ActiveCampaign Handler response: " + syncAcContactResp;
+}
+if(syncAcContactResp.get("acContactId") != null)
+{
+	updateContactMap = Map();
+	updateContactMap.put("ActiveCampaign_Contact_Id",syncAcContactResp.get("acContactId"));
+	updateContactResp = zoho.crm.updateRecord("Contacts",contactId,updateContactMap);
+}
+}
