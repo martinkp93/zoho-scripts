@@ -26,17 +26,17 @@ Its core role is to ensure that a customer's physical CRM state (Accounts/Contac
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service | Purpose | Criticality |
-| --- | --- | --- |
-| [[delugeFeatureAggregator]] | Calculates the total sum of entitlements based on all active subscriptions. | High |
-| [[delugePopulaceConnector]] | Manages User and Workspace creation/updates in the Populace identity service. | High |
-| [[delugeDaggersConnector]] | Synchronizes subscription states with the Daggers internal API. | High |
-| [[delugeTicketsConnector]] | Generates passwords and API Keys for system access. | Medium |
-| [[delugeSchlechtwetterConnector]] | Manages access to the specialized Schlechtwetter API service. | Low |
-| [[delugeCroplineMembershipHandler]] | Retrieves designated Admin IDs for distributor-specific memberships. | Medium |
-| [[delugeActiveCampaignHandler]] | Adds users to specific onboarding email lists. | Medium |
-| [[delugeMailersendConnector]] | Sends transactional activation emails to the end-user. | Medium |
-| [[delugeSendErrorAlert]] | Sends critical failure notifications to Slack/Monitoring. | High |
+| Function / Service                  | Purpose                                                                       | Criticality |
+| ----------------------------------- | ----------------------------------------------------------------------------- | ----------- |
+| [[delugeFeatureAggregator]]         | Calculates the total sum of entitlements based on all active subscriptions.   | High        |
+| [[delugePopulaceConnector]]         | Manages User and Workspace creation/updates in the Populace identity service. | High        |
+| [[delugeDaggersConnector]]          | Synchronizes subscription states with the Daggers internal API.               | High        |
+| [[delugeTicketsConnector]]          | Generates passwords and API Keys for system access.                           | Medium      |
+| [[delugeSchlechtwetterConnector]]   | Manages access to the specialized Schlechtwetter API service.                 | Low         |
+| [[delugeCroplineMembershipHandler]] | Retrieves designated Admin IDs for distributor-specific memberships.          | Medium      |
+| [[delugeActiveCampaignHandler]]     | Adds users to specific onboarding email lists.                                | Medium      |
+| [[delugeMailersendConnector]]       | Sends transactional activation emails to the end-user.                        | Medium      |
+| [[delugeSendErrorAlert]]            | Sends critical failure notifications to Slack/Monitoring.                     | High        |
 
 ## Logic Flow
 
