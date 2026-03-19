@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
+                "file": "scripts/delugeWAT02/delugeWAT02.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeSyncActiveCampaignContact"
+              "title": "delugeWAT02"
             }
           }
         ]
@@ -194,17 +194,18 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
     "scripts/delugeTriggerRenewalsAndNewSalesExportHandler/delugeTriggerRenewalsAndNewSalesExportHandler.ds",
     "scripts/delugeTriggerRenewalsAndNewSalesExportHandler/delugeTriggerRenewalsAndNewSalesExportHandler.md",
     "scripts/delugeTriggerRenewalsAndNewSalesExportHandler",
-    "scripts/delugeTieredDiscountsHandler/delugeTieredDiscountsHandler.md",
-    "scripts/delugeDuplicateBlueprint/delugeDuplicateBlueprint.md",
-    "scripts/delugeDuplicateBlueprint/delugeDuplicateBlueprint.ds",
-    "scripts/delugeDuplicateBlueprint",
-    "scripts/delugeTieredDiscountsHandler/delugeTieredDiscountsHandler.ds",
-    "scripts/delugeTieredDiscountsHandler",
+    "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker/delugeTieredDiscountsHandler.md",
+    "Watchtower/Duplicate Zoho Desk Blueprint/delugeDuplicateBlueprint.md",
+    "Watchtower/Duplicate Zoho Desk Blueprint/delugeDuplicateBlueprint.ds",
+    "Watchtower/Duplicate Zoho Desk Blueprint",
+    "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker/delugeTieredDiscountsHandler.ds",
+    "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker",
     "Acquisition and Onboarding/Lead Generation/Zapier",
     "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
     "Support/Chat",
@@ -216,7 +217,6 @@
     "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler",
     "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.md",
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.md",
-    "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.ds",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Resolve Request a Quote Pricing (for ActiveCampaign)/delugeResolveRaQPricing.md",
     "scripts/Subscription Resurrection Handler/Subscriptionresurrection.md",
     "Revenue and Finance/Conversion Pricing/Price List Pricing Handler/delugePriceListPricingHandler.md",
@@ -226,7 +226,6 @@
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Handler/delugeInvoicingDataExportHandler.md",
     "Environment Lifecycle/Update/Move User to another Workspace/delugeMoveUserToOtherWorkspace.md",
     "Validation Rules/Contact Email Validation (on creating or editing Contact)/delugeVerifyEmailInPopulace.md",
-    "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md",
     "scripts/delugeWAT02/delugeWAT02.md",
