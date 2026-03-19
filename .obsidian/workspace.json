@@ -196,6 +196,10 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "scripts/delugeWAT02/delugeWAT02.md",
+    "scripts/delugeWAT02/delugeWAT02.ds",
+    "scripts/delugeWAT02",
+    "scripts",
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Sales Sprint Updates/delugeUpdatePurchaseConversionsUpcomingRenewalDetails1.md",
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Sales Sprint Updates/delugeUpdatePurchaseConversionsUpcomingRenewalDetails1.ds",
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Sales Sprint Updates",
@@ -205,9 +209,6 @@
     "Support/Cancellation",
     "Support",
     "Revenue and Finance/Price Increases",
-    "Revenue and Finance/Data Exports",
-    "Revenue and Finance/Conversion Pricing",
-    "Revenue and Finance",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Update ActiveCampaign Contact Email/delugeSyncActiveCampaignContactEmail.md",
     "Clean-Up/Delete Visits (> 365 Days)/delugeDeleteVisitsOlderThan365Days.md",
     "Related Lists/Show Account's Daggers Subscriptions/delugeDaggersSubscriptions.md",
@@ -230,7 +231,6 @@
     "Schlechtwetter Service/Schlechtwetter Schedule/delugeSchlechtwettertageSchedule.md",
     "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.md",
     "Environment Lifecycle/Create/Create SectorWeather Series Subscription/delugeTriggerCreateSectorWeatherWorkspaceSeries.md",
-    "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.md",
-    "Environment Lifecycle/Update/Update SectorWeather Series/delugeTriggerUpdateSectorWeatherSeries.md"
+    "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.md"
   ]
 }
