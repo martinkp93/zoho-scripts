@@ -25,13 +25,13 @@ The `delugeTrialHandler` script manages the entry point for users requesting a t
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service                           | Purpose                                                                 | Criticality |
-| -------------------------------------------- | ----------------------------------------------------------------------- | ----------- |
-| [[delugeSendErrorAlert]]                     | Reports failures to the developer team via email/Slack.                 | High        |
-| [[delugeEmailTemplateHandler]]               | Retrieves specific MailerSend template IDs based on event and language. | Medium      |
-| [[delugeMailersendConnector]]                | Dispatches transactional emails through the MailerSend API.             | Medium      |
-| Zoho Billing API                             | Manages customer records and subscription provisioning.                 | High        |
-| [[triggerWorkspaceAndPermissionsHandlerCrm]] | Downstream function in Z                                                |             |
+| Function / Service                           | Purpose                                                                                | Criticality |
+| -------------------------------------------- | -------------------------------------------------------------------------------------- | ----------- |
+| [[delugeSendErrorAlert]]                     | Reports failures to the developer team via email/Slack.                                | High        |
+| [[delugeEmailTemplateHandler]]               | Retrieves specific MailerSend template IDs based on event and language.                | Medium      |
+| [[delugeMailersendConnector]]                | Dispatches transactional emails through the MailerSend API.                            | Medium      |
+| Zoho Billing API                             | Manages customer records and subscription provisioning.                                | High        |
+| [[triggerWorkspaceAndPermissionsHandlerCrm]] | Downstream function in Zoho Billing that triggers the `workspaceAndPermissionsHandler` | High        |
 
 ## Logic Flow
 
