@@ -1,0 +1,25 @@
+string standalone.delugeGetWorkspaceIdsForSchlechtwetterAccounts()
+{
+responseCode = 200;
+code = "success";
+responseMessage = "Script executed successfully";
+workspaceIds = List();
+accounts = zoho.crm.searchRecords("Accounts","(Schlechtwettertage:equals:true)");
+info "Accounts: " + accounts;
+if(accounts.size() < 0)
+{
+	return {"crmAPIResponse":{"status_code":200,"body":{"code":"success","message":"No accounts found with Schlechtwetter enabled.","workspaceIds":null,"accounts":accounts}}};
+}
+else if(accounts.contains("status") && accounts.get("status") == "error")
+{
+	return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":accounts.get("code"),"reason":accounts.get("details")}}};
+}
+for each  account in accounts
+{
+	workspaceId = account.get("Kanisa_Farm_ID");
+	workspaceIds.add(workspaceId);
+}
+//------------------ Success Response ------------------//
+// Returns success response to Cordulus backend, after which the Schlechtwetter REST API function is called by the backend
+return {"crmAPIResponse":{"status_code":responseCode,"body":{"code":code,"message":responseMessage,"workspaceIds":workspaceIds}}};
+}
