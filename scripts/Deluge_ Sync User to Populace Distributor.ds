@@ -1,0 +1,13 @@
+void automation.delugeSyncUserToPopulaceDistributor(String userId,String distributorId,String watchtowerAccess)
+{
+// 1. Only continue if Contact has a Distributor and a Populace userId.
+if(distributorId != null && userId != null)
+{
+	// 2. Determine the action based on the 'watchtowerAccess' picklist value
+	action = if(watchtowerAccess.equalsIgnoreCase("Active"),"addUserToDistributor","removeUserFromDistributor");
+	payload = {"userId":userId,"distributorId":distributorId};
+	info "Triggering Populace Connector with Action '" + action + "' for userId " + userId + " and distributorId " + distributorId;
+	// 3. Call the standalone function
+	response = standalone.delugePopulaceConnector(action,payload);
+}
+}

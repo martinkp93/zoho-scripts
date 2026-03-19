@@ -1,0 +1,365 @@
+string standalone.delugeSubscriptionHandler(String crmAPIRequest)
+{
+functionName = "delugeSubscriptionHandler";
+crmAPIRequestForCatch = if(crmAPIRequest != null,crmAPIRequest,"");
+try 
+{
+	map = Map();
+	info "--- Starting New Subscription Handler ---";
+	// Initialisation: Retrieve and Validate Webhook Data 
+	if(crmAPIRequest == null || crmAPIRequest.trim() == "")
+	{
+		errorMessage = "CRITICAL: The incoming request (crmAPIRequest) is null or empty. Halting execution.";
+		info "❌ " + errorMessage;
+		standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",map.toString(),errorMessage);
+		return errorMessage;
+	}
+	crmAPIRequestMap = crmAPIRequest.toMap();
+	body = crmAPIRequestMap.get("body");
+	info body;
+	if(body == null || body.isEmpty())
+	{
+		errorMessage = "CRITICAL: The 'body' of the request is null or empty. Halting execution.";
+		info "❌ " + errorMessage;
+		standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",map.toString(),errorMessage);
+		return errorMessage;
+	}
+	// Initialise variables
+	distributorId = body.get("distributorId");
+	invoicedById = body.get("invoicedById");
+	distributorName = body.get("distributorName");
+	priceListId = body.get("priceListId");
+	customerAccountId = body.get("customerId");
+	customerEmail = body.get("customerEmail");
+	phone = body.get("phone");
+	companyName = body.get("companyName");
+	vatNumber = body.get("vatNumber");
+	firstName = body.get("firstName");
+	lastName = body.get("lastName");
+	street1 = body.get("street1");
+	street2 = body.get("street2");
+	city = body.get("city");
+	state = body.get("state");
+	zip = body.get("zip");
+	country = body.get("country");
+	notes = body.get("notes");
+	subscriptionProductId = body.get("subscriptionProductId");
+	subscriptionProductName = body.get("subscriptionProductName");
+	subscriptionPrice = body.get("subscriptionPrice");
+	addons = body.get("selectedAddons");
+	subscriptionPlanCode = body.get("subscriptionPlanCode");
+	quantity = body.get("quantity");
+	currency = body.get("currency");
+	startDate = body.get("startDate");
+	campaignId = if(body.get("campaignId") != "NO_CAMPAIGN",body.get("campaignId"),null);
+	campaignName = if(body.get("campaignName") != "No Campaign",body.get("campaignName"),null);
+	postponedDeliveryDate = body.get("postponedDeliveryDate");
+	postponedNextRenewalDate = body.get("postponedNextRenewalDate");
+	submitToFulfilment = body.get("submitToFulfilment");
+	internalCustomerId = body.get("internalCustomerId");
+	apiRecipientFirstName = body.get("apiRecipientFirstName");
+	apiRecipientLastName = body.get("apiRecipientLastName");
+	apiRecipientEmail = body.get("apiRecipientEmail");
+	sellerEmail = body.get("sellerEmail");
+	sellerFirstName = body.get("sellerFirstName");
+	sellerLastName = body.get("sellerLastName");
+	// 
+	info "[LOG] Received request for Company: " + companyName + ", Email: " + customerEmail;
+	// --- Step 1 & 2: Find or Create Customer in Zoho Billing ---
+	//
+	info "[LOG] Step 2 & 3: Finding or creating customer for email: " + customerEmail;
+	params = Map();
+	params.put("email",customerEmail);
+	findBillingCustomerResp = invokeurl
+	[
+		url :"https://www.zohoapis.eu/billing/v1/customers"
+		type :GET
+		parameters:params
+		detailed:true
+		connection:"zohobillingconnection"
+	];
+	if(findBillingCustomerResp.get("responseCode") != 200)
+	{
+		errorMessage = "API ERROR: Failed to search for customers in Zoho Billing. Response: " + findBillingCustomerResp;
+		info "❌ " + errorMessage;
+		standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",body.toString(),errorMessage);
+		return errorMessage;
+	}
+	findBillingCustomer = findBillingCustomerResp.get("responseText");
+	customerId = null;
+	if(findBillingCustomer.get("customers").isEmpty())
+	{
+		info "[LOG] No existing customer found. Creating a new one.";
+		newCustomerMap = {"display_name":companyName,"company_name":companyName,"first_name":firstName,"last_name":lastName,"email":customerEmail,"phone":phone,"billing_address":{"country":country}};
+		createCustomerResp = invokeurl
+		[
+			url :"https://www.zohoapis.eu/billing/v1/customers"
+			type :POST
+			parameters:newCustomerMap.toString()
+			detailed:true
+			connection:"zohobillingconnection"
+		];
+		info "Create New Billing Customer payload: " + newCustomerMap;
+		// info "Create Customer Response: " + createCustomerResp;
+		if(createCustomerResp.get("responseCode") != 201)
+		{
+			errorMessage = "API ERROR: Failed to create new customer in Zoho Billing. Response: " + createCustomerResp;
+			info "❌ " + errorMessage;
+			standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",body.toString(),errorMessage);
+			return errorMessage;
+		}
+		customerInfo = createCustomerResp.get("responseText").get("customer");
+		customerId = customerInfo.get("customer_id");
+		info "[LOG] Successfully created new customer with ID: " + customerId;
+	}
+	else
+	{
+		info "[LOG] Found existing customer.";
+		customerId = findBillingCustomer.get("customers").get(0).get("customer_id");
+	}
+	info "[LOG] Using Customer ID: " + customerId;
+	//
+	// --- Step 4: Create Subscription ---
+	//
+	info "[LOG] Step 4: Creating subscription for Customer ID: " + customerId;
+	subscriptionMap = {"customer_id":customerId,"plan":{"plan_code":subscriptionPlanCode,"quantity":quantity},"starts_at":startDate,"auto_collect":false};
+	createSubscriptionResp = invokeurl
+	[
+		url :"https://www.zohoapis.eu/billing/v1/subscriptions"
+		type :POST
+		parameters:subscriptionMap.toString()
+		detailed:true
+		connection:"zohobillingconnection"
+	];
+	if(createSubscriptionResp.get("responseCode") != 201)
+	{
+		errorMessage = "API ERROR: Failed to create subscription in Zoho Billing. Response: " + createSubscriptionResp;
+		info "❌ " + errorMessage;
+		standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",body.toString(),errorMessage);
+		return errorMessage;
+	}
+	createSubscriptionRespMap = createSubscriptionResp.get("responseText");
+	productName = createSubscriptionRespMap.get("subscription").get("product_name");
+	info "[LOG] Successfully created Subscription. ID: " + createSubscriptionRespMap.get("subscription").get("subscription_id");
+	if(distributorName == "Ceravis AG")
+	{
+		startMonth = createSubscriptionRespMap.get("subscription").get("start_date").month();
+		nextBillingYear = createSubscriptionRespMap.get("subscription").get("next_billing_at").year() + 1;
+		postponedNextRenewalDate = if(startMonth.toString() != "1",nextBillingYear + "-01-01",null);
+	}
+	if(postponedNextRenewalDate != null && postponedNextRenewalDate != "")
+	{
+		postponeMap = Map();
+		postponeMap.put("renewal_at",postponedNextRenewalDate);
+		postponeRenewalResp = invokeurl
+		[
+			url :"https://www.zohoapis.eu/billing/v1/subscriptions/" + createSubscriptionRespMap.get("subscription").get("subscription_id") + "/postpone"
+			type :POST
+			parameters:postponeMap.toString()
+			detailed:true
+			connection:"zohobillingconnection"
+		];
+	}
+	if(postponeRenewalResp != null && postponeRenewalResp.get("responseText").get("code") != 0)
+	{
+		errorMessage = "API ERROR: Failed to postpone next renewal date in Zoho Billing. Response: " + postponeRenewalResp;
+		info "❌ " + errorMessage;
+		standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",body.toString(),errorMessage);
+		return errorMessage;
+	}
+	info "[LOG] Successfully postponed next renewal date to " + postponedNextRenewalDate + " for Subscription. ID: " + createSubscriptionRespMap.get("subscription").get("subscription_id");
+	// --- All critical steps are now complete. The following steps will log warnings on failure but will not halt execution. ---
+	//
+	// --- Step 5: Update Account in Zoho CRM ---
+	//
+	zcrmAccId = null;
+	if(createSubscriptionRespMap.get("subscription") != null && createSubscriptionRespMap.get("subscription").get("customer") != null)
+	{
+		zcrmAccId = createSubscriptionRespMap.get("subscription").get("customer").get("zcrm_account_id");
+	}
+	if(zcrmAccId != null)
+	{
+		info "[LOG] Step 5: Updating Zoho CRM Account ID: " + zcrmAccId;
+		updateAccMap = {"id":zcrmAccId,"CVR_VAT_number":vatNumber,"Distributor_Lookup":distributorId,"Invoiced_By_Lookup":invoicedById,"Billing_Street":street1,"Shipping_Street":street1,"Billing_Code":zip,"Shipping_Code":zip,"Billing_City":city,"Shipping_City":city,"Billing_State":state,"Shipping_State":state,"Billing_Country":country,"Shipping_Country":country,"Danish_Agro_ID":internalCustomerId,"Email_API_Recipient":apiRecipientEmail};
+		updateAccountResp = zoho.crm.updateRecord("Accounts",zcrmAccId,updateAccMap);
+		info "[LOG] CRM Account update response: " + updateAccountResp;
+		if(updateAccountResp.get("id") == null)
+		{
+			info "[WARN] Failed to update Account in CRM. ZCRM Account ID: " + zcrmAccId + ". Response: " + updateAccountResp;
+		}
+	}
+	else
+	{
+		info "[WARN] Could not update Account in CRM because ZCRM Account ID is null.";
+	}
+	//
+	// --- Step 6: Create Purchase Conversion and Sales Order ---
+	//
+	createConversionResp = null;
+	allowedProducts = {"Cordulus Farm","Cordulus FarmInfrastructure","Cordulus Farm Connect","Cordulus Road","Cordulus Miscellaneous","SectorWeather"};
+	if(zcrmAccId != null && allowedProducts.contains(productName) && !subscriptionPlanCode.contains("TEST"))
+	{
+		productsList = null;
+		addonsList = null;
+		overridePricing = false;
+		currentCycle = 0;
+		if(subscriptionPrice != "")
+		{
+			pricingResponse = standalone.delugeConversionCustomPricingHandler(subscriptionProductId,subscriptionPrice,addons,country,currentCycle);
+			if(pricingResponse.get("success"))
+			{
+				productsList = pricingResponse.get("productsList");
+				addonsList = pricingResponse.get("addonsList");
+				overridePricing = true;
+			}
+		}
+		info "[LOG] Step 6: Creating Purchase Conversion record.";
+		createConversionMap = {"Layout":520877000144985005,"Name":"Purchase Conversion","Account":zcrmAccId,"Related_Distributor":distributorId,"Related_Invoiced_By":invoicedById,"Sales_Sprint_Active":campaignId,"Related_Price_List":priceListId,"Subscription_ID":createSubscriptionRespMap.get("subscription").get("subscription_id"),"Quantity_Sold":quantity,"Product_Name":createSubscriptionRespMap.get("subscription").get("plan").get("name"),"Product_Code":subscriptionPlanCode,"Order_Notes":notes,"Conversion_Date":createSubscriptionRespMap.get("subscription").get("created_at"),"Subscription_Start_Date":createSubscriptionRespMap.get("subscription").get("activated_at"),"Seller_Name":sellerFirstName + " " + sellerLastName,"Seller_Email":sellerEmail,"Renewal_Cycle":0,"Related_Products":productsList,"Related_Addons":addonsList,"Currency":currency,"Override_Pricing":overridePricing};
+		info createConversionMap;
+		createConversionResp = zoho.crm.createRecord("Conversions",createConversionMap,{"trigger":{"workflow"}});
+		info "[LOG] Create Conversion response: " + createConversionResp;
+		if(createConversionResp.get("id") == null)
+		{
+			errorMessage = "API ERROR: Failed to create new Purchase Conversion in Zoho CRM. Response: " + createConversionResp;
+			info "❌ " + errorMessage;
+			standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",body.toString(),errorMessage);
+			info "[WARN] Failed to create Conversion record in CRM. Response: " + createConversionResp;
+		}
+	}
+	zISalesOrderLink = "";
+	if(createConversionResp != null && createConversionResp.get("id") != null && subscriptionProductName.contains("Cordulus Farm") && !subscriptionProductName.contains("Connect"))
+	{
+		info "[LOG] Creating Sales Order via CRM function.";
+		createSalesOrderMap = {"account_id":zcrmAccId,"distributor_id":distributorId,"inventory_customer_id":customerId,"quantity":quantity,"purchase_conversion_id":createConversionResp.get("id"),"country":country,"product_name":subscriptionProductName};
+		createSalesOrderResp = invokeurl
+		[
+			url :"https://www.zohoapis.eu/crm/v7/functions/getwarehousedetails/actions/execute?auth_type=apikey&zapikey=1003.c5192d624404f83bf8f765b86547a6ad.ea4c6ae061ec5d3a043a481ccf09165f"
+			type :POST
+			body:createSalesOrderMap.toString()
+			headers:{"contentType":"application/json"}
+			detailed:true
+		];
+		if(createSalesOrderResp.get("responseCode") == 200)
+		{
+			details = createSalesOrderResp.get("responseText").get("details");
+			if(details != null && details.get("output") != null)
+			{
+				outputMap = details.get("output").toMap();
+				if(outputMap.get("data") != null && outputMap.get("data").get("Sales_Order_ID") != null)
+				{
+					salesOrderId = outputMap.get("data").get("Sales_Order_ID");
+					zISalesOrderLink = "Sales Order: <https://inventory.zoho.eu/app/20087400261#/salesorders/" + salesOrderId + "|" + salesOrderId + ">";
+					info "[LOG] Successfully created Sales Order: " + salesOrderId;
+				}
+			}
+		}
+		else
+		{
+			errorMessage = "API ERROR: Failed to create new Sales Order in Zoho Inventory. Response: " + createSalesOrderResp;
+			info "❌ " + errorMessage;
+			standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",body.toString(),errorMessage);
+			info "[WARN] Failed to create Sales Order. Response: " + createSalesOrderResp;
+		}
+	}
+	//
+	// --- Step 7: Send Slack notification ---
+	//
+	info "[LOG] Step 7: Sending Slack notification.";
+	if(!subscriptionProductName.contains("Cropline"))
+	{
+		newLine = "\n";
+		zcrmAccountLink = "Account: <https://crm.zoho.eu/crm/org20087400242/tab/Accounts/" + zcrmAccId + "|" + companyName + ">";
+		zcrmDistributorLink = "Distributor: <https://crm.zoho.eu/crm/org20087400242/tab/Accounts/" + distributorId + "|" + distributorName + ">";
+		zcrmSalesSprintLink = "";
+		if(campaignName != null && campaignName != "")
+		{
+			zcrmSalesSprintLink = "Sales Sprint: <https://crm.zoho.eu/crm/org20087400242/tab/CustomModule7/" + campaignId + "|" + campaignName + ">";
+		}
+		slackText = "Subscription Activation Successful" + newLine + zcrmAccountLink + newLine + "Email: " + customerEmail + newLine + "Product: " + subscriptionProductName + newLine + zcrmDistributorLink + newLine + "Quantity: " + quantity;
+		if(zcrmSalesSprintLink != "")
+		{
+			slackText = slackText + newLine + zcrmSalesSprintLink;
+		}
+		if(zISalesOrderLink != "")
+		{
+			slackText = slackText + newLine + zISalesOrderLink;
+		}
+		newSubscriptionMessage = {"channel":"C05FE829H0B","as_bot":true,"username":"Cordulus","icon_emoji":"cordulus-stare","unfurl_links":false,"text":slackText};
+		sendSlackMessageResp = invokeurl
+		[
+			url :"https://slack.com/api/chat.postMessage"
+			type :POST
+			parameters:newSubscriptionMessage
+			detailed:true
+			connection:"slack"
+		];
+		if(sendSlackMessageResp.get("responseCode") != 200)
+		{
+			info "[WARN] Failed to send Slack success message. Response: " + sendSlackMessageResp;
+		}
+		else
+		{
+			info "[LOG] Slack success message sent.";
+		}
+	}
+	else
+	{
+		info "Skipping Slack message for Cropline subscription. ";
+	}
+	//
+	// --- Step 8: Send subscription activation receipt email ---
+	//
+	info "[LOG] Step 8: Sending activation receipt email via Mailersend.";
+	distributorEmailMap = {"Hankkija":"katriina.salovaara@hankkija.fi","Mole Valley Farmers Ltd.":"coral.tamplin@molevalleyfarmers.com","Swedish Agro":"admspannmal@swedishagro.se","Danish Agro":"Salgsadministrationen@danishagro.dk","Danish Agro Machinery":"salgsadministrationen@danishagro.dk"};
+	distributorCcEmail = distributorEmailMap.get(distributorName);
+	ccEmails = list();
+	ccEmails.add({"email":"info@cordulus.com"});
+	if(distributorCcEmail != null && distributorCcEmail != "" && distributorCcEmail != sellerEmail)
+	{
+		ccEmails.add({"email":distributorCcEmail});
+	}
+	cleanNotes = notes.replaceAll("\r\n"," ").replaceAll("\n"," ").replaceAll("\r"," ");
+	personalizationData = {"vat":vatNumber,"city":city,"item":subscriptionProductName,"email":customerEmail,"notes":cleanNotes,"phone":phone,"state":state,"country":country,"zipCode":zip,"quantity":quantity,"startDate":startDate,"customerId":internalCustomerId,"fulfilment":submitToFulfilment,"sellerName":sellerFirstName + " " + sellerLastName,"companyName":companyName,"distributor":distributorName,"salesSprint":campaignName,"sellerEmail":sellerEmail,"customerName":firstName + " " + lastName,"streetAddress":street1,"streetAddress2":street2};
+	mailersendPayload = {"from":{"email":"info@cordulus.com","name":"Cordulus"},"to":{{"email":sellerEmail}},"cc":ccEmails,"personalization":{{"email":sellerEmail,"data":personalizationData}},"subject":"New Subscription Activated: " + companyName,"template_id":"351ndgwn3qgzqx8k"};
+	info "Malersend Payload: " + mailersendPayload;
+	sendMailersendEmailResp = invokeurl
+	[
+		url :"https://api.mailersend.com/v1/email"
+		type :POST
+		body:mailersendPayload.toString()
+		detailed:true
+		connection:"mailersend"
+	];
+	if(sendMailersendEmailResp.get("responseCode") != 202)
+	{
+		errorMessage = "API ERROR: Failed to send Mailersend receipt email. Response: " + sendMailersendEmailResp;
+		info "❌ " + errorMessage;
+		standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",body.toString(),errorMessage);
+		info "[WARN] Failed to send Mailersend receipt email. Response: " + sendMailersendEmailResp;
+	}
+	else
+	{
+		info "[LOG] Mailersend receipt email sent successfully.";
+	}
+	if(submitToFulfilment == TRUE)
+	{
+		processBezos = invokeurl
+		[
+			url :"https://hooks.zapier.com/hooks/catch/1855047/3dqcng0/"
+			type :POST
+			parameters:body
+		];
+		info "Process to Bezos: " + processBezos;
+	}
+}
+catch (e)
+{
+	// Final safety net
+	errorMessage = "CRITICAL: An unexpected, unhandled error occurred in " + functionName + ". Details: " + e;
+	standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage);
+	return "{\"crmAPIResponse\":{\"status_code\":500,\"body\":{\"code\":\"failure\",\"message\":\"" + errorMessage + "\"}}}";
+}
+info "Workflow completed successfully.";
+successMessage = "New subscription handler completed successfully for customer ID: " + customerId;
+return "{\"crmAPIResponse\":{\"status_code\":200,\"body\":{\"code\":\"success\",\"message\":\"" + successMessage + "\"}}}";
+}
