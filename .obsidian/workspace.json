@@ -33,14 +33,10 @@
             "id": "be42622720ea9833",
             "type": "leaf",
             "state": {
-              "type": "split-diff-view",
-              "state": {
-                "aFile": "Connectors/delugeDaggersConnector/delugeDaggersConnector.ds",
-                "bFile": "Connectors/delugeDaggersConnector/delugeDaggersConnector.ds",
-                "aRef": ""
-              },
-              "icon": "diff",
-              "title": "Diff: delugeDaggersConnector.ds  (Working Tree)"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
         ]
@@ -216,7 +212,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
     "scripts/delugeTriggerDeleteSectorWeatherSeriesSubscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.md",
     "scripts/delugeTriggerCreateSectorWeatherWorkspaceSeries/delugeTriggerCreateSectorWeatherWorkspaceSeries.md",
@@ -234,7 +230,7 @@
     "scripts/delugeTriggerCreateSectorWeatherSeries/delugeTriggerCreateSectorWeatherSeries.ds",
     "scripts/delugeTriggerCreateSectorWeatherSeries",
     "Connectors/delugeSectorWeatherConnector/delugeSectorWeatherConnector.md",
-    "Connectors/Daggers Connector/delugeDaggersConnector.md",
+    "Connectors/Daggers/delugeDaggersConnector.md",
     "Schlechtwetter Service/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
     "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.md",
     "conflict-files-obsidian-git.md",
