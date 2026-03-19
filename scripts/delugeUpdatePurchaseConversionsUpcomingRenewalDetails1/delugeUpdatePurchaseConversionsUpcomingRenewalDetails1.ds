@@ -1,0 +1,14 @@
+void automation.delugeUpdatePurchaseConversionsUpcomingRenewalDetails1(Int salesSprintId)
+{
+// 1. Get all related Purchase Conversions.
+related_conversions = zoho.crm.getRelatedRecords("Related_Purchase_Conversions","Sales_Sprints",salesSprintId);
+if(related_conversions != null)
+{
+	// 2. For each related conversion, call the function to calculate its pricing.
+	for each  conversion in related_conversions
+	{
+		conversion_id = conversion.get("id");
+		standalone.delugeConversionPricingHandler(conversion_id);
+	}
+}
+}
