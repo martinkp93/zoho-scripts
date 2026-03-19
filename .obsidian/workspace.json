@@ -202,6 +202,15 @@
   },
   "active": "5656ca36876b2fb0",
   "lastOpenFiles": [
+    "scripts/delugeTicketsConnector/delugeTicketsConnector.md",
+    "scripts/delugeTicketsConnector/delugeTicketsConnector.ds",
+    "scripts/delugeTicketsConnector",
+    "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
+    "scripts/delugePopulaceConnector/delugePopulaceConnector.ds",
+    "scripts/delugePopulaceConnector",
+    "scripts/delugeFeatureAggregator/delugeFeatureAggregator.md",
+    "scripts/delugeFeatureAggregator/delugeFeatureAggregator.ds",
+    "scripts/delugeFeatureAggregator",
     "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
     "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
     "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.ds",
@@ -211,14 +220,8 @@
     "Welcome.md",
     "scripts/Test folder",
     "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.ds",
-    "scripts/Deluge_ Workspace and Permissions Handler",
     "scripts/Deluge_ Subscription Handler.md",
-    "scripts/Deluge_ Populace Connector/Deluge_ Populace Connector.ds",
     "scripts/Deluge_ Sync User to Populace Distributor.md",
-    "scripts/Deluge_ Sync User to Populace Distributor.ds",
-    "scripts/Deluge_ Subscription Handler.ds",
-    "scripts/Deluge_ Populace Membership Handler.ds",
-    "scripts/Deluge_ Populace Connector",
     "README.md"
   ]
 }
