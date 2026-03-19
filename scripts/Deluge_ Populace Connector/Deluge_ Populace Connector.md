@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001170034"
 Name: Deluge: Populace Connector
-Revision Timestamp: 2026-03-19T14:34:06.301Z
+Revision Timestamp: 2026-03-19T14:41:39.866Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -85,19 +85,17 @@ The script standardizes the `invokeurl` call using a named connection (`populace
 > [!IMPORTANT]
 > This script requires a Zoho Connection named `populace` to be pre-configured with the appropriate scopes for the external API.
 
-
 > [!WARNING]
 > The script modifies the `payload` map in-place during the path-substitution phase. If the calling script needs the original payload map after this function executes, it must pass a copy.
-
 
 > [!CAUTION]
 > If a path parameter is missing from the `payload` map but required by the URL template (e.g., `{userId}`), the literal string `{userId}` will remain in the URL, likely causing a 404 or 400 error from the API.
 
-
-> [!SUCCESS]
+> [!TIP]
 > The interpolation logic handles complex paths with multiple parameters (e.g., `/distributors/{distributorId}/users/{userId}`) by iteratively updating the path and cleaning the payload body.
 
 ## Change Log
 - **2026-03-19T14:28:08.009Z:** Initial creation of documentation via DeluluDocu.
 - **2026-03-19T14:29:09.413Z:** Maintenance update; minor comment adjustment in Step 1 to clarify configuration maps. No logic changes were made to the core execution flow.
 - **2026-03-19T14:34:06.301Z:** Minor non-functional update; corrected a typographical error in a code comment and removed an extraneous space in the function signature. Logic remains identical to the previous version.
+- **2026-03-19T14:41:39.866Z:** Maintenance update; corrected "Mapss" typo in Step 1 and standardized spacing in the function signature declaration. No functional logic changes performed.
