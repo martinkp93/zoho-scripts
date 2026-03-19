@@ -1,0 +1,20 @@
+string standalone.delugePostSuccessMessageToSlack(String slackText, String slackChannelId)
+{
+try 
+{
+	slackPayload = {"channel":slackChannelId,"as_bot":true,"username":"Cordulus","icon_emoji":"cordulus-stare","unfurl_links":false,"text":slackText};
+	response = invokeurl
+	[
+		url :"https://slack.com/api/chat.postMessage"
+		type :POST
+		parameters:slackPayload
+		connection:"slack"
+	];
+	info "Slack success message response: " + response;
+}
+catch (e)
+{
+	info "Failed to post success message to Slack. Details: " + e;
+}
+return "";
+}
