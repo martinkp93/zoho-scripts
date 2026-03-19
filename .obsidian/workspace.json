@@ -13,30 +13,15 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
+                "file": "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeFeatureAggregator"
-            }
-          },
-          {
-            "id": "3e6e3221ab3c2e72",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "conflict-files-obsidian-git.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "conflict-files-obsidian-git"
+              "title": "delugeMobileAppRequestAQuote"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       },
       {
         "id": "f3afbe6afa2a9b40",
@@ -225,7 +210,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "3e6e3221ab3c2e72",
+  "active": "5656ca36876b2fb0",
   "lastOpenFiles": [
     "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
     "conflict-files-obsidian-git.md",
