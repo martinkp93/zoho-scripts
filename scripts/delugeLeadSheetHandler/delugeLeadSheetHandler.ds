@@ -1,0 +1,183 @@
+string standalone.delugeLeadSheetHandler(Int conversionId)
+{
+// Define initial map for tracking state in case of error 
+crmAPIRequest = Map();
+try 
+{
+	functionName = "delugeLeadSheetHandler";
+	defaultAccountCountry = "Other";
+	defaultDistributorId = 520877000145481486;
+	defaultDistributorName = "Cordulus A/S";
+	// 1. Fetch Conversion Record
+	conversionRecord = zoho.crm.getRecordById("Conversions",conversionId);
+	if(conversionRecord.get("id") == null)
+	{
+		info "Conversion record not found for ID: " + conversionId;
+	}
+	leadType = ifnull(conversionRecord.get("Lead_Type"),"Default");
+	// 2. Fetch Account Record with safety check
+	accountLookup = conversionRecord.get("Account");
+	if(accountLookup == null)
+	{
+		info "No Account associated with this Conversion.";
+		errorMessage = "No Account associated with Conversion ID: " + conversionId;
+		standalone.delugeSendErrorAlert(functionName,conversionId,errorMessage);
+		// We cannot proceed without an Account, so we exit.
+		return {"success":false,"status":"AccountNotFound","message":errorMessage};
+	}
+	accountId = accountLookup.get("id");
+	accountRecord = zoho.crm.getRecordById("Accounts",accountId);
+	accountCountry = ifnull(accountRecord.get("Billing_Country"),"");
+	// 3. Fetch Contacts
+	contacts = zoho.crm.getRelatedRecords("Contacts","Accounts",accountId);
+	if(contacts.size() == 0)
+	{
+		info "No Contacts found for Account ID: " + accountId;
+		errorMessage = "No Contact found for Account ID: " + accountId;
+		standalone.delugeSendErrorAlert(functionName,accountId,errorMessage);
+		// We cannot proceed without a Contact, so we exit.
+		return {"success":false,"status":"ContactNotFound","message":errorMessage};
+	}
+	contactRecord = contacts.get(0);
+	// 4. Distributor Logic
+	distributorLookup = accountRecord.get("Distributor_Lookup");
+	distributorId = if(distributorLookup != null,distributorLookup.get("id"),defaultDistributorId);
+	distributorName = if(distributorLookup != null,distributorLookup.get("name"),defaultDistributorName);
+	regionColumnDistributors = {"Hankkija Oy","Danish Agro","Baltic Agro Estonia"};
+	regionColumn = if(regionColumnDistributors.contains(distributorName) && conversionRecord.get("UTM_Ad_Set_Name") != null,conversionRecord.get("UTM_Ad_Set_Name").getSuffix(" "),null);
+	distributorRecord = zoho.crm.getRecordById("Accounts",distributorId);
+	sheetsSubform = distributorRecord.get("Spreadsheets");
+	if(sheetsSubform == null || sheetsSubform.size() == 0)
+	{
+		info "No Spreadsheet subform data found for Distributor: " + distributorName;
+		errorMessage = "No Spreadsheet subform data found for Distributor: " + distributorName;
+		standalone.delugeSendErrorAlert(functionName,distributorName,errorMessage);
+		// We cannot proceed without a Spreadsheet subform, so we exit.
+		return {"success":false,"status":"SpreadsheetSubformNotFound","message":errorMessage};
+	}
+	// 5. Identify Spreadsheet URL/IDs
+	spreadsheetUrl = "";
+	spreadsheetId = "";
+	sheetId = "";
+	spreadsheetCountry = "";
+	emailRecipients = List();
+	for each  row in sheetsSubform
+	{
+		isLeadType = row.get("Type") == "Leads" && row.get("Segment") == leadType;
+		if(isLeadType && row.get("Country") == accountCountry)
+		{
+			spreadsheetUrl = row.get("Spreadsheet_URL");
+			spreadsheetId = row.get("Spreadsheet_ID");
+			sheetId = row.get("Sheet_ID");
+			spreadsheetCountry = row.get("Country");
+			emailRecipients = row.get("Emails_to_Notify").toList(",");
+			break;
+		}
+		else if(isLeadType && row.get("Country") == defaultAccountCountry)
+		{
+			spreadsheetUrl = row.get("Spreadsheet_URL");
+			spreadsheetId = row.get("Spreadsheet_ID");
+			sheetId = row.get("Sheet_ID");
+			spreadsheetCountry = row.get("Country");
+			emailRecipients = row.get("Emails_to_Notify").toList(",");
+			break;
+		}
+	}
+	// 6. Data Preparation
+	rowData = List();
+	rowData.add(ifnull(conversionRecord.get("Created_Time"),zoho.currenttime).toString("YYYY-MM-dd"));
+	rowData.add(ifnull(contactRecord.get("First_Name"),""));
+	rowData.add(ifnull(contactRecord.get("Last_Name"),""));
+	rowData.add("'" + ifnull(contactRecord.get("Phone"),""));
+	rowData.add(ifnull(contactRecord.get("Email"),""));
+	rowData.add("");
+	rowData.add("");
+	rowData.add(ifnull(conversionRecord.get("Sales_Status"),""));
+	rowData.add("");
+	rowData.add("");
+	rowData.add(ifnull(regionColumn,""));
+	rowData.add("");
+	rowData.add("");
+	rowData.add("");
+	rowData.add("");
+	rowData.add("'" + conversionId.toString());
+	valuesList = List();
+	valuesList.add(rowData);
+	payload = {"values":valuesList};
+	// info payload;
+	// 7. Integration Execution
+	if(spreadsheetUrl.contains("google"))
+	{
+		info "Sending lead to leadsheet for distributor '" + distributorName + "' and country '" + spreadsheetCountry + "': " + spreadsheetUrl;
+		pushResponse = invokeurl
+		[
+			url :"https://sheets.googleapis.com/v4/spreadsheets/" + spreadsheetId + "/values/" + sheetId + "!A1:append?valueInputOption=USER_ENTERED"
+			type :POST
+			parameters:payload.toString()
+			headers:{"Content-Type":"application/json"}
+			detailed:true
+			connection:"googlesheets"
+		];
+		info "Google Push: " + pushResponse;
+	}
+	else if(spreadsheetUrl.contains("sharepoint"))
+	{
+		info "Sending lead to leadsheet for distributor '" + distributorName + "' and country '" + spreadsheetCountry + "': " + spreadsheetUrl;
+		ssIds = {"spreadsheetId":spreadsheetId,"sheetId":sheetId};
+		payload.put("ids",ssIds);
+		pushResponse = invokeurl
+		[
+			url :"https://hooks.zapier.com/hooks/catch/1855047/uqz6upk/"
+			type :POST
+			parameters:payload
+			detailed:true
+		];
+		// info "Zapier Push: " + pushResponse;
+	}
+	if(pushResponse.get("responseCode") != "200")
+	{
+		info "Failed to push lead to spreadsheet.";
+		errorMessage = "Failed to push lead to spreadsheet for Conversion ID: " + conversionId;
+		standalone.delugeSendErrorAlert(functionName,pushResponse,errorMessage);
+		return {"success":false,"status":"FailedToPushLeadToSpreadsheet","message":errorMessage};
+	}
+	// 8. MailerSend Logic
+	info "Sending notification email to: " + emailRecipients;
+	// 1. Grab the first email for 'To', and the rest for 'CC'
+	toRecipient = {{"email":emailRecipients.get(0).trim()}};
+	ccEmails = emailRecipients.subList(1);
+	// Gets everything from index 1 to the end
+	for each  email in ccEmails
+	{
+		ccList = {{"email":email}};
+	}
+	// info "To Recipient: " + toRecipient;
+	// info "CC Recipients: " + ccEmails;
+	mailersendPayload = {"from":{"email":"info@cordulus.com","name":"Cordulus"},"to":toRecipient,"subject":"New Cordulus Lead","html":"<p>Hello,</p>" + "<p>A new lead has been collected for <b>" + distributorName + "</b></p>" + "<p><b>Here are the details:</b><br>" + "Name: " + contactRecord.get("First_Name") + " " + contactRecord.get("Last_Name") + "<br>" + "Email: " + contactRecord.get("Email") + "<br>" + "Phone: " + contactRecord.get("Phone") + "<br>" + "Country: " + spreadsheetCountry + "<br>" + "Distributor: " + distributorName + "</p>" + "You can see a full list of all collected leads using the following link. Please update the status field once the lead has been contacted." + "</p>" + "Link to Spreadsheet: " + spreadsheetUrl + "</p>" + "<p>Sincerely,<br>Cordulus</p>"};
+	if(ccList.size() > 0)
+	{
+		mailersendPayload.put("cc",ccList);
+	}
+	mailResponse = invokeurl
+	[
+		url :"https://api.mailersend.com/v1/email"
+		type :POST
+		body:mailersendPayload.toString()
+		detailed:true
+		connection:"mailersend"
+	];
+	// info mailResponse;
+	info "Successfully synchronised lead to spreadsheet.";
+	return {"success":true,"status":"LeadSynchronised","conversionId":conversionId,"message":"Lead synchronised to leadsheet successfully."};
+}
+catch (e)
+{
+	// Construct error message and trigger standalone alert function
+	errorMessage = "Critical error in delugeLeadSheetHandler: " + e;
+	info errorMessage;
+	crmAPIRequest.put("conversionId",conversionId);
+	standalone.delugeSendErrorAlert(functionName,crmAPIRequest,errorMessage);
+	return {"success":false,"status":"DelugeError","message":errorMessage};
+}
+return "";
+}
