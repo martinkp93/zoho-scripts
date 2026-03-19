@@ -1,0 +1,105 @@
+string standalone.delugeSectorWeatherConnector(String action, Map payload)
+{
+try 
+{
+	baseUrl = "https://sector.cordulus.com/svc/v1/zoho";
+	// --- Step 1: Config Map --- 
+	config = Map();
+	// Weather Series
+	config.put("createSeries",{"m":"POST","p":"/series"});
+	config.put("updateSeries",{"m":"PUT","p":"/series/{seriesId}"});
+	config.put("deleteSeries",{"m":"DELETE","p":"/series"});
+	// Workspace Series Subscriptions
+	config.put("createWorkspaceSeriesSubscription",{"m":"POST","p":"/subscriptions"});
+	config.put("updateWorkspaceSeriesSubscription",{"m":"PUT","p":"/subscriptions/{seriesSubId}"});
+	config.put("deleteWorkspaceSeriesSubscription",{"m":"DELETE","p":"/subscriptions/{seriesSubId}"});
+	actionData = config.get(action);
+	if(actionData == null)
+	{
+		errorMsg = "SectorWeather API " + action + " failed: Invalid action specified";
+		standalone.delugeSendErrorAlert("sectorWeather_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":"Invalid action: " + action};
+	}
+	// --- Step 2: Build the URL ---
+	method = actionData.get("m");
+	path = actionData.get("p");
+	// Find and replace the keys in the url with key-values passed in input
+	for each  key in payload.keys()
+	{
+		searchTarget = "{" + key + "}";
+		if(path.contains(searchTarget))
+		{
+			val = ifNull(payload.get(key),"").toString().encodeUrl();
+			parts = path.toList(searchTarget);
+			// Remove ID from payload so it's not sent in the JSON body
+			payload.remove(key);
+			if(parts.size() == 1)
+			{
+				path = parts.get(0) + val;
+			}
+			else
+			{
+				path = parts.toText(val);
+			}
+		}
+	}
+	url = baseUrl + path;
+	// --- Step 3: Execute ---
+	response = Map();
+	headerMap = {"Content-Type":"application/json"};
+	if(method == "POST")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :POST
+			parameters:payload.toString()
+			headers:headerMap
+			detailed:true
+			connection:"sector"
+		];
+	}
+	else if(method == "PUT")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :PUT
+			parameters:payload.toString()
+			headers:headerMap
+			detailed:true
+			connection:"sector"
+		];
+	}
+	else if(method == "DELETE")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :DELETE
+			headers:headerMap
+			detailed:true
+			connection:"sector"
+		];
+	}
+	// --- Step 4: Handle Response ---
+	successCodes = {200,201,204};
+	responseCode = response.get("responseCode").toLong();
+	if(successCodes.contains(responseCode))
+	{
+		return {"success":true,"data":response.get("responseText")};
+	}
+	else
+	{
+		errorMsg = "SectorWeather API " + action + " failed (" + responseCode + "): " + response.get("responseText");
+		standalone.delugeSendErrorAlert("sectorWeather_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":errorMsg};
+	}
+}
+catch (e)
+{
+	errorMsg = "Unexpected error in sectorWeather_connector: " + e;
+	standalone.delugeSendErrorAlert("sectorWeather_connector",payload.toString(),errorMsg);
+	return {"success":false,"error_message":errorMsg};
+}
+}
