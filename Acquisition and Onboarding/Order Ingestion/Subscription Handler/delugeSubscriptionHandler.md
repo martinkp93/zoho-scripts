@@ -26,15 +26,16 @@ The script automates the entire lifecycle of a new subscription: from customer c
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service | Purpose | Criticality |
-| --- | --- | --- |
-| [[delugeSendErrorAlert]] | Dispatches error notifications to developers upon failure. | High |
-| [[delugeConversionCustomPricingHandler]] | Calculates custom line items and pricing for CRM Conversion records. | Medium |
-| Zoho Billing API | Manages recurring billing entities. | High |
-| Zoho CRM API | Updates Account data and creates Conversion records. | High |
-| MailerSend API | Sends branded activation receipts to customers and distributors. | Medium |
-| Slack API | Provides real-time visibility into new sales for the team. | Low |
-| Zapier (Bezos Hook) | Triggers physical fulfillment for hardware products. | Medium |
+| Function / Service                           | Purpose                                                                                | Criticality |
+| -------------------------------------------- | -------------------------------------------------------------------------------------- | ----------- |
+| [[delugeSendErrorAlert]]                     | Dispatches error notifications to developers upon failure.                             | High        |
+| [[delugeConversionCustomPricingHandler]]     | Calculates custom line items and pricing for CRM Conversion records.                   | Medium      |
+| Zoho Billing API                             | Manages recurring billing entities.                                                    | High        |
+| Zoho CRM API                                 | Updates Account data and creates Conversion records.                                   | High        |
+| MailerSend API                               | Sends branded activation receipts to customers and distributors.                       | Medium      |
+| Slack API                                    | Provides real-time visibility into new sales for the team.                             | Low         |
+| Zapier (Bezos Hook)                          | Triggers physical fulfillment for hardware products.                                   | Medium      |
+| [[triggerWorkspaceAndPermissionsHandlerCrm]] | Downstream function in Zoho Billing that triggers the `workspaceAndPermissionsHandler` | High        |
 
 ## Logic Flow
 
