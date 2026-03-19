@@ -196,6 +196,15 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "scripts/delugeWAT03/delugeWAT03.ds",
+    "scripts/delugeWAT03/delugeWAT03.md",
+    "scripts/delugeWAT03",
+    "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.ds",
+    "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.md",
+    "scripts/delugeSyncActiveCampaignContact",
+    "scripts/delugeGLSLabelHandler/delugeGLSLabelHandler.md",
+    "scripts/delugeGLSLabelHandler/delugeGLSLabelHandler.ds",
+    "scripts/delugeGLSLabelHandler",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT02/delugeWAT02.ds",
     "scripts/delugeWAT02",
@@ -204,11 +213,6 @@
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Sales Sprint Updates/delugeUpdatePurchaseConversionsUpcomingRenewalDetails1.ds",
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Sales Sprint Updates",
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Renewal Cycle Updates/delugeUpdateConversionPricing.md",
-    "Clean-Up",
-    "Acquisition and Onboarding/Marketing/ActiveCampaign",
-    "Support/Cancellation",
-    "Support",
-    "Revenue and Finance/Price Increases",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Update ActiveCampaign Contact Email/delugeSyncActiveCampaignContactEmail.md",
     "Clean-Up/Delete Visits (> 365 Days)/delugeDeleteVisitsOlderThan365Days.md",
     "Related Lists/Show Account's Daggers Subscriptions/delugeDaggersSubscriptions.md",
@@ -227,10 +231,6 @@
     "Environment Lifecycle/Update/Update Populace Workspace/delugeTriggerUpdatePopulaceWorkspace.md",
     "Environment Lifecycle/Update/Update Populace Distributor/delugeTriggerUpdatePopulaceDistributor.md",
     "Environment Lifecycle/Delete/Delete Populace User/delugeTriggerDeletePopulaceUser.md",
-    "Environment Lifecycle/Update/Update Populace Membership/delugePopulaceMembershipHandler.md",
-    "Schlechtwetter Service/Schlechtwetter Schedule/delugeSchlechtwettertageSchedule.md",
-    "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.md",
-    "Environment Lifecycle/Create/Create SectorWeather Series Subscription/delugeTriggerCreateSectorWeatherWorkspaceSeries.md",
-    "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.md"
+    "Environment Lifecycle/Update/Update Populace Membership/delugePopulaceMembershipHandler.md"
   ]
 }
