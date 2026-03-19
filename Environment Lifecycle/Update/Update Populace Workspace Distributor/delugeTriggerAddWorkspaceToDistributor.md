@@ -23,9 +23,9 @@ The `delugeTriggerAddWorkspaceToDistributor` function is an automation utility d
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service | Purpose | Criticality |
-| --- | --- | --- |
-| [[standalone.delugePopulaceConnector]] | Handles the API authentication and communication with the Populace platform. | High |
+| Function / Service          | Purpose                                                                      | Criticality |
+| --------------------------- | ---------------------------------------------------------------------------- | ----------- |
+| [[delugePopulaceConnector]] | Handles the API authentication and communication with the Populace platform. | High        |
 
 ## Logic Flow
 

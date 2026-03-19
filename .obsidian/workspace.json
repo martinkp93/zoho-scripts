@@ -192,6 +192,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
+    "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
+    "standalone.delugePopulaceConnector.md",
     "Environment Lifecycle/Delete/Delete Populace User/delugeTriggerDeletePopulaceUser.md",
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Processor (Schedule)/delugeTriggerRenewalsAndNewSalesExportHandler.md",
     "scripts/delugeWAT02/delugeWAT02.md",
@@ -205,7 +208,6 @@
     "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker/delugeTieredDiscountsHandler.ds",
     "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker",
     "Acquisition and Onboarding/Lead Generation/Zapier",
-    "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
     "Support/Chat",
     "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
     "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.md",
@@ -224,9 +226,7 @@
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Handler (Schedule)/delugeInvoicingDataExportHandler.md",
     "Environment Lifecycle/Update/Move User to another Workspace/delugeMoveUserToOtherWorkspace.md",
     "Validation Rules/Contact Email Validation (on creating or editing Contact)/delugeVerifyEmailInPopulace.md",
-    "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md",
-    "scripts/delugeWAT03/delugeWAT03.md",
-    "Acquisition and Onboarding/Marketing/Attribution/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md"
+    "scripts/delugeWAT03/delugeWAT03.md"
   ]
 }

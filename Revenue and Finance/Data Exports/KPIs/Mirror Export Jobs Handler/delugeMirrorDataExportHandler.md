@@ -19,11 +19,11 @@ The `delugeMirrorDataExportHandler` is a scheduled script designed to orchestrat
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service | Purpose | Criticality |
-| --- | --- | --- |
-| [[standalone.delugeSendErrorAlert]] | Handles error reporting if an export job fails to initialize. | Medium |
-| Zoho Analytics API (v2) | Provides the bulk export functionality and generates Job IDs. | High |
-| Zoho CRM API (v8) | Used to fetch Variable IDs and update their values. | High |
+| Function / Service       | Purpose                                                       | Criticality |
+| ------------------------ | ------------------------------------------------------------- | ----------- |
+| [[delugeSendErrorAlert]] | Handles error reporting if an export job fails to initialize. | Medium      |
+| Zoho Analytics API (v2)  | Provides the bulk export functionality and generates Job IDs. | High        |
+| Zoho CRM API (v8)        | Used to fetch Variable IDs and update their values.           | High        |
 
 ## Logic Flow
 
