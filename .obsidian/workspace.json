@@ -31,10 +31,14 @@
             "id": "be42622720ea9833",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "scripts/delugeFeatureAggregator/delugeFeatureAggregator.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "delugeFeatureAggregator"
             }
           }
         ]
@@ -200,8 +204,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "5656ca36876b2fb0",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeFeatureAggregator/delugeFeatureAggregator.md",
     "scripts/delugeDaggersConnector/delugeDaggersConnector.md",
     "scripts/delugeDaggersConnector/delugeDaggersConnector.ds",
     "scripts/delugeDaggersConnector",
@@ -220,7 +225,6 @@
     "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
     "scripts/delugeTicketsConnector/delugeTicketsConnector.md",
     "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
-    "scripts/delugeFeatureAggregator/delugeFeatureAggregator.md",
     "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
     "scripts/Deluge_ Populace Membership Handler.md",
     "scripts/Deluge_ Populace Connector/Deluge_ Populace Connector.md",
