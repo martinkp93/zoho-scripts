@@ -1,0 +1,166 @@
+string standalone.delugeResolveRaQPricing(Int distributorId)
+{
+payloadForCatch = {"distributorId":distributorId};
+functionName = "delugeResolveRaQPricing";
+try 
+{
+	// distributorId = 520877000134040282;
+	salesSprint = null;
+	// Initialise pricing variablesss
+	initialPrice = null;
+	firstRenewalPrice = null;
+	startupPrice = null;
+	priceListPrice = null;
+	priceListStartupPrice = null;
+	sprintType = null;
+	// Initialise maps to hold pricing details
+	prices = Map();
+	salesSprintMap = Map();
+	priceListMap = Map();
+	productsMap = Map();
+	rows = Map();
+	// 1. Get Price List for Distributor
+	groupPriceList = zoho.crm.getRelatedRecords("Related_Group_Price_List","Accounts",distributorId);
+	if(groupPriceList.size() > 0)
+	{
+		priceListId = groupPriceList.get(0).get("Related_Group_Price_List").get("id");
+		info "Group Price List found. Continuing with Group Price List ID.";
+	}
+	else
+	{
+		priceListSearch = zoho.crm.getRelatedRecords("Related_Price_List","Accounts",distributorId);
+		if(priceListSearch.size() != 1)
+		{
+			errorMsg = "Critical error in delugeResolveRaQPricing: No Price List found for distributor. Cannot resolve pricing.";
+			info errorMsg;
+			standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMsg);
+			return {"success":false,"error_message":errorMsg};
+		}
+		priceListId = priceListSearch.get(0).get("id");
+		info "Distributor Price List found. Continuing with Distributor Price List ID.";
+	}
+	priceList = zoho.crm.getRecordById("Price_Lists",priceListId);
+	priceListCurrency = priceList.get("Currency");
+	priceListSubform = priceList.get("Subform_2");
+	// 2. Find Sales Sprints related to Distributor
+	relatedSalesSprints = zoho.crm.getRelatedRecords("Related_Sales_Sprints_2","Accounts",distributorId);
+	// 3. Find Active Sales Sprints
+	// activeSalesSprints = zoho.crm.searchRecords("Sales_Sprints","((Sales_Sprint_Active:equals:Yes) AND (Send_to_Active_Campaign:equals:true))");
+	queryMap = Map();
+	queryMap.put("select_query","select id, Name, Sales_Sprint_Active, Send_to_Active_Campaign from Sales_Sprints where Sales_Sprint_Active = 'Yes' and Send_to_Active_Campaign = true");
+	response = invokeurl
+	[
+		url :"https://www.zohoapis.eu/crm/v2/coql"
+		type :POST
+		parameters:queryMap.toString()
+		connection:"zohocrmconnection"
+	];
+	activeSalesSprints = response.get("data");
+	info activeSalesSprints;
+	// 4. Put the IDs for "relatedSalesSprints" and "activeSalesSprints" into separate list that can be parsed in step 3.1.
+	if(activeSalesSprints != null && relatedSalesSprints != null)
+	{
+		// 4.1. Related Sales Sprints to list
+		relatedSalesSprintIds = List();
+		for each  relatedSalesSprint in relatedSalesSprints
+		{
+			relatedSalesSprintIds.add(relatedSalesSprint.get("Sales_Campaigns_2").get("id"));
+		}
+		// 4.2. Active Sales Sprints to list
+		activeSalesSprintIds = List();
+		for each  rec in activeSalesSprints
+		{
+			activeSalesSprintIds.add(rec.get("id"));
+		}
+		// 4.3. Use "intersect" to find matching id in both lists 
+		salesSprintIntersect = activeSalesSprintIds.intersect(relatedSalesSprintIds);
+		info salesSprintIntersect;
+		// 4.4. Check if intersect returns more than one active Sales Sprint for the distributor; return error if more than one is found
+		if(salesSprintIntersect.size() > 1)
+		{
+			errorMsg = "Critical error in delugeResolveRaQPricing: More than one active Sales Sprint found for distributor. Cannot resolve pricing.";
+			info errorMsg;
+			standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMsg);
+			return {"success":false,"error_message":errorMsg};
+		}
+		else if(salesSprintIntersect.size() == 1)
+		{
+			salesSprintId = activeSalesSprintIds.intersect(relatedSalesSprintIds).get(0);
+			salesSprint = zoho.crm.getRecordById("Sales_Sprints",salesSprintId);
+		}
+	}
+	// 5. Get Sales Sprint prices for Products and put product ids into a map
+	if(salesSprint != null)
+	{
+		salesSprintName = salesSprint.get("Name");
+		pricingSubform = salesSprint.get("Pricing_and_Renewal_Detai");
+		accrualPeriod = salesSprint.get("Accrual_Period_in_Months");
+		sprintType = if(accrualPeriod == 12,"standard","two for one");
+		salesSprintMap.put("salesSprintName",salesSprintName);
+		salesSprintMap.put("salesSprintId",salesSprintId);
+		salesSprintMap.put("salesSprintType",sprintType);
+		for each  row in pricingSubform
+		{
+			productId = row.get("Products").get("id");
+			productName = row.get("Products").get("name");
+			if(productName == "Cordulus Farm Station: Annual Subscription")
+			{
+				initialPrice = row.get("Initial_Year");
+				firstRenewalPrice = row.get("First_Renewal");
+				productsMap.put("subId",productId);
+				continue;
+			}
+			if(productName == "Cordulus Farm Station: Startup Cost")
+			{
+				startupPrice = row.get("Initial_Year");
+				productsMap.put("startupId",productId);
+				continue;
+			}
+		}
+	}
+	// 6. Get Price List prices for Products 
+	for each  row in priceListSubform
+	{
+		rowProductId = row.get("Products").get("id");
+		rowProductName = row.get("Products").get("name");
+		if(rowProductId == productsMap.get("subId") || rowProductName.contains("Cordulus Farm Station: Annual Subscription"))
+		{
+			priceListPrice = row.get("Price_End_User");
+			validPricing = if(priceListPrice != null,true,false);
+			continue;
+		}
+		if(rowProductId == productsMap.get("startupId") || rowProductName.contains("Cordulus Farm Station: Startup Cost"))
+		{
+			priceListStartupPrice = row.get("Price_End_User");
+			continue;
+		}
+	}
+	// 7. Put the prices together	
+	if(sprintType != null)
+	{
+		salesSprintMap.put("subPriceYear1",priceListCurrency + " " + ifnull(initialPrice,priceListPrice));
+		if(sprintType == "two for one")
+		{
+			salesSprintMap.put("subPriceYear2",priceListCurrency + " " + ifnull(firstRenewalPrice,priceListPrice));
+		}
+		salesSprintMap.put("startupPrice",priceListCurrency + " " + ifnull(startupPrice,priceListStartupPrice));
+	}
+	if(validPricing)
+	{
+		priceListMap.put("subPrice",priceListCurrency + " " + priceListPrice);
+		priceListMap.put("startupPrice",priceListCurrency + " " + priceListStartupPrice);
+		prices.put("salesSprint",salesSprintMap);
+		prices.put("priceList",priceListMap);
+	}
+	// info prices;
+	return {"success":true,"data":prices};
+}
+catch (e)
+{
+	errorMsg = "Unexpected error in delugeResolveRaQPricing: " + e;
+	info errorMsg;
+	standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMsg);
+	return {"success":false,"error_message":errorMsg};
+}
+return "";
+}
