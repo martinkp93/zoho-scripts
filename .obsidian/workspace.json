@@ -11,10 +11,14 @@
             "id": "5656ca36876b2fb0",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "delugeWorkspaceAndPermissionsHandler"
             }
           }
         ]
@@ -196,13 +200,16 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "5656ca36876b2fb0",
   "lastOpenFiles": [
+    "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
+    "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
+    "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.ds",
+    "scripts/delugeWorkspaceAndPermissionsHandler",
     "scripts/Deluge_ Populace Membership Handler.md",
     "scripts/Deluge_ Populace Connector/Deluge_ Populace Connector.md",
     "Welcome.md",
     "scripts/Test folder",
-    "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
     "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.ds",
     "scripts/Deluge_ Workspace and Permissions Handler",
     "scripts/Deluge_ Subscription Handler.md",
@@ -212,8 +219,6 @@
     "scripts/Deluge_ Subscription Handler.ds",
     "scripts/Deluge_ Populace Membership Handler.ds",
     "scripts/Deluge_ Populace Connector",
-    "scripts",
-    "README.md",
-    "Markdown template"
+    "README.md"
   ]
 }
