@@ -192,6 +192,10 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "scripts/triggerWorkspaceAndPermissionsHandlerCrm/triggerWorkspaceAndPermissionsHandlerCrm.md",
+    "scripts/triggerWorkspaceAndPermissionsHandlerCrm/triggerWorkspaceAndPermissionsHandlerCrm.ds",
+    "scripts/triggerWorkspaceAndPermissionsHandlerCrm",
+    "scripts/delugeCancellationScheduledRemoved/delugeCancellationScheduledRemoved.md",
     "scripts/delugePartialCancellation/delugePartialCancellation.md",
     "scripts/delugePartialCancellation/delugePartialCancellation.ds",
     "scripts/delugePartialCancellation",
@@ -200,12 +204,10 @@
     "scripts/delugeCancellationScheduled/delugeCancellationScheduled.md",
     "scripts/delugeCancellationScheduled/delugeCancellationScheduled.ds",
     "scripts/delugeCancellationScheduled",
-    "scripts/delugeCancellationImmediately/delugeCancellationImmediately.md",
-    "scripts/delugeCancellationImmediately/delugeCancellationImmediately.ds",
-    "scripts/delugeCancellationImmediately",
+    "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md",
+    "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.ds",
+    "Support/Subscription Cancellation/Immediate Cancellation",
     "scripts/Deluge_ Partial Cancellation/Deluge_ Partial Cancellation.md",
-    "scripts/Deluge_ Partial Cancellation/Deluge_ Partial Cancellation.ds",
-    "scripts/Deluge_ Partial Cancellation",
     "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.md",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
     "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
@@ -225,8 +227,6 @@
     "Support/Subscription Reactivation/Subscription Resurrection Handler/Subscriptionresurrection.md",
     "Revenue and Finance/Conversion Pricing/Price List Pricing Handler/delugePriceListPricingHandler.md",
     "Support/Chat/SalseIQ Missed Chat Notification/delugeSalesIQMissedChat.md",
-    "Revenue and Finance/Invoicing Automation/Draft Invoicing Handler/delugeProcessRenewalsOrNewSalesForInvoicingV2.md",
-    "Revenue and Finance/Data Exports/Invoicing/Invoicing Exports Handler/delugeRenewalsAndNewSalesExportHandler.md",
-    "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Handler (Schedule)/delugeInvoicingDataExportHandler.md"
+    "Revenue and Finance/Invoicing Automation/Draft Invoicing Handler/delugeProcessRenewalsOrNewSalesForInvoicingV2.md"
   ]
 }
