@@ -196,6 +196,13 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "scripts/delugeTriggerRenewalsAndNewSalesExportHandler/delugeTriggerRenewalsAndNewSalesExportHandler.ds",
+    "scripts/delugeTriggerRenewalsAndNewSalesExportHandler/delugeTriggerRenewalsAndNewSalesExportHandler.md",
+    "scripts/delugeTriggerRenewalsAndNewSalesExportHandler",
+    "scripts/delugeTieredDiscountsHandler/delugeTieredDiscountsHandler.md",
+    "scripts/delugeDuplicateBlueprint/delugeDuplicateBlueprint.md",
+    "scripts/delugeDuplicateBlueprint/delugeDuplicateBlueprint.ds",
+    "scripts/delugeDuplicateBlueprint",
     "scripts/delugeTieredDiscountsHandler/delugeTieredDiscountsHandler.ds",
     "scripts/delugeTieredDiscountsHandler",
     "Acquisition and Onboarding/Lead Generation/Zapier",
@@ -210,10 +217,6 @@
     "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.md",
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.md",
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.ds",
-    "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler",
-    "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.ds",
-    "Validation Rules/Account Validation (on moving Contact to another Account)",
-    "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.ds",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Resolve Request a Quote Pricing (for ActiveCampaign)/delugeResolveRaQPricing.md",
     "scripts/Subscription Resurrection Handler/Subscriptionresurrection.md",
     "Revenue and Finance/Conversion Pricing/Price List Pricing Handler/delugePriceListPricingHandler.md",
@@ -228,9 +231,6 @@
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT03/delugeWAT03.md",
-    "Acquisition and Onboarding/Marketing/Attribution/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md",
-    "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Renewal Cycle Updates/delugeUpdateConversionPricing.md",
-    "Support/Shipment Labels/GLS Label Handler/delugeGLSLabelHandler.md",
-    "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Sales Sprint Updates/delugeUpdatePurchaseConversionsUpcomingRenewalDetails1.md"
+    "Acquisition and Onboarding/Marketing/Attribution/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md"
   ]
 }
