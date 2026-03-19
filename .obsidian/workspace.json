@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "scripts/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md",
+                "file": "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Account)/delugeWAT02.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeWAT03"
+              "title": "delugeWAT02"
             }
           }
         ]
@@ -196,7 +196,8 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
-    "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Accounts)/delugeWAT02.md",
+    "Watchtower/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md",
+    "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Account)/delugeWAT02.md",
     "Support/Subscription Cancellation/Scheduled Cancellation/delugeCancellationScheduled.md",
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
@@ -230,7 +231,6 @@
     "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.md",
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Resolve Request a Quote Pricing (for ActiveCampaign)/delugeResolveRaQPricing.md",
-    "Support/Subscription Reactivation/Subscription Resurrection Handler/Subscriptionresurrection.md",
-    "Revenue and Finance/Conversion Pricing/Price List Pricing Handler/delugePriceListPricingHandler.md"
+    "Support/Subscription Reactivation/Subscription Resurrection Handler/Subscriptionresurrection.md"
   ]
 }
