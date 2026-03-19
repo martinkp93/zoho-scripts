@@ -1,0 +1,111 @@
+void automation.delugeVisitsToActiveCampaign(Int visitId, Int contactId, String activeCampaignId)
+{
+// Validate input
+if(contactId == null)
+{
+	info "❗ Visit is not linked to a CRM Contact.";
+}
+else
+{
+	try 
+	{
+		// ========================
+		// Step 1: Fetch Contact Info
+		// ========================
+		contactRecord = zoho.crm.getRecordById("Contacts",contactId);
+		if(contactRecord == null)
+		{
+			info "Failed to retrieve contact with ID: " + contactId;
+		}
+		email = contactRecord.get("Email");
+		activeCampaignContactId = contactRecord.get("ActiveCampaign_Contact_ID");
+		account = contactRecord.get("Account_Name");
+		if(account == null)
+		{
+			info "No linked account for contact: " + contactId;
+		}
+		accountId = account.get("id");
+		accountData = zoho.crm.getRecordById("Accounts",accountId);
+		if(accountData == null)
+		{
+			info "Failed to retrieve account with ID: " + accountId;
+		}
+		weatherDemo = accountData.get("Weather_Demo");
+		// ========================
+		// Step 2: Process Visits
+		// ========================
+		fieldValuesList = list();
+		containsAppOpen = "false";
+		timeSpent = 0;
+		countOSVisits = 0;
+		if(weatherDemo == true)
+		{
+			visits = zoho.crm.getRelatedRecords("Visits_Zoho_Livedesk","Contacts",contactId);
+			for each  visit in visits
+			{
+				timeSpent = timeSpent + ifnull(visit.get("Time_Spent"),0);
+				os = visit.get("Operating_System");
+				url = visit.get("Visited_Page_URL");
+				if((os.contains("iOS") || os.contains("Android")) && url == null)
+				{
+					containsAppOpen = "true";
+					countOSVisits = countOSVisits + 1;
+				}
+			}
+			fieldValuesList.add({"field":"41","value":timeSpent});
+			if(countOSVisits == 1 && activeCampaignId != "")
+			{
+				fieldValuesList.add({"field":"40","value":"true"});
+			}
+		}
+		// ========================
+		// Step 3: Analyze Actions Performed
+		// ========================
+		containsViewedForecast = "false";
+		containsViewedAnalysis = "false";
+		containsViewedHistory = "false";
+		actions = zoho.crm.getRelatedRecords("Actions_Performed","Visits",visitId);
+		for each  ap in actions
+		{
+			page = ifnull(ap.get("Visited_Page"),"").toLowerCase();
+			if(page.contains("analysis"))
+			{
+				containsViewedAnalysis = "true";
+				fieldValuesList.add({"field":"44","value":containsViewedAnalysis});
+			}
+			else if(page.contains("forecast"))
+			{
+				containsViewedForecast = "true";
+				fieldValuesList.add({"field":"43","value":containsViewedForecast});
+			}
+			else if(page.contains("history"))
+			{
+				containsViewedHistory = "true";
+				fieldValuesList.add({"field":"42","value":containsViewedHistory});
+			}
+		}
+		// ========================
+		// Step 4: Sync with ActiveCampaign
+		// ========================
+		contactMap = Map();
+		contactMap.put("email",email);
+		contactMap.put("fieldValues",fieldValuesList);
+		updateMap = Map();
+		updateMap.put("contact",contactMap);
+		info "Sync payload to ActiveCampaign: " + updateMap;
+		response = invokeurl
+		[
+			url :"https://cordulus.api-us1.com/api/3/contact/sync"
+			type :POST
+			parameters:updateMap.toString()
+			detailed:true
+			connection:"activecampaign"
+		];
+		info "ActiveCampaign Response: " + response.toString();
+	}
+	catch (e)
+	{
+		info "Error in delugeVisitsToActiveCampaignV2: " + e.toString();
+	}
+}
+}
