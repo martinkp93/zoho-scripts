@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
+                "file": "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeMirrorExportsHandler"
+              "title": "accountvalidation"
             }
           }
         ]
@@ -196,6 +196,13 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
+    "scripts/ownerProtection/ownerProtection.md",
+    "scripts/ownerProtection/ownerProtection.ds",
+    "scripts/ownerProtection",
+    "scripts/delugeSalesSprintPricingHandler/delugeSalesSprintPricingHandler.ds",
+    "scripts/delugeSalesSprintPricingHandler",
+    "scripts/delugeMirrorDataExportHandler/delugeMirrorDataExportHandler.md",
     "scripts/delugeResolveRaQPricing/delugeResolveRaQPricing.ds",
     "scripts/delugeResolveRaQPricing/delugeResolveRaQPricing.md",
     "scripts/delugeResolveRaQPricing",
@@ -206,17 +213,11 @@
     "scripts/Subscriptionresurrection",
     "scripts/delugePriceListPricingHandler/delugePriceListPricingHandler.md",
     "scripts/delugeSalesIQMissedChat/delugeSalesIQMissedChat.md",
-    "scripts/delugeSalesIQMissedChat/delugeSalesIQMissedChat.ds",
-    "scripts/delugeSalesIQMissedChat",
-    "scripts/delugePriceListPricingHandler/delugePriceListPricingHandler.ds",
-    "scripts/delugePriceListPricingHandler",
     "Revenue and Finance/Invoicing Automation/Draft Invoicing Handler/delugeProcessRenewalsOrNewSalesForInvoicingV2.md",
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Exports Handler/delugeRenewalsAndNewSalesExportHandler.md",
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Handler/delugeInvoicingDataExportHandler.md",
     "Environment Lifecycle/Update/Move User to another Workspace/delugeMoveUserToOtherWorkspace.md",
-    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
     "Validation Rules/Contact Email Validation (on creating or editing Contact)/delugeVerifyEmailInPopulace.md",
-    "Revenue and Finance/Invoicing Automation",
     "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
     "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.md",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
@@ -230,7 +231,6 @@
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Update ActiveCampaign Contact Email/delugeSyncActiveCampaignContactEmail.md",
     "Clean-Up/Delete Visits (> 365 Days)/delugeDeleteVisitsOlderThan365Days.md",
     "Related Lists/Show Account's Daggers Subscriptions/delugeDaggersSubscriptions.md",
-    "Support/Cancellation/Update Ticket with Churn Reason/delugeChurnReasonUpdate.md",
-    "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md"
+    "Support/Cancellation/Update Ticket with Churn Reason/delugeChurnReasonUpdate.md"
   ]
 }
