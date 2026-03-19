@@ -1,0 +1,129 @@
+string standalone.delugeMobileAppRequestAQuote(String crmAPIRequest)
+{
+crmAPIRequestMap = crmAPIRequest.toMap();
+request_body = crmAPIRequestMap.get("body");
+workspaceId = request_body.get("workspaceId");
+userId = request_body.get("userId");
+distributorId = request_body.get("distributorId");
+// Get ZCRM accountId from workspaceId 
+account = zoho.crm.searchRecords("Accounts","(Kanisa_Farm_ID:equals:" + workspaceId + ")");
+if(account.isEmpty())
+{
+	error_map = {"message":"No Zoho CRM Account found that matches workspaceId.","code":""};
+	response_body = {"error":error_map};
+	response = {"status_code":404,"body":response_body};
+	info response;
+	return {"crmAPIResponse":response};
+}
+accountMap = account.toMap();
+accountId = accountMap.get("id");
+accountDistributorId = accountMap.get("Distributor_Lookup").get("id");
+// info "Account ID: " + accountId;
+info "Accounts Distributor Account ID: " + accountDistributorId;
+//
+// Get ZCRM Account's current Distributor
+accountsDistributor = zoho.crm.getRecordById("Accounts",accountDistributorId);
+accountsDistributorAccountId = accountsDistributor.get("id");
+//
+// Get ZCRM Account ID for selected distributorId from mobile app Request a Quote
+// matchedDistributor = zoho.crm.searchRecords("Accounts","(Populace_Distributor_ID:equals:" + distributorId + ")").toMap();
+matchedDistributor = zoho.crm.searchRecords("Accounts","(Populace_Distributor_ID:equals:" + distributorId + ")");
+if(matchedDistributor.isEmpty())
+{
+	error_map = {"message":"No Zoho CRM Distributor Account found that matches distributorId.","code":""};
+	response_body = {"error":error_map};
+	response = {"status_code":404,"body":response_body};
+	info response;
+	return {"crmAPIResponse":response};
+}
+matchedDistributorMap = matchedDistributor.toMap();
+matchedDistributorAccountId = matchedDistributorMap.get("id");
+matchedDistributorAccountName = matchedDistributorMap.get("Account_Name");
+//
+// Check if related ZCRM Account ID of selected distributorId from mobile app Request a Quote matches ZCRM Account's current Distributors ZCRM Account id
+// and update if it does not match
+if(matchedDistributorAccountId != accountsDistributorAccountId)
+{
+	updateMap = Map();
+	updateMap.put("Distributor_Lookup",matchedDistributorAccountId);
+	updateDistributorLookup = zoho.crm.updateRecord("Accounts",accountId,updateMap);
+	info "Updated Account's Distributor to reflect selected Distributor from mobile app Request a Quote.";
+}
+//
+// Get ZCRM contactEmail from workspaceId
+contact = zoho.crm.searchRecords("Contacts","(Kanisa_User_ID:equals:" + userId + ")").toMap();
+if(contact.isEmpty())
+{
+	error_map = {"message":"No Zoho CRM Contact found that matches userId.","code":""};
+	response_body = {"error":error_map};
+	response = {"status_code":404,"body":response_body};
+	info response;
+	return {"crmAPIResponse":response};
+}
+contactMap = contact.toMap();
+contactId = contactMap.get("id");
+contactEmail = contactMap.get("Email");
+contactActiveCampaignId = contactMap.get("ActiveCampaign_Contact_ID");
+// info "Contact Email: " + contactEmail;
+// info "Contact ActiveCampaign ID: " + contactActiveCampaignId;
+if(contactActiveCampaignId.isNull())
+{
+	error_map = {"message":"Matched CRM Contact does not contain an ActiveCampaign Contact ID.","code":""};
+	response_body = {"error":error_map};
+	response = {"status_code":404,"body":response_body};
+	info response;
+	return {"crmAPIResponse":response};
+}
+// 
+// Proceed to create Request a Quote Conversion in ZCRM
+raqMap = Map();
+raqMap.put("Account",accountId);
+raqMap.put("Name","Request a Quote Conversion");
+raqMap.put("UTM_Source","Cordulus Farm Mobile App");
+//
+// Create Request a Quote Conversion in ZCRM
+createConversionResponse = zoho.crm.createRecord("Conversions",raqMap);
+//info "Create Conversion Response: " + createConversionResponse;
+info "Created Request a Quote Conversion.";
+success_map = {"message":"Script executed successfully.","code":""};
+info response;
+//
+// Add tag to ActiveCampaign Contact
+conversionName = "Request a Quote Conversion";
+requestAQuoteSource = "Mobile App";
+if(contactId != null)
+{
+	tags = {conversionName,requestAQuoteSource};
+	finalTags = List();
+	for each  tag in tags
+	{
+		if(tag != null)
+		{
+			finalTags.add(tag);
+		}
+	}
+	info "Final Tags: " + finalTags;
+	// Call the standalone handler. 
+	// It will handle creating the AC contact, adding tags, and return the ActiveCampaign Contact ID
+	firstName = null;
+	lastName = null;
+	country = null;
+	email = contactEmail;
+	existingAcId = contactActiveCampaignId;
+	conversionName = "Request a Quote Conversion";
+	conversionId = createConversionResponse.get("id");
+	country = null;
+	distributorName = matchedDistributorAccountName;
+	utmSource = "Mobile App";
+	utmTraffic = "Organic";
+	utmCampaign = null;
+	utmMedium = null;
+	vertical = "Farm";
+	phone = null;
+	syncAcContactResp = standalone.delugeActiveCampaignHandler(contactId.toLong(),accountId.toLong(),firstName,lastName,email,country,existingAcId,finalTags,conversionName,conversionId,distributorName,utmSource,utmMedium,utmCampaign,vertical,phone);
+	info "Called ActiveCampaign Handler";
+}
+response_body = {"success":success_map};
+response = {"status_code":200,"body":response_body};
+return {"crmAPIResponse":response};
+}
