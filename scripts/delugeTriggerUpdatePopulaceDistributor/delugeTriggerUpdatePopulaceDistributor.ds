@@ -1,0 +1,33 @@
+void automation.delugeTriggerUpdatePopulaceDistributor(Int accountId, String country, String accountName, String teamId, String distributorId, String departmentId)
+{
+//
+// Update Team in "Watchtower Live" department in Zoho Desk 
+// Prepare data map
+updateTeamMap = Map();
+updateTeamMap.put("name",accountName);
+// Make the request
+updateTeamResponse = invokeurl
+[
+	url :"https://desk.zoho.eu/api/v1/teams/" + teamId
+	type :PATCH
+	parameters:updateTeamMap.toString()
+	detailed:true
+	connection:"zohodesk"
+];
+if(updateTeamResponse.get("responseCode") != "200")
+{
+	info "Error: Failed to update Team in Zoho Desk with response: " + updateTeamResponse.get("responseText");
+	return;
+}
+// Update Distributor in Populace
+// Prepare data map
+updateDistributorPayload = {"accountId":accountId,"name":accountName,"country":country,"distributorId":distributorId};
+// Make the request
+updateDistributorResponse = standalone.delugePopulaceConnector("updateDistributor",updateDistributorPayload);
+// info updateDistributorMap;
+if(updateDistributorResponse.get("success") != true)
+{
+	info "Error: Failed to update Distributor in Populace with response: " + updateDistributorResponse;
+	return;
+}
+}
