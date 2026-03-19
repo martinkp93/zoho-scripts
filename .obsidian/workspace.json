@@ -247,7 +247,7 @@
     "Acquisition and Onboarding/Lead Ingestion/delugeLeadHandler/delugeLeadHandler.md",
     "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.md",
     "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
-    "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.md",
+    "Acquisition and Onboarding/Inventory/Get Warehouse ID for CRM Account/delugeZohoInventoryGetWarehouseId.md",
     "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch/delugeManualUpdateFirstLastTouch.md",
     "Errors and Messages/delugeSendErrorAlert/delugeSendErrorAlert.md"
   ]
