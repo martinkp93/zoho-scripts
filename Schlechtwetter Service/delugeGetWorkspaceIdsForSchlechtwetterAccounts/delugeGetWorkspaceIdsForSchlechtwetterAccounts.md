@@ -22,9 +22,9 @@ This function acts as a discovery endpoint for the Cordulus backend, which then 
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service | Purpose | Criticality |
-| --- | --- | --- |
-| [[Zoho CRM API]] | Utilizes `zoho.crm.searchRecords` to filter accounts. | High |
+| Function / Service | Purpose                                               | Criticality |
+| ------------------ | ----------------------------------------------------- | ----------- |
+| Zoho CRM API       | Utilizes `zoho.crm.searchRecords` to filter accounts. | High        |
 
 ## Logic Flow
 
