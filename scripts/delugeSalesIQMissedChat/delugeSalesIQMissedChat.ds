@@ -1,0 +1,24 @@
+string standalone.delugeSalesIQMissedChat(String crmAPIRequest)
+{
+// 1. Parse the incoming body from SalesIQ
+requestBody = crmAPIRequest.get("body").toMap();
+// 2. Extract the specific variables
+vMessage = requestBody.get("message");
+vEmail = requestBody.get("visitor_email");
+vName = requestBody.get("visitor_name");
+vCountry = requestBody.get("country");
+vChatID = requestBody.get("chat_id");
+// 3. Construct the Email Content
+emailSubject = "New After-Hours Chat from " + vName;
+emailHtml = "<h3>New Support Inquiry</h3>" + "<p><strong>From:</strong> " + vName + " (" + vEmail + ")</p>" + "<p><strong>Country:</strong> " + vCountry + "</p>" + "<p><strong>Message:</strong> " + vMessage + "</p>" + "<p><strong>Chat Reference:</strong> " + vChatID + "</p>";
+// 4. Build the MailerSend JSON Payload
+payload = Map();
+payload.put("from",{"email":"info@cordulus.com","name":"Cordulus Support Bot"});
+payload.put("to",{{"email":"support@cordulus.com","name":"Cordulus Support"}});
+payload.put("subject",emailSubject);
+payload.put("html",emailHtml);
+// 5. Send the request to MailerSend
+sendEmail = standalone.delugeMailersendConnector(payload);
+info sendEmail;
+return "Success";
+}

@@ -1,0 +1,114 @@
+string standalone.delugePriceListPricingHandler(Int price_list_id, String billing_country, String conversion_plan_code)
+{
+try 
+{
+	// 1. Data Retrieval
+	priceListRecord = zoho.crm.getRecordById("Price_Lists",price_list_id);
+	priceListSubform = priceListRecord.get("Subform_2");
+	priceListAddons = priceListRecord.get("Price_List_for_Addons");
+	productLookup = zoho.crm.searchRecords("Products","(Zoho_Billing_Plan_Code:equals:" + conversion_plan_code + ")");
+	if(productLookup.isEmpty())
+	{
+		return {"success":false,"error":"Plan not found"};
+	}
+	mainId = productLookup.get(0).get("id");
+	childRecords = zoho.crm.getRelatedRecords("Related_Child_Products","Products",mainId);
+	childId = if(childRecords.size() > 0,childRecords.get(0).get("Related_Child_Products").get("id"),null);
+	// 2. Map Subform for Lookup efficiency
+	subformMap = Map();
+	for each  row in priceListSubform
+	{
+		if(row.get("Products") != null)
+		{
+			subformMap.put(row.get("Products").get("id").toString(),row);
+		}
+	}
+	// 3. Initialize Standardized Maps
+	initial = Map();
+	regular = Map();
+	addon = Map();
+	scheduled = Map();
+	// 4. Process Subscription & Startup Products
+	targetIds = {mainId,childId};
+	for each  pid in targetIds
+	{
+		if(pid == null || !subformMap.containsKey(pid.toString()))
+		{
+			continue;
+		}
+		row = subformMap.get(pid.toString());
+		pRec = zoho.crm.getRecordById("Products",pid);
+		codes = pRec.get("Product_Codes");
+		for each  c in codes
+		{
+			type = c.get("Product_Code_Type");
+			pCode = if(billing_country == "Denmark",c.get("Product_Code_Denmark"),c.get("Product_Code_Other"));
+			if(type == "New Sales")
+			{
+				// Logic separates startup (child) from subscription (main) via keys
+				keyType = if(pid == mainId,"subscription","startup");
+				initial.put(keyType + "_price",row.get("Price"));
+				initial.put(keyType + "_end_user_price",row.get("Price_End_User"));
+				initial.put(keyType + "_product_id",pid);
+				initial.put(keyType + "_product_code",pCode);
+				initial.put(keyType + "_product_credit_code",pRec.get("Product_Credit_Code"));
+			}
+			else if(type == "Renewals" && pid == mainId)
+			{
+				regular.put("subscription_price",row.get("Price"));
+				regular.put("subscription_end_user_price",row.get("Price_End_User"));
+				regular.put("subscription_product_id",pid);
+				regular.put("subscription_product_code",pCode);
+				// Scheduled logic moved to its own map
+				if(row.get("New_Price_Net") != null)
+				{
+					scheduled.put("subscription_price",row.get("New_Price_Net"));
+					scheduled.put("subscription_end_user_price",row.get("New_Price_End_User"));
+					scheduled.put("subscription_effective_date",row.get("New_Price_Effective_Date"));
+				}
+			}
+		}
+	}
+	// 5. Process Addons (Grouped)
+	addonSearch = if(billing_country == "United Kingdom","Subscription","One-Time");
+	addonRecords = zoho.crm.getRelatedRecords("Related_Addons","Products",mainId);
+	for each  rec in addonRecords
+	{
+		if(rec.get("Related_Addons").get("name").contains(addonSearch))
+		{
+			aId = rec.get("Related_Addons").get("id");
+			for each  aRow in priceListAddons
+			{
+				if(aRow.get("Addons").get("id") == aId)
+				{
+					aRec = zoho.crm.getRecordById("Products",aId);
+					for each  ac in aRec.get("Product_Codes")
+					{
+						if(ac.get("Product_Code_Type") == "New Sales")
+						{
+							addon.put("price",aRow.get("Price_Net"));
+							addon.put("end_user_price",aRow.get("Price_End_User"));
+							addon.put("product_id",aId);
+							addon.put("product_code",if(billing_country == "Denmark",ac.get("Product_Code_Denmark"),ac.get("Product_Code_Other")));
+							// Scheduled addon logic
+							if(aRow.get("New_Price_Net") != null)
+							{
+								scheduled.put("addon_price",aRow.get("New_Price_Net"));
+								scheduled.put("addon_end_user_price",aRow.get("New_Price_End_User"));
+								scheduled.put("addon_effective_date",aRow.get("New_Price_Effective_Date"));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	// 6. Final Return
+	return {"success":true,"initial":initial,"regular":regular,"addon":addon,"scheduled":scheduled};
+}
+catch (e)
+{
+	return {"success":false,"error":e};
+}
+return "";
+}
