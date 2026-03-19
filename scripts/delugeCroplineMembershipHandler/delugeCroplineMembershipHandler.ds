@@ -1,0 +1,24 @@
+string standalone.delugeCroplineMembershipHandler(String distributorName)
+{
+// 1. Initialise a map holding distributor name and user(s) to be added as Admin
+memberships = Map();
+memberships.put("Baltic Agro Estonia",{"user_id":"3064"});
+memberships.put("Baltic Agro Latvia",{"user_id":"6492"});
+memberships.put("Baltic Agro Latvia Machinery",{"user_id":"6475"});
+memberships.put("Danish Agro",{"user_id":"4376"});
+memberships.put("Danish Agro Cropline Support",{"user_id":"4376"});
+memberships.put("Hankkija Oy",{"user_id":"2607"});
+memberships.put("Norwegian Agro Machinery",{"user_id":"8146"});
+memberships.put("Swedish Agro",{"user_id":"5194"});
+if(memberships.get(distributorName) == null)
+{
+	return {"success":false};
+}
+userId = memberships.get(distributorName).get("user_id");
+if(userId == null)
+{
+	return {"success":false};
+}
+// 2. Return the userId to the calling function
+return {"success":true,"data":{"userId":userId}};
+}
