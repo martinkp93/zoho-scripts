@@ -232,7 +232,7 @@
     "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
     "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
-    "scripts/delugeUpdateConversionPricing/delugeUpdateConversionPricing.md",
+    "Revenue and Finance/Conversion Pricing/delugeUpdateConversionPricing/delugeUpdateConversionPricing.md",
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.md",
     "Related Lists/Sync Products to Price List's Related Products/delugeSyncProductsToRelatedProducts.md",
     "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
