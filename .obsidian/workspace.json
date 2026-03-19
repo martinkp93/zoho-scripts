@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.md",
+                "file": "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ownerProtection"
+              "title": "delugeMirrorDataExportHandler"
             }
           }
         ]
@@ -196,6 +196,8 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
+    "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.md",
     "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
     "scripts/delugeSubscriptionCycleHandler/delugeSubscriptionCycleHandler.ds",
     "scripts/delugeSubscriptionCycleHandler/delugeSubscriptionCycleHandler.md",
@@ -204,13 +206,11 @@
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.md",
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.ds",
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler",
-    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
-    "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.md",
     "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.ds",
     "Validation Rules/Account Validation (on moving Contact to another Account)",
     "scripts/delugeSalesSprintPricingHandler/delugeSalesSprintPricingHandler.ds",
     "scripts/delugeSalesSprintPricingHandler",
-    "scripts/delugeMirrorDataExportHandler/delugeMirrorDataExportHandler.md",
+    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
     "scripts/delugeResolveRaQPricing/delugeResolveRaQPricing.ds",
     "scripts/delugeResolveRaQPricing/delugeResolveRaQPricing.md",
     "scripts/delugeResolveRaQPricing",
