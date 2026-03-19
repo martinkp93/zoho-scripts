@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.md",
+                "file": "scripts/accountvalidation/accountvalidation.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeSyncActiveCampaignContact"
+              "title": "accountvalidation"
             }
           }
         ]
@@ -196,6 +196,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.md",
     "scripts/delugeTriggerAddWorkspaceToDistributor/delugeTriggerAddWorkspaceToDistributor.md",
     "scripts/delugeTriggerAddWorkspaceToDistributor/delugeTriggerAddWorkspaceToDistributor.ds",
     "scripts/delugeTriggerAddWorkspaceToDistributor",
@@ -218,7 +219,6 @@
     "scripts/delugeWAT03/delugeWAT03.md",
     "Acquisition and Onboarding/Marketing/Attribution/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md",
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Renewal Cycle Updates/delugeUpdateConversionPricing.md",
-    "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.md",
     "Support/Shipment Labels/GLS Label Handler/delugeGLSLabelHandler.md",
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Sales Sprint Updates/delugeUpdatePurchaseConversionsUpcomingRenewalDetails1.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Update ActiveCampaign Contact Email/delugeSyncActiveCampaignContactEmail.md",
