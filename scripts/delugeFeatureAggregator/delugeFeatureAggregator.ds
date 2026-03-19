@@ -1,0 +1,214 @@
+string standalone.delugeFeatureAggregator(String orgId, String customerId, String country)
+{
+try 
+{
+	// --- 1. Initialization ---
+	aggregatedFeatures = List();
+	daggersPayloadList = List();
+	templatesList = List();
+	demo_start = null;
+	demo_end = null;
+	foundCategory = null;
+	servicePlanCache = Map();
+	// Cache to store Service Plan records after first successful lookup
+	// --- 2. Get Active Subscriptions 
+	activeSubscriptionsList = List();
+	getActiveSubscriptionsResp = invokeurl
+	[
+		url :"https://www.zohoapis.eu/billing/v1/subscriptions?customer_id=" + customerId + "&filter_by=SubscriptionStatus.ACTIVE"
+		type :GET
+		connection:"zohobillingconnection"
+	];
+	if(getActiveSubscriptionsResp.get("code") == 0)
+	{
+		activeSubscriptionsList = getActiveSubscriptionsResp.get("subscriptions");
+	}
+	// --- 3. Loop through Subscriptions and Gather Configuration 
+	for each  activeSubscription in activeSubscriptionsList
+	{
+		subscriptionId = activeSubscription.get("subscription_id");
+		subscriptionData = zoho.billing.retrieve("subscriptions",orgId,subscriptionId,"zohobillingconnection").get("subscription");
+		productName = subscriptionData.get("product_name");
+		planCode = subscriptionData.get("plan").get("plan_code");
+		servicePlanRecord = null;
+		// --- Cache Lookup and Fetch ---
+		if(servicePlanCache.containsKey(planCode))
+		{
+			servicePlanRecord = servicePlanCache.get(planCode);
+		}
+		else
+		{
+			servicePlanSearch = zoho.crm.searchRecords("Service_Plans","(Zoho_Billing_Plan_Code:equals:" + planCode + ")");
+			if(servicePlanSearch.size() > 0)
+			{
+				servicePlanRecord = zoho.crm.getRecordById("Service_Plans",servicePlanSearch.get(0).get("id"));
+				servicePlanCache.put(planCode,servicePlanRecord);
+			}
+		}
+		// --- Process Features and Catalogs from the Service Plan Record 
+		if(servicePlanRecord != null)
+		{
+			// A. Process Features (for aggregatedFeatures list)
+			features = servicePlanRecord.get("Features");
+			if(foundCategory == null)
+			{
+				foundCategory = servicePlanRecord.get("Category");
+			}
+			if(features != null)
+			{
+				for each  feature in features
+				{
+					if(feature != null && feature != "" && !aggregatedFeatures.contains(feature))
+					{
+						aggregatedFeatures.add(feature);
+					}
+				}
+			}
+			// B. Process Daggers Catalogs (for daggersPayloadList)
+			daggersSubform = servicePlanRecord.get("Daggers_Catalogs_Mappings");
+			if(daggersSubform != null)
+			{
+				for each  catalogEntry in daggersSubform
+				{
+					catalogDetails = Map();
+					catalogDetails.put("catalog",catalogEntry.get("Catalog"));
+					catalogDetails.put("historyDelta",catalogEntry.get("History_Delta"));
+					catalogDetails.put("forecastDelta",catalogEntry.get("Forecast_Delta"));
+					catalogDetails.put("geometry",catalogEntry.get("Geometry"));
+					// Ensure this is the correct field name
+					daggersPayloadList.add(catalogDetails);
+				}
+			}
+			// C. Process Demo Dates (for demo_start/end variables)
+			if(features != null && features.contains("weatherDemo"))
+			{
+				created_time_str = subscriptionData.get("created_time");
+				expires_at_str = subscriptionData.get("expires_at");
+				endDateString = expires_at_str;
+				if(created_time_str != null && endDateString != null && endDateString != "")
+				{
+					local_datetime = created_time_str.toTime("yyyy-MM-dd'T'HH:mm:ssZ","Europe/Copenhagen");
+					created_at_utc = local_datetime.toString("yyyy-MM-dd'T'HH:mm:ss'Z'","UTC");
+					utc_time_part = created_at_utc.substring(11);
+					expires_date_part = endDateString.toDateTime("yyyy-MM-dd").toString("yyyy-MM-dd");
+					expires_at_utc = expires_date_part + "T" + utc_time_part;
+					demo_start = created_at_utc;
+					demo_end = expires_at_utc;
+				}
+			}
+			// D. Process Templates 
+			templatesSubform = servicePlanRecord.get("Template_Mappings");
+			if(templatesSubform != null && templatesSubform.size() > 0)
+			{
+				info templatesSubform;
+				for each  templateEntry in templatesSubform
+				{
+					if(templateEntry.get("Country") == country)
+					{
+						language = templateEntry.get("Language");
+						break;
+					}
+					else
+					{
+						language = "en";
+						// fallback default
+					}
+				}
+				info "Language:" + language;
+			}
+		}
+	}
+	info aggregatedFeatures;
+	// --- 4. Geometry Merging and Cleanup 
+	finalProcessedSubscriptions = List();
+	groupedCatalogs = Map();
+	// Group all collected catalogs by name
+	for each  catalogItem in daggersPayloadList
+	{
+		catalogName = catalogItem.get("catalog");
+		if(!groupedCatalogs.containsKey(catalogName))
+		{
+			groupedCatalogs.put(catalogName,List());
+		}
+		listForThisCatalog = groupedCatalogs.get(catalogName);
+		listForThisCatalog.add(catalogItem);
+	}
+	// Process each group to merge or select the correct entry
+	for each  catalogName in groupedCatalogs.keys()
+	{
+		catalogGroup = groupedCatalogs.get(catalogName);
+		itemsWithGeometry = List();
+		itemsWithoutGeometry = List();
+		// Sort items into those with and without geometries
+		for each  item in catalogGroup
+		{
+			if(item.get("geometry") != null && item.get("geometry") != "")
+			{
+				itemsWithGeometry.add(item);
+			}
+			else
+			{
+				itemsWithoutGeometry.add(item);
+			}
+		}
+		// If there is 'at least one' item with a geometry, prioritize it.
+		if(itemsWithGeometry.size() > 0)
+		{
+			if(itemsWithGeometry.size() > 1)
+			{
+				// Merge case: More than one geometry found, so merge them.
+				info "Merging " + itemsWithGeometry.size() + " geometries for catalog: " + catalogName;
+				geometriesToCombine = List();
+				for each  subscriptionWithGeometry in itemsWithGeometry
+				{
+					geometry = subscriptionWithGeometry.get("geometry");
+					cleanGeometry = geometry.trim();
+					if(cleanGeometry.startsWithIgnoreCase("GEOMETRYCOLLECTION"))
+					{
+						geometriesString = cleanGeometry.substring(cleanGeometry.indexOf("(") + 1,cleanGeometry.lastIndexOf(")"));
+						geometriesToCombine.add(geometriesString.trim());
+					}
+					else if(cleanGeometry.startsWithIgnoreCase("POLYGON"))
+					{
+						geometriesToCombine.add(cleanGeometry);
+					}
+				}
+				combinedGeometriesString = geometriesToCombine.toString().remove("[").remove("]");
+				mergedGeometryWKT = "GEOMETRYCOLLECTION (" + combinedGeometriesString + ")";
+				finalMergedSubscription = itemsWithGeometry.get(0);
+				finalMergedSubscription.put("geometry",mergedGeometryWKT);
+				finalProcessedSubscriptions.add(finalMergedSubscription);
+			}
+			else
+			{
+				// Single geometry case: Exactly one geometry found, so we just use that one
+				finalProcessedSubscriptions.add(itemsWithGeometry.get(0));
+			}
+		}
+		else
+		{
+			// No geometry case: No items had a geometry, so add the first item (with its null geometry)
+			finalProcessedSubscriptions.add(itemsWithoutGeometry.get(0));
+		}
+	}
+	// --- 5. Final Cleanup Logic (convert "" to null) 
+	for each  subscription in finalProcessedSubscriptions
+	{
+		if(subscription.containsKey("geometry") && subscription.get("geometry") == "")
+		{
+			subscription.put("geometry",null);
+		}
+	}
+	info finalProcessedSubscriptions;
+	// --- Step 4: Return all aggregated data 
+	return {"success":true,"features":aggregatedFeatures,"daggersPayloadList":finalProcessedSubscriptions,"demo_start":demo_start,"demo_end":demo_end,"category":foundCategory,"language":language};
+}
+catch (e)
+{
+	errorMessage = "An unexpected error occurred in feature_aggregator. Details: " + e;
+	standalone.delugeSendErrorAlert("feature_ aggregator","",errorMessage);
+	return {"success":false,"error_message":errorMessage};
+}
+// --- Step 4: Return all aggregated data ---
+return {"success":true,"features":aggregatedFeatures,"daggersPayloadList":finalProcessedSubscriptions,"demo_start":demo_start,"demo_end":demo_end,"category":foundCategory,"language":language};
+}
