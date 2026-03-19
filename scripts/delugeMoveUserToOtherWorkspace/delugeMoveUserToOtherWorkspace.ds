@@ -1,0 +1,72 @@
+void automation.delugeMoveUserToOtherWorkspace(String previousValues, Int AccountId, Int contactId)
+{
+try 
+{
+	//
+	// --- 1. INITIALIZE  --- 
+	ContactDetails = zoho.crm.getRecordById("Contacts",contactId);
+	PopulaceUserRole = ContactDetails.get("User_Type");
+	PopulaceUserId = ContactDetails.get("Kanisa_User_ID");
+	ContactEmail = ContactDetails.get("Email");
+	ContactId = ContactDetails.get("id");
+	FirstName = ContactDetails.get("First_Name");
+	LastName = ContactDetails.get("Last_Name");
+	// --- 2. REMOVE FROM OLD WORKSPACE ---
+	prevMap = previousValues;
+	if(prevMap.containsKey("Account_Name"))
+	{
+		OldAccountId = prevMap.get("Account_Name");
+		OldAccountDetails = zoho.crm.getRecordById("Accounts",OldAccountId);
+		OldaccountName = OldAccountDetails.get("Account_Name");
+		OldWorkspaceId = OldAccountDetails.get("Kanisa_Farm_ID");
+		info OldWorkspaceId + " " + PopulaceUserId;
+		if(OldWorkspaceId != null && PopulaceUserId != null)
+		{
+			action = "deleteMembership";
+			payload = {"workspaceId":OldWorkspaceId,"userId":PopulaceUserId};
+			response = standalone.delugePopulaceConnector(action,payload);
+			info "Removed from Old Workspace: " + response;
+		}
+		if(response.get("status") == "error")
+		{
+			info "Failed to remove user from the old workspace.";
+			errorMessage = "Failed to remove user from the old workspace. User ID: " + PopulaceUserId;
+			standalone.delugeSendErrorAlert("populace_connector",previousValues.toString(),errorMessage);
+			return;
+		}
+	}
+	// 3. ADD TO NEW WORKSPACE
+	NewAccountDetails = zoho.crm.getRecordById("Accounts",AccountId);
+	AccountName = NewAccountDetails.get("Account_Name");
+	NewWorkspaceId = NewAccountDetails.get("Kanisa_Farm_ID");
+	info "Target Workspace: " + NewWorkspaceId + PopulaceUserId;
+	if(NewWorkspaceId != null && PopulaceUserId != null)
+	{
+		action = "addMembership";
+		payload = {"workspaceId":NewWorkspaceId,"userId":PopulaceUserId,"role":PopulaceUserRole};
+		response = standalone.delugePopulaceConnector(action,payload);
+		info "Added to a New Workspace: " + response;
+	}
+	if(response.get("status") == "error")
+	{
+		info "Failed to perform the action AddMembership.";
+		errorMessage = "Failed to remove user from the old workspace. User ID: " + PopulaceUserId;
+		standalone.delugeSendErrorAlert("populace_connector",previousValues.toString(),errorMessage);
+		return;
+	}
+	// This runs only if all previous critical steps have succeeded.
+	ContactLink = "<https://crm.zoho.eu/crm/org20087400242/tab/Contacts/" + ContactId + "|" + FirstName + " " + LastName + ">";
+	AccountLink = "<https://crm.zoho.eu/crm/org20087400242/tab/Accounts/" + AccountId + "|" + AccountName + ">";
+	OldAccountLink = "<https://crm.zoho.eu/crm/org20087400242/tab/Accounts/" + OldAccountId + "|" + OldaccountName + ">";
+	PopulaceUserLink = "<https://populace.cordulus.com/dashboard/users/" + PopulaceUserId + "|" + PopulaceUserRole + ">";
+	PopulaceWorkspaceLink = "<https://populace.cordulus.com/dashboard/workspaces/" + NewWorkspaceId + "|" + "Workspace " + NewWorkspaceId + ">";
+	SuccessMessage = ContactLink + " moved as " + PopulaceUserLink + " from " + OldAccountLink + " to " + AccountLink;
+	SlackChannelId = "CC61ZM8PN";
+	standalone.delugePostSuccessMessageToSlack(SuccessMessage,SlackChannelId);
+}
+catch (e)
+{
+	errorMsg = "Unexpected error in delugeMoveUserToOtherWorkspace: " + e;
+	standalone.delugeSendErrorAlert("delugeMoveUserToOtherWorkspace",previousValues.toString(),errorMsg);
+}
+}
