@@ -1,0 +1,204 @@
+string standalone.delugegetzohoidsfromdeviceoremaildev(String crmAPIRequest)
+{
+org_id = 20087400249;
+// Convert input string to map.
+crmAPIRequestMap = crmAPIRequest.toMap();
+request_body = crmAPIRequestMap.get("body");
+// Initialize inputs
+input_device_label = "";
+input_email = "";
+// Safely retrieve values if present
+if(request_body.containsKey("device_label"))
+{
+	input_device_label = request_body.get("device_label");
+}
+if(request_body.containsKey("email"))
+{
+	input_email = request_body.get("email");
+}
+// Validation: ensure exactly one of the two is provided
+if(input_device_label == "" && input_email == "" || input_device_label != "" && input_email != "")
+{
+	error_message = "Invalid request. Invalid values passed for 'email' and 'device_label'";
+	error_code = 400;
+	error_map = {"message":error_message,"code":error_code};
+	response_body = {"error":error_map};
+	response = {"status_code":404,"body":response_body};
+	return {"crmAPIResponse":response};
+}
+if(input_device_label != "")
+{
+	device_label = input_device_label.toUpperCase();
+	// 1. Invoke Tycho endpoint to retrieve Workspace ID from device label
+	retrieve_workspace_url = "https://meteor.cordulus.dev/svc/v1/devices/" + device_label;
+	retrieve_workspace_id = invokeurl
+	[
+		url :retrieve_workspace_url
+		type :GET
+		detailed:true
+		connection:"tychodev"
+	];
+	if(retrieve_workspace_id.get("responseCode") != "200")
+	{
+		responseText = retrieve_workspace_id.get("responseText");
+		error_message = responseText.get("message");
+		error_code = responseText.get("code");
+		info "Retrieve Workspace Failed: " + error_message;
+		info "Error Code: " + error_code;
+		error_map = {"message":error_message,"code":error_code};
+		response_body = {"error":error_map};
+		response = {"status_code":404,"body":response_body};
+		return {"crmAPIResponse":response};
+	}
+	// Retrieve Workspace ID from Tycho response
+	response_text = retrieve_workspace_id.get("responseText");
+	workspace_id = response_text.get("owner").get("workspaceId").toString();
+	info "Workspace ID: " + workspace_id;
+	// Note: using temp_workspace_id instead of workspace_id for testing
+	// 2. Invoke Populace endpoint to retrieve User ID from Workspace ID
+	retrieve_user_url = "https://populace.cordulus.dev/svc/v1/zoho/workspaces/" + workspace_id + "/owner";
+	retrieve_user_id = invokeurl
+	[
+		url :retrieve_user_url
+		type :GET
+		detailed:true
+		connection:"populacedev"
+	];
+	info "Retrieve User ID: " + retrieve_user_id;
+	if(retrieve_user_id.get("responseCode") != "200")
+	{
+		responseText = retrieve_user_id.get("responseText");
+		error_message = responseText.get("message");
+		error_code = responseText.get("code");
+		info "Retrieve User Failed: " + error_message;
+		info "Error Code: " + error_code;
+		error_map = {"message":"User not found.","code":error_code};
+		response_body = {"error":error_map};
+		response = {"status_code":404,"body":response_body};
+		return {"crmAPIResponse":response};
+	}
+	// Retrieve User ID from Populace response
+	user_id = retrieve_user_id.get("responseText").get("userId");
+	// 3. Retrieve Zoho Desk Contact using the User ID
+	search_contact_url = "https://desk.zoho.eu/api/v1/contacts/search?&customField1=cf_user_id:" + user_id + "&customField2=dev:true";
+	retrieve_contact = invokeurl
+	[
+		url :search_contact_url
+		type :GET
+		connection:"zohooauth"
+	];
+	// Validate contact search result
+	if(!retrieve_contact.contains("data"))
+	{
+		info "Error: No matching contact found. User ID does not match any Zoho Desk Contact.";
+		error_map = {"message":"No matching contact found. User ID does not match any Zoho Desk Contact.","code":""};
+		response_body = {"error":error_map};
+		response = {"status_code":404,"body":response_body};
+		return {"crmAPIResponse":response};
+	}
+	else if(retrieve_contact.get("data").size() != 1)
+	{
+		info "Error: More than one Contact found that matches User ID.";
+		error_map = {"message":"More than one Contact found that matches User ID: " + user_id,"code":""};
+		response_body = {"error":error_map};
+		response = {"status_code":409,"body":response_body};
+		return {"crmAPIResponse":response};
+	}
+}
+if(input_email != "")
+{
+	email = input_email.toLowerCase();
+	// 1. Retrieve Zoho Desk Contact using email
+	search_contact_url = "https://desk.zoho.eu/api/v1/contacts/search?email=" + email.encodeUrl() + "&customField2=dev:true";
+	retrieve_contact = invokeurl
+	[
+		url :search_contact_url
+		type :GET
+		connection:"zohooauth"
+	];
+	// Validate contact search result
+	if(!retrieve_contact.contains("data"))
+	{
+		info "Error: No matching contact found. Email does not match any Zoho Desk Contact.";
+		error_map = {"message":"No matching contact found. Email does not match any Zoho Desk Contact.","code":""};
+		response_body = {"error":error_map};
+		response = {"status_code":404,"body":response_body};
+		return {"crmAPIResponse":response};
+	}
+	else if(retrieve_contact.get("data").size() != 1)
+	{
+		info "Error: More than one Contact found that matches email.";
+		error_map = {"message":"More than one Contact found that matches email.","code":""};
+		response_body = {"error":error_map};
+		response = {"status_code":409,"body":response_body};
+		return {"crmAPIResponse":response};
+	}
+}
+// 4. Process Contact details and retrieve associated Account and Distributor information
+contact_data = retrieve_contact.get("data").get(0);
+contact_id = contact_data.get("id");
+contact_first_name = contact_data.get("firstName");
+contact_last_name = contact_data.get("lastName");
+contact_phone = contact_data.get("phone");
+contact_email = contact_data.get("email");
+desk_crm_contact_id = contact_data.get("zohoCRMContact").get("id");
+account_data = contact_data.get("account");
+account_id = account_data.get("id");
+account_name = account_data.get("accountName");
+// Retrieve Desk Account record using the account_id
+desk_account = zoho.desk.getRecordById(org_id,"Accounts",account_id,"zohooauth");
+desk_crm_account_id = desk_account.get("zohoCRMAccount").get("id");
+// Retrieve Zoho CRM Account details and related Distributor information
+zoho_crm_account = zoho.crm.getRecordById("Accounts",desk_crm_account_id);
+workspace_id = zoho_crm_account.get("Kanisa_Farm_ID");
+distributor_lookup = zoho_crm_account.get("Distributor_Lookup");
+distributor_id = "";
+team_id = "";
+distributor_name = "";
+if(distributor_lookup != null)
+{
+	// Retrieve the full distributor record only once to avoid duplicate calls
+	distributor_record = zoho.crm.getRecordById("Accounts",distributor_lookup.get("id"));
+	distributor_id = distributor_record.get("Populace_Distributor_ID");
+	team_id = distributor_record.get("Team_ID");
+	distributor_name = distributor_lookup.get("name");
+	// Retrieve Associated Contact ID
+	associated_contact_id = null;
+	retrieve_associated_contacts = invokeurl
+	[
+		url :"https://desk.zoho.eu/api/v1/accounts/" + account_id + "/contacts?from=0&limit=20"
+		type :GET
+		connection:"zohooauth"
+	];
+	associated_contacts = retrieve_associated_contacts.get("data");
+	for each  associated_contact in associated_contacts
+	{
+		if(associated_contact.get("mappingInfo").get("mappingType") == "SECONDARY")
+		{
+			associated_contact_id = associated_contact.get("id");
+		}
+	}
+	// info "Associated Contact ID: " + associated_contact_id;
+}
+// Build response maps
+contact_map = {"contactId":contact_id,"contactFirstName":contact_first_name,"contactLastName":contact_last_name,"contactEmail":contact_email,"contactPhone":contact_phone};
+account_map = {"accountId":account_id,"accountName":account_name,"workspaceId":workspace_id};
+distributor_map = {"distributorId":distributor_id,"teamId":team_id,"distributorName":distributor_name,"distributorContactId":associated_contact_id};
+response_body = {"contact":contact_map,"account":account_map,"distributor":distributor_map};
+response = {"status_code":200,"body":response_body};
+// Logging useful information
+info "Account Name: " + account_name;
+info "Account Zoho Desk ID: " + account_id;
+info "Account Zoho CRM ID: " + desk_crm_account_id;
+info "Workspace ID: " + workspace_id;
+info "Contact First Name: " + contact_first_name;
+info "Contact Last Name: " + contact_last_name;
+info "Contact Zoho Desk ID: " + contact_id;
+info "Contact Zoho CRM ID: " + desk_crm_contact_id;
+info "Distributor Name: " + distributor_name;
+info "Distributor ID: " + distributor_id;
+info "Distributor Team ID: " + team_id;
+info "Distributor Contact ID: " + associated_contact_id;
+info "Returned Response: " + response;
+return {"crmAPIResponse":response};
+}
