@@ -212,12 +212,16 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
-    "scripts/delugeSchlechtwetterRestAPI/delugeSchlechtwetterRestAPI.md",
-    "scripts/delugeSchlechtwetterRestAPI/delugeSchlechtwetterRestAPI.ds",
-    "scripts/delugeSchlechtwetterRestAPI",
-    "scripts/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
-    "scripts/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.ds",
-    "scripts/delugeGetWorkspaceIdsForSchlechtwetterAccounts",
+    "Schlechtwetter Service",
+    "Schlechtwetter Service/delugeSchlechtwettertageSchedule/delugeSchlechtwettertageSchedule.md",
+    "Schlechtwetter Service/delugeSchlechtwettertageSchedule/delugeSchlechtwettertageSchedule.ds",
+    "Schlechtwetter Service/delugeSchlechtwettertageSchedule",
+    "Schlechtwetter Service/delugeSchlechtwetterRestAPI/delugeSchlechtwetterRestAPI.md",
+    "Schlechtwetter Service/delugeSchlechtwetterRestAPI/delugeSchlechtwetterRestAPI.ds",
+    "Schlechtwetter Service/delugeSchlechtwetterRestAPI",
+    "Schlechtwetter Service/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
+    "Schlechtwetter Service/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.ds",
+    "Schlechtwetter Service/delugeGetWorkspaceIdsForSchlechtwetterAccounts",
     "scripts/Deluge_ Schlechtwetter Schedule/Deluge_ Schlechtwetter Schedule.md",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
     "conflict-files-obsidian-git.md",
@@ -229,8 +233,6 @@
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionHandler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
     "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.md",
-    "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.ds",
-    "Errors and Messages/delugePostSuccessMessageToSlack",
     "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.md",
     "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeLeadSheetHandler/delugeLeadSheetHandler.md",
@@ -245,8 +247,6 @@
     "scripts/delugeCroplineMembershipHandler/delugeCroplineMembershipHandler.md",
     "Acquisition and Onboarding/Marketing/delugeActiveCampaignHandler/delugeActiveCampaignHandler.md",
     "Connectors/delugePopulaceConnector/delugePopulaceConnector.md",
-    "Connectors/delugeTicketsConnector/delugeTicketsConnector.md",
-    "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
-    "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md"
+    "Connectors/delugeTicketsConnector/delugeTicketsConnector.md"
   ]
 }
