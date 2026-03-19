@@ -1,0 +1,64 @@
+void automation.delugeSyncProductsToRelatedProducts(String priceListId)
+{
+try 
+{
+	// --- STEP 1: PREPARE THE LIST ---
+	// Get the full Price List record to read the subform
+	priceListRecord = zoho.crm.getRecordById("Price_Lists",priceListId.toLong());
+	subformList = priceListRecord.get("Subform_2");
+	// Build the list of products that should be linked,
+	newProductsPayloadList = List();
+	if(subformList != null)
+	{
+		for each  subformRow in subformList
+		{
+			productLookup = subformRow.get("Products");
+			if(productLookup != null)
+			{
+				productId = productLookup.get("id");
+				newProductsPayloadList.add({"Related_Products":{"id":productId}});
+			}
+		}
+	}
+	info "New list of products to link for Price List " + priceListId + ": " + newProductsPayloadList;
+	// --- STEP 2: CLEAR ALL EXISTING LINKS ---
+	// Get the IDs of the records currently in the related list.
+	currentlyRelatedProducts = zoho.crm.getRelatedRecords("Related_Products","Price_Lists",priceListId.toLong());
+	if(currentlyRelatedProducts.size() > 0)
+	{
+		junctionRecordIds = List();
+		for each  relatedProduct in currentlyRelatedProducts
+		{
+			junctionRecordIds.add(relatedProduct.get("id"));
+		}
+		// Make a single DELETE call to remove all existing links at once.
+		info "Clearing " + junctionRecordIds.size() + " existing products for Price List " + priceListId;
+		deleteResponse = invokeurl
+		[
+			url :"https://www.zohoapis.eu/crm/v9/Price_Lists/" + priceListId + "/Related_Products?ids=" + junctionRecordIds
+			type :DELETE
+			connection:"zohocrmconnection"
+		];
+		info "Clear response: " + deleteResponse;
+	}
+	// --- STEP 3: ADD THE NEW, CORRECT LINKS ---
+	if(newProductsPayloadList.size() > 0)
+	{
+		// Build the payload to link the new list of products.
+		addPayload = {"data":newProductsPayloadList};
+		info "Setting " + newProductsPayloadList.size() + " new products for Price List " + priceListId;
+		addResponse = invokeurl
+		[
+			url :"https://www.zohoapis.eu/crm/v9/Price_Lists/" + priceListId + "/Related_Products"
+			type :POST
+			parameters:addPayload.toString()
+			connection:"zohocrmconnection"
+		];
+		info "Add response: " + addResponse;
+	}
+}
+catch (e)
+{
+	info "Error syncing products for Price List " + priceListId + ". Details: " + e;
+}
+}
