@@ -1,0 +1,97 @@
+string standalone.delugeConversionCustomPricingHandler(Int subscriptionProductId, String subscriptionPrice, String addons, String country, Int currentCycle)
+{
+try 
+{
+	// --- 1. Initialize final return maps --- 
+	relatedProductsList = List();
+	relatedAddonsList = List();
+	// --- 2. Process the main subscription products ---
+	if(subscriptionProductId != null)
+	{
+		productRecord = zoho.crm.getRecordById("Products",subscriptionProductId);
+		subscriptionProductName = productRecord.get("Product_Name");
+		// Find the correct product code for the subscription (New Sales)
+		subscriptionProductCode = null;
+		productCodes = productRecord.get("Product_Codes");
+		if(productCodes != null)
+		{
+			for each  productCodeRow in productCodes
+			{
+				if(productCodeRow.get("Product_Code_Type") == "New Sales")
+				{
+					// Apply country-specific lookup
+					subscriptionProductCode = if(country == "Denmark",productCodeRow.get("Product_Code_Denmark"),productCodeRow.get("Product_Code_Other"));
+					break;
+				}
+			}
+		}
+		// Add the main subscription product to the list
+		if(subscriptionProductCode != null)
+		{
+			relatedProductsMap = Map();
+			relatedProductsMap.put("Products",subscriptionProductId);
+			relatedProductsMap.put("Product_Code",subscriptionProductCode.toString());
+			relatedProductsMap.put("Current_Cycle_Pricing",subscriptionPrice);
+			// Assuming New Sale price is the same as the upcoming price, unless complex pricing is applied later
+			relatedProductsMap.put("Upcoming_Cycle_Pricing",subscriptionPrice);
+			relatedProductsList.add(relatedProductsMap);
+		}
+	}
+	// --- 3. Process all selected add-ons ---
+	for each  addon in addons
+	{
+		addonId = addon.get("id");
+		addonPrice = addon.get("price");
+		addonQuantity = addon.get("quantity");
+		addonProductCode = null;
+		addonProductRecord = zoho.crm.getRecordById("Products",addonId);
+		// info addonProductRecord;
+		addonProductName = addonProductRecord.get("Product_Name");
+		addonProductCodes = addonProductRecord.get("Product_Codes");
+		if(addonProductCodes != null)
+		{
+			for each  addonProductCodeRow in addonProductCodes
+			{
+				if(addonProductCodeRow.get("Product_Code_Type") == "New Sales")
+				{
+					addonProductCode = if(country == "Denmark",addonProductCodeRow.get("Product_Code_Denmark"),addonProductCodeRow.get("Product_Code_Other"));
+					break;
+				}
+			}
+		}
+		// Add the addon to the list if a code was found.
+		if(addonProductCode != null)
+		{
+			if(addonProductName != "Lufft IRS31 Pro: Annual Subscription (5+ Years)" && currentCycle <= 4)
+			{
+				relatedAddonsMap = Map();
+				relatedAddonsMap.put("Addons",addonId);
+				relatedAddonsMap.put("Quantity",addonQuantity);
+				relatedAddonsMap.put("Addon_Code",addonProductCode.toString());
+				relatedAddonsMap.put("Current_Cycle_Pricing",addonPrice);
+				relatedAddonsMap.put("Upcoming_Cycle_Pricing",addonPrice);
+				relatedAddonsList.add(relatedAddonsMap);
+			}
+			else if(addonProductName == "Lufft IRS31 Pro: Annual Subscription (5+ Years)" && currentCycle >= 4 || currentCycle >= 5)
+			{
+				relatedAddonsMap = Map();
+				relatedAddonsMap.put("Addons",addonId);
+				relatedAddonsMap.put("Quantity",addonQuantity);
+				relatedAddonsMap.put("Addon_Code",addonProductCode.toString());
+				relatedAddonsMap.put("Current_Cycle_Pricing",addonPrice);
+				relatedAddonsMap.put("Upcoming_Cycle_Pricing",addonPrice);
+				relatedAddonsList.add(relatedAddonsMap);
+			}
+		}
+	}
+	// --- 4. Return the two lists in a single map 
+	return {"success":true,"productsList":relatedProductsList,"addonsList":relatedAddonsList};
+}
+catch (e)
+{
+	// Log the error and return a failure state.
+	errorMessage = "Error in calculate_new_sale_pricing: " + e;
+	return {"success":false,"error_message":errorMessage};
+}
+return "";
+}
