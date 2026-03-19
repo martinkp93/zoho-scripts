@@ -194,8 +194,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Support/Shipment Labels",
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Renewal Cycle Updates/delugeUpdateConversionPricing.md",
     "scripts/delugeWAT03/delugeWAT03.ds",
     "scripts/delugeWAT03/delugeWAT03.md",
@@ -203,9 +204,9 @@
     "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.ds",
     "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.md",
     "scripts/delugeSyncActiveCampaignContact",
-    "scripts/delugeGLSLabelHandler/delugeGLSLabelHandler.md",
-    "scripts/delugeGLSLabelHandler/delugeGLSLabelHandler.ds",
-    "scripts/delugeGLSLabelHandler",
+    "Support/Shipment Labels/GLS Label Handler/delugeGLSLabelHandler.md",
+    "Support/Shipment Labels/GLS Label Handler/delugeGLSLabelHandler.ds",
+    "Support/Shipment Labels/GLS Label Handler",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT02/delugeWAT02.ds",
     "scripts/delugeWAT02",
