@@ -4,39 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "1c1f3b967f253b02",
-        "type": "tabs",
-        "dimension": 45.19230769230769,
-        "children": [
-          {
-            "id": "5656ca36876b2fb0",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Acquisition and Onboarding/Order Ingestion/Subscription Reversal Handler/delugeSubscriptionReversalHandler.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "delugeSubscriptionReversalHandler"
-            }
-          }
-        ]
-      },
-      {
         "id": "f3afbe6afa2a9b40",
         "type": "tabs",
-        "dimension": 54.807692307692314,
         "children": [
           {
             "id": "be42622720ea9833",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "Revenue and Finance/Conversion Pricing/delugeUpdateConversionPricing/delugeUpdateConversionPricing.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "delugeUpdateConversionPricing"
             }
           }
         ]
@@ -212,7 +194,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
     "Acquisition and Onboarding/Marketing/ActiveCampaign",
     "Support/Cancellation",
