@@ -14,7 +14,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
+                "file": "Acquisition and Onboarding/Order Ingestion/Subscription Reversal Handler/delugeSubscriptionReversalHandler.md",
                 "mode": "source",
                 "source": false
               },
@@ -226,9 +226,9 @@
     "scripts/delugeTriggerUpdateSectorWeatherSeries",
     "scripts/delugeTriggerCreateSectorWeatherWorkspaceSeries/delugeTriggerCreateSectorWeatherWorkspaceSeries.ds",
     "scripts/delugeTriggerCreateSectorWeatherWorkspaceSeries",
-    "scripts/delugeTriggerCreateSectorWeatherSeries/delugeTriggerCreateSectorWeatherSeries.md",
-    "scripts/delugeTriggerCreateSectorWeatherSeries/delugeTriggerCreateSectorWeatherSeries.ds",
-    "scripts/delugeTriggerCreateSectorWeatherSeries",
+    "scripts/Create Sector Weather Series/delugeTriggerCreateSectorWeatherSeries.md",
+    "scripts/Create Sector Weather Series/delugeTriggerCreateSectorWeatherSeries.ds",
+    "scripts/Create Sector Weather Series",
     "Connectors/SectorWeather/delugeSectorWeatherConnector.md",
     "Connectors/Daggers/delugeDaggersConnector.md",
     "Schlechtwetter Service/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
@@ -237,9 +237,9 @@
     "Schlechtwetter Service/delugeSchlechtwettertageSchedule/delugeSchlechtwettertageSchedule.md",
     "Schlechtwetter Service/delugeSchlechtwetterRestAPI/delugeSchlechtwetterRestAPI.md",
     "scripts/Deluge_ Schlechtwetter Schedule/Deluge_ Schlechtwetter Schedule.md",
-    "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
+    "Acquisition and Onboarding/Order Ingestion/Subscription Reversal Handler/delugeSubscriptionReversalHandler.md",
     "Connectors/Schlechtwetter/delugeSchlechtwetterConnector.md",
-    "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionHandler/delugeSubscriptionHandler.md",
+    "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
     "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.md",
     "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
