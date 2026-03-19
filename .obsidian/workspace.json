@@ -210,8 +210,10 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Acquisition and Onboarding/Lead",
+    "Acquisition and Onboarding",
     "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
     "Connectors",
     "Connectors/delugeDaggersConnector/delugeDaggersConnector.md",
@@ -227,7 +229,6 @@
     "scripts/delugeCroplineMembershipHandler/delugeCroplineMembershipHandler.ds",
     "scripts/delugeCroplineMembershipHandler",
     "scripts/delugeActiveCampaignHandler/delugeActiveCampaignHandler.md",
-    "scripts/delugeActiveCampaignHandler/delugeActiveCampaignHandler.ds",
     "Connectors/delugePopulaceConnector/delugePopulaceConnector.md",
     "Connectors/delugeTicketsConnector/delugeTicketsConnector.md",
     "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
