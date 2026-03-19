@@ -196,6 +196,12 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "scripts/delugeWeatherStationQuantityUpdate/delugeWeatherStationQuantityUpdate.ds",
+    "scripts/delugeWeatherStationQuantityUpdate/delugeWeatherStationQuantityUpdate.md",
+    "scripts/delugeWeatherStationQuantityUpdate",
+    "scripts/delugeUpdatePurchaseConversionAndSoQty/delugeUpdatePurchaseConversionAndSoQty.md",
+    "scripts/delugeUpdatePurchaseConversionAndSoQty/delugeUpdatePurchaseConversionAndSoQty.ds",
+    "scripts/delugeUpdatePurchaseConversionAndSoQty",
     "scripts/delugePostponeTo1JanOnNewOrders/delugePostponeTo1JanOnNewOrders.ds",
     "scripts/delugePostponeTo1JanOnNewOrders",
     "Watchtower/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md",
@@ -211,11 +217,7 @@
     "Support/Subscription Cancellation/Partial Cancellation/delugePartialCancellation.ds",
     "Support/Subscription Cancellation/Partial Cancellation",
     "Support/Subscription Cancellation/Scheduled Cancellation Removed/delugeCancellationScheduledRemoved.ds",
-    "Support/Subscription Cancellation/Scheduled Cancellation Removed",
-    "Support/Subscription Cancellation/Scheduled Cancellation/delugeCancellationScheduled.ds",
-    "Support/Subscription Cancellation/Scheduled Cancellation",
     "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md",
-    "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.ds",
     "scripts/Deluge_ Partial Cancellation/Deluge_ Partial Cancellation.md",
     "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.md",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
@@ -229,8 +231,6 @@
     "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
     "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.md",
     "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
-    "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.md",
-    "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.md",
-    "Acquisition and Onboarding/Marketing/ActiveCampaign/Resolve Request a Quote Pricing (for ActiveCampaign)/delugeResolveRaQPricing.md"
+    "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.md"
   ]
 }
