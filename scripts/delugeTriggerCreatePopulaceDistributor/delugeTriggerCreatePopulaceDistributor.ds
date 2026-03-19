@@ -1,0 +1,52 @@
+void automation.delugeTriggerCreatePopulaceDistributor(Int accountId, String country, String accountName, String departmentId)
+{
+//
+// Create Team in "Watchtower Live" department in Zoho Desk 
+// Prepare data map
+createTeamMap = Map();
+createTeamMap.put("name",accountName);
+createTeamMap.put("departmentId",departmentId);
+// Make the request
+createTeamResponse = invokeurl
+[
+	url :"https://desk.zoho.eu/api/v1/teams"
+	type :POST
+	parameters:createTeamMap.toString()
+	detailed:true
+	connection:"zohodesk"
+];
+info "Create Zoho Desk Team response: " + createTeamResponse;
+if(createTeamResponse.get("responseCode") != "200")
+{
+	info "Error: Failed to create Team in Zoho Desk with response: " + createTeamResponse.get("responseText");
+	return;
+}
+teamId = createTeamResponse.get("responseText").get("id");
+//
+// Create Distributor in Populace
+// Prepare payload
+distributorPayload = {"name":accountName,"country":country,"accountId":accountId,"deskTeamId":teamId};
+// Make the request
+createDistributorResponse = standalone.delugePopulaceConnector("createDistributor",distributorPayload);
+info "Create Populace Distributor response: " + createDistributorResponse;
+if(createDistributorResponse.get("success") != true)
+{
+	info "Error: Failed to create Distributor in Populace with response: " + createDistributorResponse;
+	return;
+}
+distributorId = createDistributorResponse.get("data").get("distributorId").toString();
+//
+// Update Distributor's Account in Zoho CRM
+// Prepare data map
+updateAccountMap = Map();
+updateAccountMap.put("Team_ID",teamId);
+updateAccountMap.put("Populace_Distributor_ID",distributorId);
+// Make the request
+updateAccountResponse = zoho.crm.updateRecord("Accounts",accountId,updateAccountMap);
+info "Update Zoho CRM Account response: " + updateAccountResponse;
+if(updateAccountResponse.notContains("Modified_Time"))
+{
+	info "Error: Failed to update Distributor's Account in Zoho CRM with response: " + updateAccountResponse;
+	return;
+}
+}
