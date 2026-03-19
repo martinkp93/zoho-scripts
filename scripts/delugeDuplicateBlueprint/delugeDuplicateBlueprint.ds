@@ -1,0 +1,41 @@
+string standalone.delugeDuplicateBlueprint()
+{
+blueprint = invokeurl
+[
+	url :"https://desk.zoho.eu/api/v1/blueprints/138065000024829130"
+	type :GET
+	connection:"zohodesk"
+];
+info blueprint;
+// Remove specific objects (not allowed for creating blueprint)
+blueprint.remove("id");
+blueprint.remove("criteria");
+blueprint.remove("orderNumber");
+blueprint.remove("layout");
+blueprint.remove("createdBy");
+blueprint.remove("createdTimeInMillis");
+blueprint.remove("modifiedBy");
+blueprint.remove("modifiedTimeInMillis");
+blueprint.remove("draft");
+// Update blueprint name
+// currentName = blueprint.get("name");
+blueprint.remove("name");
+currentName = "Watchtower: Sributor, Inc Blueprint";
+blueprint.put("name",currentName);
+blueprint.remove("description");
+currentTeamId = "138065000029751051";
+blueprint.put("description",currentTeamId);
+// If blueprint should be copied to another department
+// blueprint.remove("departmentId");
+// blueprint.put("departmentId","138065000024668141");
+// Execute POST with the modified Map
+response = invokeurl
+[
+	url :"https://desk.zoho.eu/api/v1/blueprints"
+	type :POST
+	parameters:blueprint.toString()
+	connection:"zohodesk"
+];
+info "Server Response: " + response;
+return "Process Complete";
+}

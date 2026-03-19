@@ -1,0 +1,17 @@
+void schedule.delugeTriggerRenewalsAndNewSalesExportHandler()
+{
+// 1. Define the configurations for both runs.
+configs = List();
+configs.add({"task":"Renewals","segment":"Cordulus"});
+configs.add({"task":"New Sales","segment":"Cordulus"});
+configs.add({"task":"Renewals","segment":"Cropline"});
+// 2. Loop through and trigger the standalone script
+for each  run in configs
+{
+	taskName = run.get("task");
+	segment = run.get("segment");
+	info "Triggering " + taskName;
+	// 3. Call standalone script 
+	standalone.delugeRenewalsAndNewSalesExportHandler(taskName,segment);
+}
+}
