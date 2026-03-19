@@ -35,7 +35,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "scripts/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
+                "file": "Acquisition and Onboarding/Marketing/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
                 "mode": "source",
                 "source": false
               },
@@ -228,11 +228,11 @@
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.md",
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.ds",
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)",
-    "scripts/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
+    "Acquisition and Onboarding/Marketing/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
     "scripts/delugeSyncProductsToRelatedProducts/delugeSyncProductsToRelatedProducts.md",
     "scripts/delugeSyncProductsToRelatedProducts/delugeSyncProductsToRelatedProducts.ds",
     "scripts/delugeSyncProductsToRelatedProducts",
-    "scripts/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.ds",
+    "Acquisition and Onboarding/Marketing/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.ds",
     "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
     "Environment Lifecycle/Update/Update Populace User/delugeTriggerUpdatePopulaceUser.md",
     "Environment Lifecycle/Delete/Delete Populace Workspace/delugeTriggerDeletePopulaceWorkspace.md",
