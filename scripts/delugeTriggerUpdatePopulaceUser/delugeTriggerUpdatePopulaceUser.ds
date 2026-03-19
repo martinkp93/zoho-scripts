@@ -1,0 +1,52 @@
+void automation.delugeTriggerUpdatePopulaceUser(Int contactId)
+{
+try 
+{
+	// --- 1. Get the latest Contact data ---
+	contactRecord = zoho.crm.getRecordById("Contacts",contactId);
+	userId = contactRecord.get("Kanisa_User_ID");
+	// Only proceed if there's a Populace User ID to update
+	if(userId != null)
+	{
+		// --- 2. Get the related Account to determine the language ---
+		language = "en";
+		// Default language
+		accountId = contactRecord.get("Account_Name").get("id");
+		if(accountId != null)
+		{
+			accountRecord = zoho.crm.getRecordById("Accounts",accountId);
+			language = if(accountRecord.get("Language") != null,accountRecord.get("Language"),language);
+		}
+		// --- 3. Build the payload for the connector ---
+		payload = Map();
+		payload.put("userId",userId);
+		payload.put("contactId",contactId);
+		payload.put("email",contactRecord.get("Email"));
+		payload.put("firstName",contactRecord.get("First_Name"));
+		payload.put("lastName",contactRecord.get("Last_Name"));
+		payload.put("language",language.toLowerCase());
+		// --- 4. Call your reusable standalone connector ---
+		info "Triggering Populace update for Contact ID: " + contactId;
+		response = standalone.delugePopulaceConnector("updateUser",payload);
+		info "Update Populace User response: " + response;
+		// --- 5. Add a note to the CRM record with the result ---
+		noteContent = if(response.get("success"),"Successfully synced contact with Populace User.","ERROR: Failed to sync contact with Populace User. Check Slack for details.");
+		noteMap = Map();
+		noteMap.put("Note_Title","Populace User Sync");
+		noteMap.put("Note_Content",noteContent + " (Triggered by field update)");
+		noteMap.put("Parent_Id",contactId);
+		noteMap.put("se_module","Contacts");
+		zoho.crm.createRecord("Notes",noteMap);
+	}
+}
+catch (e)
+{
+	// Log any unexpected errors
+	noteMap = Map();
+	noteMap.put("Note_Title","Populace User Sync");
+	noteMap.put("Note_Content","CRITICAL ERROR: The trigger_update_populace_user function failed unexpectedly. Details: " + e);
+	noteMap.put("Parent_Id",contactId);
+	noteMap.put("se_module","Contacts");
+	zoho.crm.createRecord("Notes",noteMap);
+}
+}
