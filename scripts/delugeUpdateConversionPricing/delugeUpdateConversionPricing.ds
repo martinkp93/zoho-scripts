@@ -1,0 +1,5 @@
+void automation.delugeUpdateConversionPricing(Int conversionId)
+{
+// Call the standalone specialist to do all the work.
+standalone.delugeConversionPricingHandler(conversionId);
+}
