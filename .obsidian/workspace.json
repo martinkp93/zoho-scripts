@@ -212,8 +212,20 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Environment Lifecycle/Update/Update Populace Workspace/delugeTriggerUpdatePopulaceWorkspace.ds",
+    "Environment Lifecycle/Update/Update Populace Workspace/delugeTriggerUpdatePopulaceWorkspace.md",
+    "Environment Lifecycle/Update/Update Populace Workspace",
+    "scripts/Update Populace Distributor/delugeTriggerUpdatePopulaceDistributor.md",
+    "scripts/Update Populace Distributor/delugeTriggerUpdatePopulaceDistributor.ds",
+    "scripts/Update Populace Distributor",
+    "scripts/delugeTriggerDeletePopulaceUser/delugeTriggerDeletePopulaceUser.md",
+    "scripts/delugeTriggerDeletePopulaceUser/delugeTriggerDeletePopulaceUser.ds",
+    "scripts/delugeTriggerDeletePopulaceUser",
+    "Environment Lifecycle/Update/Update Populace Membership/delugePopulaceMembershipHandler.md",
+    "Environment Lifecycle/Update/Update Populace Membership/delugePopulaceMembershipHandler.ds",
+    "Environment Lifecycle/Update/Update Populace Membership",
     "Schlechtwetter Service/Schlechtwetter Schedule/delugeSchlechtwettertageSchedule.md",
     "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.md",
     "Environment Lifecycle/Create/Create SectorWeather Series Subscription/delugeTriggerCreateSectorWeatherWorkspaceSeries.md",
@@ -221,15 +233,8 @@
     "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription",
     "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.md",
     "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.ds",
-    "Environment Lifecycle/Update/Update SectorWeather Series Subscription",
     "Environment Lifecycle/Update/Update SectorWeather Series/delugeTriggerUpdateSectorWeatherSeries.md",
-    "Environment Lifecycle/Update/Update SectorWeather Series/delugeTriggerUpdateSectorWeatherSeries.ds",
-    "Environment Lifecycle/Update/Update SectorWeather Series",
-    "Environment Lifecycle/Create/Create SectorWeather Series Subscription/delugeTriggerCreateSectorWeatherWorkspaceSeries.ds",
-    "Environment Lifecycle/Create/Create SectorWeather Series Subscription",
     "Environment Lifecycle/Create/Create SectorWeather Series/delugeTriggerCreateSectorWeatherSeries.md",
-    "Environment Lifecycle/Create/Create SectorWeather Series/delugeTriggerCreateSectorWeatherSeries.ds",
-    "Environment Lifecycle/Create/Create SectorWeather Series",
     "Connectors/SectorWeather/delugeSectorWeatherConnector.md",
     "Connectors/Daggers/delugeDaggersConnector.md",
     "Schlechtwetter Service/Get Workspace IDs for Schlechtwetter Accounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
@@ -244,11 +249,6 @@
     "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.md",
     "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
     "Acquisition and Onboarding/Lead Ingestion/Lead Sheet Handler/delugeLeadSheetHandler.md",
-    "Acquisition and Onboarding/Lead Ingestion/Lead Handler/delugeLeadHandler.md",
-    "Acquisition and Onboarding/Lead Generation/Mobile App/Mobile App Request a Quote/delugeMobileAppRequestAQuote.md",
-    "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
-    "Acquisition and Onboarding/Inventory/Get Warehouse ID for CRM Account/delugeZohoInventoryGetWarehouseId.md",
-    "Acquisition and Onboarding/Order Ingestion/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md",
-    "Errors and Messages/Send Error Alert to Slack/delugeSendErrorAlert.md"
+    "Acquisition and Onboarding/Lead Ingestion/Lead Handler/delugeLeadHandler.md"
   ]
 }
