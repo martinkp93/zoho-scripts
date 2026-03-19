@@ -1,0 +1,36 @@
+void automation.delugeTriggerUpdateSectorWeatherWorkspaceSeries(Int zohoSeriesSubId)
+{
+// 1. Initialisation
+action = "updateWorkspaceSeriesSubscription";
+// 2. Retrieve record, build payload
+seriesSubRecord = zoho.crm.getRecordById("Race_Series_Subscriptions",zohoSeriesSubId);
+account = zoho.crm.getRecordById("Accounts",seriesSubRecord.get("Account").get("id"));
+workspaceId = account.get("Kanisa_Farm_ID");
+seriesSubform = seriesSubRecord.get("Related_Race_Series");
+// 2.1. Parse subform in the record
+for each  row in seriesSubform
+{
+	seriesSubId = row.get("SectorWeather_Series_Sub_ID");
+	if(seriesSubId != null)
+	{
+		payload = Map();
+		zohoSeriesId = row.get("Race_Series_Name").get("id").toLong();
+		zohoSubId = row.get("id").toLong();
+		seriesId = row.get("SectorWeather_Series_ID");
+		subStart = row.get("Start").toTime().addHour(1).toString("yyyy-MM-dd'T'HH:mm:ss'Z'","UTC");
+		subEnd = row.get("End").toTime().addHour(25).toString("yyyy-MM-dd'T'HH:mm:ss'Z'","UTC");
+		payload.put("workspaceId",workspaceId.toLong());
+		payload.put("seriesId",seriesId.tolong());
+		payload.put("start",subStart);
+		payload.put("end",subEnd);
+		payload.put("zohoSubId",zohoSubId);
+		payload.put("seriesSubId",seriesSubId);
+		info row.get("id").toLong();
+		// 3. Call standalone connector
+		info "Triggering SectorWeather Workspace Series update for Workspace ID: " + workspaceId + " and Series ID: " + seriesId;
+		info payload;
+		response = standalone.delugeSectorWeatherConnector(action,payload);
+		info "PUT SectorWeather Workspace Series response: " + response;
+	}
+}
+}
