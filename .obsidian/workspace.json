@@ -212,8 +212,10 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeVisitsToActiveCampaign/delugeVisitsToActiveCampaign.ds",
+    "scripts/delugeVisitsToActiveCampaign",
     "Buttons",
     "Validation Rules",
     "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
@@ -228,8 +230,6 @@
     "Environment Lifecycle/Create/Create Populace Distributor",
     "Buttons/Initiate Password Reset/delugePopulaceInitiatePasswordReset.md",
     "Buttons/Initiate Password Reset/delugePopulaceInitiatePasswordReset.ds",
-    "Buttons/Initiate Password Reset",
-    "Environment Lifecycle/Update/Update Populace User/delugeTriggerUpdatePopulaceUser.ds",
     "Environment Lifecycle/Update/Update Populace Distributor User/delugeSyncUserToPopulaceDistributor.md",
     "Environment Lifecycle/Update/Update Populace Workspace/delugeTriggerUpdatePopulaceWorkspace.md",
     "Environment Lifecycle/Update/Update Populace Distributor/delugeTriggerUpdatePopulaceDistributor.md",
