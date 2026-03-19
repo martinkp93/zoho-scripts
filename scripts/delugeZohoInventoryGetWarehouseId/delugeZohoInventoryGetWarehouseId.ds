@@ -1,0 +1,88 @@
+void automation.delugeZohoInventoryGetWarehouseId(String account_name, Int account_id, String country)
+{
+items = zoho.inventory.getRecordsByID("Items","20087400261","389902000050438236","zohoinventory");
+item = items.get("item");
+warehouses = item.get("warehouses");
+matched_warehouse_id = null;
+matched_warehouse_name = null;
+warehouse_note = null;
+// Initialize the note
+// Iterate through warehouses to find a match
+for each  warehouse in warehouses
+{
+	warehouse_id = warehouse.get("warehouse_id");
+	warehouse_name = warehouse.get("warehouse_name");
+	// Check for direct match or "Machinery" subsidiary
+	if(warehouse_name == account_name)
+	{
+		matched_warehouse_id = warehouse_id;
+		matched_warehouse_name = warehouse_name;
+		warehouse_note = "Warehouse matched account name.";
+		break;
+	}
+	else if(account_name != null && account_name.indexOf("Machinery") != -1 && warehouse_name == account_name.substring(0,account_name.indexOf(" Machinery")))
+	{
+		matched_warehouse_id = warehouse_id;
+		matched_warehouse_name = warehouse_name;
+		warehouse_note = "Matched a Machinery subsidiary.";
+		break;
+	}
+	else if(country == "United Kingdom" && account_name != "GB Trading Group Ltd." && warehouse_name == "Bezos.ai")
+	{
+		matched_warehouse_id = warehouse_id;
+		matched_warehouse_name = warehouse_name;
+		warehouse_note = "Matched a UK company to Bezos.ai.";
+		break;
+	}
+}
+// If no match found, set to "Cordulus A/S"
+if(matched_warehouse_id == null)
+{
+	for each  warehouse in warehouses
+	{
+		if(warehouse.get("warehouse_name") == "Cordulus A/S")
+		{
+			matched_warehouse_id = warehouse.get("warehouse_id");
+			matched_warehouse_name = warehouse.get("warehouse_name");
+			warehouse_note = "No warehouse matched the account name. Defaulted to Cordulus A/S as warehouse.";
+			break;
+		}
+	}
+}
+// Output the matched warehouse ID
+if(matched_warehouse_id != null)
+{
+	info "Matched Warehouse ID: " + matched_warehouse_id;
+}
+else
+{
+	info "No warehouse matched the account name, and 'Cordulus A/S' was not found.";
+}
+// Assuming matched_warehouse_id is already obtained from the previous script
+update_map = Map();
+if(matched_warehouse_id != null)
+{
+	update_map.put("Warehouse_ID",matched_warehouse_id);
+	update_map.put("Warehouse_Name",matched_warehouse_name);
+	if(warehouse_note != null)
+	{
+		update_map.put("Warehouse_Note",warehouse_note);
+	}
+}
+else
+{
+	update_map.put("Warehouse_Note","No warehouse matched the account name.");
+	update_map.put("Warehouse_Name","");
+	update_map.put("Warehouse_ID","");
+}
+// Update the Account record with the new Warehouse ID or the message
+if(account_id != null)
+{
+	update_response = zoho.crm.updateRecord("Accounts",account_id,update_map);
+	info "Update Response: " + update_response;
+}
+else
+{
+	info "Account ID is not provided.";
+}
+}
