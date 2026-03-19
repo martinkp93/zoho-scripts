@@ -196,6 +196,12 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeTriggerAddWorkspaceToDistributor/delugeTriggerAddWorkspaceToDistributor.md",
+    "scripts/delugeTriggerAddWorkspaceToDistributor/delugeTriggerAddWorkspaceToDistributor.ds",
+    "scripts/delugeTriggerAddWorkspaceToDistributor",
+    "scripts/delugePriceListIncreaseHandlerSchedule/delugePriceListIncreaseHandlerSchedule.md",
+    "scripts/delugePriceListIncreaseHandlerSchedule/delugePriceListIncreaseHandlerSchedule.ds",
+    "scripts/delugePriceListIncreaseHandlerSchedule",
     "scripts/delugeRenewalsAndNewSalesExportHandler/delugeRenewalsAndNewSalesExportHandler.md",
     "scripts/delugeProcessRenewalsOrNewSalesForInvoicingV2/delugeProcessRenewalsOrNewSalesForInvoicingV2.md",
     "scripts/delugeProcessRenewalsOrNewSalesForInvoicingV2/delugeProcessRenewalsOrNewSalesForInvoicingV2.ds",
@@ -206,11 +212,7 @@
     "scripts/delugeInvoicingDataExportHandler/delugeInvoicingDataExportHandler.md",
     "scripts/delugeInvoicingDataExportHandler/delugeInvoicingDataExportHandler.ds",
     "scripts/delugeInvoicingDataExportHandler",
-    "scripts/accountvalidation/accountvalidation.ds",
     "scripts/accountvalidation/accountvalidation.md",
-    "scripts/accountvalidation",
-    "scripts/delugeRenewalsAndNewSalesExportHandler/delugeRenewalsAndNewSalesExportHandler.ds",
-    "scripts/delugeRenewalsAndNewSalesExportHandler",
     "scripts/delugeMoveUserToOtherWorkspace/delugeMoveUserToOtherWorkspace.md",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT03/delugeWAT03.md",
@@ -229,8 +231,6 @@
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.md",
     "Related Lists/Sync Products to Price List's Related Products/delugeSyncProductsToRelatedProducts.md",
     "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
-    "Environment Lifecycle/Update/Update Populace User/delugeTriggerUpdatePopulaceUser.md",
-    "Environment Lifecycle/Delete/Delete Populace Workspace/delugeTriggerDeletePopulaceWorkspace.md",
-    "Environment Lifecycle/Create/Create Populace Distributor/delugeTriggerCreatePopulaceDistributor.md"
+    "Environment Lifecycle/Update/Update Populace User/delugeTriggerUpdatePopulaceUser.md"
   ]
 }
