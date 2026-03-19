@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001170034"
 Name: Deluge: Populace Connector
-Revision Timestamp: 2026-03-19T14:29:09.413Z
+Revision Timestamp: 2026-03-19T14:34:06.301Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -37,31 +37,31 @@ This script orchestrates the following internal functions and external services:
 
 ```mermaid
 graph TD
-    Start([Start]) --> Config[Lookup Action in Config Map]
-    Config --> CheckAction{Action Valid?}
+    Start(["Start"]) --> Config["Lookup Action in Config Map"]
+    Config --> CheckAction{"Action Valid?"}
     
-    CheckAction -- No --> ErrAction[Call delugeSendErrorAlert]
-    ErrAction --> RetFail[Return Success: False]
+    CheckAction -- "No" --> ErrAction["Call [[delugeSendErrorAlert]]"]
+    ErrAction --> RetFail["Return Success: False"]
     
-    CheckAction -- Yes --> PathParam[Iterate Payload Keys]
-    PathParam --> Replace{Key in Path?}
-    Replace -- Yes --> Sub[Replace {key} in Path & Remove from Payload]
-    Replace -- No --> Next[Keep in Payload for Body]
+    CheckAction -- "Yes" --> PathParam["Iterate Payload Keys"]
+    PathParam --> Replace{"Key in Path?"}
+    Replace -- "Yes" --> Sub["Replace {key} in Path & Remove from Payload"]
+    Replace -- "No" --> Next["Keep in Payload for Body"]
     Sub --> PathParam
     Next --> PathParam
     
-    PathParam -- Done --> Invoke{Method Type?}
-    Invoke -- POST/PUT --> InvBody[InvokeURL with Payload as JSON Body]
-    Invoke -- DELETE --> InvDel[InvokeURL without Body]
+    PathParam -- "Done" --> Invoke{"Method Type?"}
+    Invoke -- "POST/PUT" --> InvBody["InvokeURL with Payload as JSON Body"]
+    Invoke -- "DELETE" --> InvDel["InvokeURL without Body"]
     
-    InvBody --> RespCode{HTTP 200/201/204?}
+    InvBody --> RespCode{"HTTP 200/201/204?"}
     InvDel --> RespCode
     
-    RespCode -- Yes --> RetSucc[Return Success: True + Data]
-    RespCode -- No --> ErrAPI[Call delugeSendErrorAlert]
+    RespCode -- "Yes" --> RetSucc["Return Success: True + Data"]
+    RespCode -- "No" --> ErrAPI["Call [[delugeSendErrorAlert]]"]
     ErrAPI --> RetFail
     
-    catch[Exception Catch] --> ErrCatch[Call delugeSendErrorAlert]
+    catch["Exception Catch"] --> ErrCatch["Call [[delugeSendErrorAlert]]"]
     ErrCatch --> RetFail
 ```
 
@@ -85,11 +85,14 @@ The script standardizes the `invokeurl` call using a named connection (`populace
 > [!IMPORTANT]
 > This script requires a Zoho Connection named `populace` to be pre-configured with the appropriate scopes for the external API.
 
+
 > [!WARNING]
 > The script modifies the `payload` map in-place during the path-substitution phase. If the calling script needs the original payload map after this function executes, it must pass a copy.
 
+
 > [!CAUTION]
 > If a path parameter is missing from the `payload` map but required by the URL template (e.g., `{userId}`), the literal string `{userId}` will remain in the URL, likely causing a 404 or 400 error from the API.
+
 
 > [!SUCCESS]
 > The interpolation logic handles complex paths with multiple parameters (e.g., `/distributors/{distributorId}/users/{userId}`) by iteratively updating the path and cleaning the payload body.
@@ -97,3 +100,4 @@ The script standardizes the `invokeurl` call using a named connection (`populace
 ## Change Log
 - **2026-03-19T14:28:08.009Z:** Initial creation of documentation via DeluluDocu.
 - **2026-03-19T14:29:09.413Z:** Maintenance update; minor comment adjustment in Step 1 to clarify configuration maps. No logic changes were made to the core execution flow.
+- **2026-03-19T14:34:06.301Z:** Minor non-functional update; corrected a typographical error in a code comment and removed an extraneous space in the function signature. Logic remains identical to the previous version.
