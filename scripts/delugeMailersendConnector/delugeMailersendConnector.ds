@@ -1,0 +1,32 @@
+string standalone.delugeMailersendConnector(Map payload)
+{
+try 
+{
+	response = invokeurl
+	[
+		url :"https://api.mailersend.com/v1/email"
+		type :POST
+		parameters:payload.toString()
+		headers:{"Content-Type":"application/json"}
+		detailed:true
+		connection:"mailersend"
+	];
+	// MailerSend returns 202 (Accepted) on success
+	if(response.get("responseCode") == 202)
+	{
+		return {"success":true,"data":response};
+	}
+	else
+	{
+		errorMessage = "MailerSend API call failed. Response: " + response;
+		standalone.delugeSendErrorAlert("mailersend_connector",payload.toString(),errorMessage);
+		return {"success":false,"error_message":errorMessage};
+	}
+}
+catch (e)
+{
+	errorMessage = "An unexpected error occurred in mailersend_connector. Details: " + e;
+	standalone.delugeSendErrorAlert("mailersend_connector",payload.toString(),errorMessage);
+	return {"success":false,"error_message":errorMessage};
+}
+}
