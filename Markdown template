@@ -1,10 +1,3 @@
----
-Function ID: "12345678"
-Name:
-Revision Timestamp:
-Status: Functional
-
-
 **Postman Documentation:** [Link to API Collection Placeholder]
 
 ---
@@ -65,7 +58,7 @@ graph TD
 > 2. **Step [NUMBER] ([specificSection]):** [detail the error and how to solve it]
 
 
-> [!SUCCESS]
+> [!TIP]
 > **[TYPE] ALERT:** The current revision resolves x critical [errorType] errors.
 > 3. **Step [NUMBER] ([specificSection]):** [detail the error and it was resolved]
 > 4. **Step [NUMBER] ([specificSection]):** [detail the error and it was resolved]
