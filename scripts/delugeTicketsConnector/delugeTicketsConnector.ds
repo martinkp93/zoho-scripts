@@ -1,0 +1,93 @@
+string standalone.delugeTicketsConnector(String action, Map payload)
+{
+try 
+{
+	baseUrl = "https://tickets.cordulus.com/svc/v1";
+	// --- Step 1: Config Map ---
+	config = Map();
+	// Credentials
+	config.put("createCredentials",{"m":"POST","p":"/users/{userId}/credentials"});
+	config.put("deleteCredentials",{"m":"DELETE","p":"/users/{userId}/credentials"});
+	// API Keys
+	config.put("createApiKey",{"m":"POST","p":"/users/{userId}/workspaces/{workspaceId}/api-keys"});
+	config.put("deleteApiKey",{"m":"DELETE","p":"/users/{userId}/workspaces/{workspaceId}/api-keys"});
+	// Password Management (uses another url)
+	config.put("initiatePasswordReset",{"m":"POST","p":"https://tickets.cordulus.com/api/v1/initiate-password-reset"});
+	// Find and replace the keys in the url with key-values passed in input
+	actionData = config.get(action);
+	if(actionData == null)
+	{
+		errorMsg = "Tickets API " + action + " failed: Invalid action specified";
+		standalone.delugeSendErrorAlert("tickets_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":errorMsg};
+	}
+	// --- Step 2: Build the URL ---
+	method = actionData.get("m");
+	path = actionData.get("p");
+	// Handle Paths (initiate password reset uses another url)
+	url = if(path.startsWith("http"),path,baseUrl + path);
+	// Dynamic ID replacement
+	for each  key in payload.keys()
+	{
+		searchTarget = "{" + key + "}";
+		if(url.contains(searchTarget))
+		{
+			val = ifNull(payload.get(key),"").toString().encodeUrl();
+			parts = url.toList(searchTarget);
+			// Remove from payload so it's not sent in the JSON body
+			payload.remove(key);
+			if(parts.size() == 1)
+			{
+				url = parts.get(0) + val;
+			}
+			else
+			{
+				url = parts.toText(val);
+			}
+		}
+	}
+	// --- Step 3: Execute ---
+	response = Map();
+	headerMap = {"Content-Type":"application/json"};
+	if(method == "POST")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :POST
+			parameters:payload.toString()
+			detailed:true
+			connection:"tickets"
+		];
+	}
+	else if(method == "DELETE")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :DELETE
+			detailed:true
+			connection:"tickets"
+		];
+	}
+	// --- Step 4: Handle Response ---
+	successCodes = {200,201,204};
+	responseCode = response.get("responseCode").toLong();
+	if(successCodes.contains(responseCode))
+	{
+		return {"success":true,"data":response.get("responseText")};
+	}
+	else
+	{
+		errorMsg = "Tickets API " + action + " failed (" + responseCode + "): " + response.get("responseText");
+		standalone.delugeSendErrorAlert("tickets_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":errorMsg};
+	}
+}
+catch (e)
+{
+	errorMsg = "Unexpected error in tickets_connector: " + e;
+	standalone.delugeSendErrorAlert("tickets_connector",payload.toString(),errorMsg);
+	return {"success":false,"error_message":errorMsg};
+}
+}
