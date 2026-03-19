@@ -1,0 +1,220 @@
+void automation.getVisits1(Int visit_id)
+{
+// Get the visit data
+visit = zoho.crm.getRecordById("Visits",visit_id);
+contact_id = visit.get("Visited_By").get("id");
+// info "Contact ID: " + contact_id;
+visit_created_time = visit.get("Created_Time");
+visit_created_date = visit_created_time.subString(0,10);
+// info "Visit Created Date : " + visit_created_date;
+// info "Visit Created Time: " + visit_created_time ;
+// info "Visit: " + visit;
+// Get the actions_performed data
+actions_performed = zoho.crm.getRelatedRecords("Actions_Performed","Visits",visit_id);
+// info "Actions Performed Data: " + actions_performed ;
+// Check if Visit Data includes a URL with "success" and if it's the only page visited
+// We don't want to continue if that is the case, as it indicates a session on a 
+// "Success" page that wasn't exited after sign up.
+containsSuccessURL = false;
+isOnlySuccessPage = false;
+conversion_url = "";
+for each  ap in actions_performed
+{
+	actions = ap.get("Actions");
+	if(actions != null)
+	{
+		if(containsSuccessURL)
+		{
+			// If we have found the "success" URL in the previous iteration
+			conversion_url = actions;
+			break;
+		}
+		if(actions.contains("success"))
+		{
+			containsSuccessURL = true;
+			// Check if it's the only page visited
+			if(actions_performed.size() == 1)
+			{
+				isOnlySuccessPage = true;
+			}
+		}
+	}
+}
+// Output the URL visited before 'success' if found
+if(conversion_url != "")
+{
+	info "The URL visited before 'success' is: " + conversion_url;
+}
+else if(containsSuccessURL && conversion_url == "")
+{
+	info "There is no URL visited before 'success'.";
+}
+// Output if it's the only page visited
+if(isOnlySuccessPage)
+{
+	info "The 'success' URL is the only page visited.";
+}
+//
+// Only continue script if URL contains 'success'
+if(containsSuccessURL && !isOnlySuccessPage)
+{
+	//
+	// Get the Accessed URL in the array of Actions Performed
+	containsUtmParams = false;
+	for each  ap in actions_performed
+	{
+		action_type = ap.get("Action_Type");
+		if(action_type == "Accessed")
+		{
+			accessed_url = ap.get("Actions");
+			page_visited = ap.get("Parent_Id").get("name");
+			info "Accessed URL: " + accessed_url;
+			info "Page Visited: " + page_visited;
+			if(accessed_url.contains("utm"))
+			{
+				containsUtmParams = true;
+				accessed_url_parts = accessed_url.subString(accessed_url.indexOf("?") + 1).toList("&");
+				url_params = Map();
+				for each  part in accessed_url_parts
+				{
+					if(part.contains("="))
+					{
+						param_parts = part.toList("=");
+						url_params.put(param_parts.get(0),param_parts.get(1));
+					}
+				}
+				utm_source = url_params.get("utm_source");
+				if(utm_source = "fb" || utm_source = "Facebook" || utm_source = "Meta")
+				{
+					utm_source = "Facebook";
+					utm_medium = url_params.get("utm_medium");
+					utm_content = url_params.get("utm_content");
+					utm_campaign = url_params.get("utm_campaign");
+					utm_traffic = url_params.get("utm_traffic");
+					utm_adsetname = url_params.get("utm_adsetname");
+				}
+				if(utm_traffic == null)
+				{
+					utm_traffic = "Paid";
+				}
+				if(utm_source == "ActiveCampaign")
+				{
+					utm_medium = url_params.get("utm_medium");
+					utm_content = url_params.get("utm_content");
+					utm_campaign = url_params.get("utm_campaign");
+					utm_traffic = "Organic";
+				}
+				params_map = Map();
+				params_map.put("Page_Visited",page_visited);
+				params_map.put("URL_Long",accessed_url);
+				params_map.put("Visited_Page_URL_Long",accessed_url);
+				params_map.put("Conversion_URL_Long",conversion_url);
+				params_map.put("UTM_Source",utm_source);
+				params_map.put("UTM_Medium",utm_medium);
+				params_map.put("UTM_Content",utm_content);
+				params_map.put("UTM_Campaign",utm_campaign);
+				params_map.put("UTM_Traffic",utm_traffic);
+				params_map.put("Visit_ID",visit_id.toString());
+				info "URL contains UTM Params. Creating " + utm_source + " Params Map.";
+				// info "UTM Params Map: " + params_map;
+			}
+			else if(accessed_url.contains("fbclid") && containsUtmParams == false)
+			{
+				info "URL does not contain UTM Params, but contains 'fbclid'. Creating 'Facebook' and 'Paid' params map.";
+				containsUtmParams = false;
+				params_map = Map();
+				params_map.put("Page_Visited",page_visited);
+				params_map.put("URL_Long",accessed_url);
+				params_map.put("Visited_Page_URL_Long",accessed_url);
+				params_map.put("Conversion_URL_Long",conversion_url);
+				params_map.put("UTM_Source","Facebook");
+				params_map.put("UTM_Traffic","Paid");
+				params_map.put("Visit_ID",visit_id.toString());
+			}
+			else
+			{
+				info "URL does not contain UTM Params. Creating Organic params map.";
+				containsUtmParams = false;
+				params_map = Map();
+				params_map.put("Page_Visited",page_visited);
+				params_map.put("URL_Long",accessed_url);
+				params_map.put("Visited_Page_URL_Long",accessed_url);
+				params_map.put("Conversion_URL_Long",conversion_url);
+				params_map.put("UTM_Source","Direct");
+				params_map.put("UTM_Traffic","Organic");
+				params_map.put("Visit_ID",visit_id.toString());
+			}
+		}
+	}
+	info "Params Map:" + params_map;
+	//
+	// Get the Account ID related to the Contact
+	account = zoho.crm.getRecordById("Contacts",contact_id).get("Account_Name");
+	account_id = account.get("id");
+	//Get email related to the Contact
+	email = zoho.crm.getRecordById("Contacts",contact_id).get("Email");
+	activeCampaignContactId = zoho.crm.getRecordById("Contacts",contact_id).get("ActiveCampaign_Contact_ID");
+	// Get ActiveCampaign Contact ID related to the Contact
+	// info "Account: " + account;
+	// info "Account ID: " + account_id;
+	//
+	// Get the specific Conversion to update
+	conversions = zoho.crm.getRelatedRecords("Demo_Conversions","Accounts",account_id);
+	// info "Conversions: " + conversions;
+	//
+	// Loop through conversion to find conversion related to current visit
+	for each  conversion in conversions
+	{
+		conversion_created_time = conversion.get("Created_Time");
+		conversion_name = conversion.get("Name");
+		conversion_id = conversion.get("id");
+		conversion_activeCampaign_id = conversion.get("ActiveCampaign_ID");
+		conversion_created_date = conversion_created_time.subString(0,10);
+		if(conversion_created_date == visit_created_date && conversion_name != "Purchase Conversion")
+		{
+			// if(conversion_name == "Demo Conversion")
+			// if(conversion_name == "Demo Conversion")
+			info "Matched Conversion Created Time: " + conversion_created_time;
+			info "Matched Conversion: " + conversion_name + " ( " + conversion_id + ")";
+			update_conversion_response = zoho.crm.updateRecord("Conversions",conversion_id,params_map);
+			info "Update Conversion Response: " + update_conversion_response;
+			if(activeCampaignContactId != null)
+			{
+				activeCampaignUtmSource = params_map.get("UTM_Source");
+				activeCampaignUtmCampaign = params_map.get("UTM_Campaign");
+				activeCampaignUtmMedium = params_map.get("UTM_Medium");
+				info activeCampaignUtmSource;
+				info activeCampaignUtmMedium;
+				info activeCampaignUtmCampaign;
+				// Define field values correctly as a list
+				fieldValuesList = list();
+				fieldValuesList.add({"field":"47","value":activeCampaignUtmSource});
+				fieldValuesList.add({"field":"48","value":activeCampaignUtmMedium});
+				fieldValuesList.add({"field":"49","value":activeCampaignUtmCampaign});
+				// Create the "contact" map with email and fieldValues
+				contactMap = Map();
+				contactMap.put("email",email);
+				contactMap.put("fieldValues",fieldValuesList);
+				// Correct payload structure (ActiveCampaign expects a "contact" key)
+				updateMap = Map();
+				updateMap.put("contact",contactMap);
+				//info updateMap;
+				// Make API call
+				response = invokeurl
+				[
+					url :"https://cordulus.api-us1.com/api/3/contact/sync"
+					type :post
+					parameters:updateMap.toString()
+					detailed:true
+					connection:"activecampaign"
+				];
+				info "Update AC Contact Response: " + response.get("responseCode");
+			}
+		}
+		else
+		{
+			info "No eligible visit data found for updating the Conversion.";
+		}
+	}
+}
+}
