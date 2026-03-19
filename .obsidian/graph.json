@@ -18,13 +18,13 @@
       "query": "path:Connectors  ",
       "color": {
         "a": 1,
-        "rgb": 369325
+        "rgb": 12322797
       }
     }
   ],
   "collapse-display": false,
   "showArrow": true,
-  "textFadeMultiplier": -3,
+  "textFadeMultiplier": -2.2,
   "nodeSizeMultiplier": 1.36689670138889,
   "lineSizeMultiplier": 1.43495225694444,
   "collapse-forces": false,
@@ -32,6 +32,6 @@
   "repelStrength": 13.6345486111111,
   "linkStrength": 0.534201388888889,
   "linkDistance": 500,
-  "scale": 1.11502408939586,
+  "scale": 0.5275526465052618,
   "close": false
 }

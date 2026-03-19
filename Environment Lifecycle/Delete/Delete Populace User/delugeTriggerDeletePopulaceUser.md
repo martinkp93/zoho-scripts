@@ -23,9 +23,9 @@ The `delugeTriggerDeletePopulaceUser` function serves as an orchestration layer 
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service                    | Purpose                                                                         | Criticality |
-| ------------------------------------- | ------------------------------------------------------------------------------- | ----------- |
-| [[standalonedelugePopulaceConnector]] | Handles the actual HTTP communication and authentication with the Populace API. | High        |
+| Function / Service          | Purpose                                                                         | Criticality |
+| --------------------------- | ------------------------------------------------------------------------------- | ----------- |
+| [[delugePopulaceConnector]] | Handles the actual HTTP communication and authentication with the Populace API. | High        |
 
 ## Logic Flow
 
