@@ -196,6 +196,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/Subscriptionresurrection/Subscriptionresurrection.md",
     "scripts/Subscriptionresurrection/Subscriptionresurrection.ds",
     "scripts/Subscriptionresurrection",
     "scripts/delugePriceListPricingHandler/delugePriceListPricingHandler.md",
@@ -217,7 +218,6 @@
     "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.md",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.ds",
-    "Environment Lifecycle/Update/Update Populace Workspace Distributor",
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT03/delugeWAT03.md",
