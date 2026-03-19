@@ -1,0 +1,34 @@
+// test 
+subscriptionId = subscriptions.get("subscription_id");
+organizationId = organization.get("organization_id");
+zcrmAccountId = subscriptions.get("customer").get("zcrm_account_id");
+startMonth = subscriptions.get("start_date").month();
+nextBillingYear = subscriptions.get("next_billing_at").year() + 1;
+zcrmAccount = zoho.crm.getRecordById("Accounts",zcrmAccountId,"zohocrmall");
+// info "ZCRM Account: " + zcrmAccount;
+if(zcrmAccount.get("Distributor_Lookup").get("name") == "Ceravis AG" && startMonth.toString() != "1")
+{
+	postponeNextBillingAt = nextBillingYear + "-01-01";
+	info "Postpone Next Billing At: " + postponeNextBillingAt;
+	parameters_data = {"renewal_at":postponeNextBillingAt};
+	updateNextBilling = invokeurl
+	[
+		url :"https://www.zohoapis.eu/billing/v1/subscriptions/" + subscriptionId + "/postpone"
+		type :POST
+		parameters:parameters_data.toString()
+		detailed:true
+		connection:"zohobilling"
+	];
+	info "Update Next Billing Response: " + updateNextBilling.get("responseCode");
+	sendmail
+	[
+		from :zoho.adminuserid
+		to :"mp@cordulus.com"
+		subject :"Ceravis subscription (new order) postponed"
+		message :"Subscription ID " + subscriptionId + " postponed to " + postponeNextBillingAt
+	]
+}
+else
+{
+	info "Start Billing Date is in Month " + startMonth + ". Postpone not required.";
+}
