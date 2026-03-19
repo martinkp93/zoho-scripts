@@ -1,0 +1,90 @@
+string standalone.delugeDaggersConnector(String action, String workspaceId, String subscriptionsPayload)
+{
+try 
+{
+	baseUrl = "https://daggers.cordulus.com/admin/svc/v1";
+	// --- Step 1: Bundle inputs into a map for consistent processing ---
+	payload = {"workspaceId":workspaceId,"subscriptions":subscriptionsPayload};
+	// --- Step 2: Config Map --- 
+	config = Map();
+	// Subscriptions
+	config.put("syncSubscriptions",{"m":"PUT","p":"/workspaces/{workspaceId}/subscriptions"});
+	config.put("getSubscriptions",{"m":"GET","p":"/workspaces/{workspaceId}/subscriptions"});
+	actionData = config.get(action);
+	if(actionData == null)
+	{
+		errorMsg = "Daggers API " + action + " failed: Invalid action specified";
+		standalone.delugeSendErrorAlert("daggers_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":errorMsg};
+	}
+	// --- Step 3: Build the URL ---
+	method = actionData.get("m");
+	path = actionData.get("p");
+	// Find and replace the keys in the url with key-values passed in input
+	for each  key in payload.keys()
+	{
+		searchTarget = "{" + key + "}";
+		if(path.contains(searchTarget))
+		{
+			val = ifNull(payload.get(key),"").toString().encodeUrl();
+			parts = path.toList(searchTarget);
+			// Remove the workspaceId from the map so it doesn't end up in the JSON body
+			payload.remove(key);
+			if(parts.size() == 1)
+			{
+				path = parts.get(0) + val;
+			}
+			else
+			{
+				path = parts.toText(val);
+			}
+		}
+	}
+	url = baseUrl + path;
+	// --- Step 4: Execute ---
+	response = Map();
+	headerMap = {"Content-Type":"application/json"};
+	if(method == "PUT")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :PUT
+			parameters:payload.toString()
+			headers:headerMap
+			detailed:true
+			connection:"daggers"
+		];
+	}
+	else if(method == "GET")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :GET
+			headers:headerMap
+			detailed:true
+			connection:"daggers"
+		];
+	}
+	// --- Step 5: Handle Response ---
+	successCodes = {200,204};
+	responseCode = response.get("responseCode").toLong();
+	if(successCodes.contains(responseCode))
+	{
+		return {"success":true,"message":"Daggers sync successful.","response":response};
+	}
+	else
+	{
+		errorMsg = "Daggers API " + action + " failed (" + responseCode + "): " + response.get("responseText");
+		standalone.delugeSendErrorAlert("daggers_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":errorMsg};
+	}
+}
+catch (e)
+{
+	errorMsg = "Unexpected error in daggers_connector: " + e;
+	standalone.delugeSendErrorAlert("daggers_connector","",errorMsg);
+	return {"success":false,"error_message":errorMsg};
+}
+}
