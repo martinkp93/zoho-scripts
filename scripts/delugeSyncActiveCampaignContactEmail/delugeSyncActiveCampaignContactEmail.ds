@@ -1,0 +1,29 @@
+void automation.delugeSyncActiveCampaignContactEmail(String activeCampaignContactId, String firstName, String lastName, String email)
+{
+baseUrl = "https://cordulus.api-us1.com/api/3";
+contactMap = Map();
+contactMap.put("email",email);
+contactMap.put("firstName",firstName);
+contactMap.put("lastName",lastName);
+updateMap = Map();
+updateMap.put("contact",contactMap);
+// MAKE PUT REQUEST
+updateContact = invokeurl
+[
+	url :baseUrl + "/contacts/" + activeCampaignContactId
+	type :PUT
+	parameters:updateMap.toString()
+	detailed:true
+	connection:"activecampaign"
+];
+// info "Create AC Contact Response: " + createContact;
+if(updateContact.get("responseCode") != "200")
+{
+	info "Unable to update Contact in ActiveCampaign.";
+	info "Error Response: " + updateContact;
+}
+else
+{
+	info "Updated Contact in ActiveCampaign.";
+}
+}
