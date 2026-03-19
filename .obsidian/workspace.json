@@ -94,7 +94,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 415.5
   },
   "right": {
     "id": "72429b3ffa1da224",
@@ -212,19 +212,20 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
-    "scripts/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.md",
-    "scripts/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.ds",
-    "scripts/delugeZohoInventoryGetWarehouseId",
-    "scripts/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.ds",
-    "scripts/delugeMobileAppRequestAQuote",
+    "Environment Lifecycle/Untitled",
+    "Environment Lifecycle",
+    "Acquisition and Onboarding/Lead Generation/Mobile App",
+    "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.md",
+    "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.ds",
+    "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId",
+    "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.ds",
+    "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote",
     "Acquisition and Onboarding/Lead Generation",
     "Acquisition and Onboarding/Inventory",
     "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch/delugeManualUpdateFirstLastTouch.md",
     "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch/delugeManualUpdateFirstLastTouch.ds",
     "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
-    "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.ds",
-    "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionHandler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeLeadSheetHandler/delugeLeadSheetHandler.md",
