@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "scripts/ownerProtection/ownerProtection.md",
+                "file": "scripts/Account Validation (on moving Contact to another Account)/ownerProtection.md",
                 "mode": "source",
                 "source": false
               },
@@ -194,7 +194,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
     "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
     "scripts/delugeSubscriptionCycleHandler/delugeSubscriptionCycleHandler.ds",
@@ -205,9 +205,9 @@
     "scripts/delugeConversionPricingHandler/delugeConversionPricingHandler.ds",
     "scripts/delugeConversionPricingHandler",
     "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
-    "scripts/ownerProtection/ownerProtection.md",
-    "scripts/ownerProtection/ownerProtection.ds",
-    "scripts/ownerProtection",
+    "scripts/Account Validation (on moving Contact to another Account)/ownerProtection.md",
+    "scripts/Account Validation (on moving Contact to another Account)/ownerProtection.ds",
+    "scripts/Account Validation (on moving Contact to another Account)",
     "scripts/delugeSalesSprintPricingHandler/delugeSalesSprintPricingHandler.ds",
     "scripts/delugeSalesSprintPricingHandler",
     "scripts/delugeMirrorDataExportHandler/delugeMirrorDataExportHandler.md",
