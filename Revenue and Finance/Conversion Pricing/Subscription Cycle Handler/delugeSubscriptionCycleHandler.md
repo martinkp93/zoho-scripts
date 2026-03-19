@@ -9,7 +9,7 @@ Status: Functional
 ---
 
 ## Overview
-The `delugeSubscriptionCycleHandler` is a standalone utility designed to track and increment the renewal history of a subscription within the Zoho CRM "Conversions" module. When triggered (typically by an external subscription renewal event), it locates the corresponding record and increments the `Renewal_Cycle` field by 1. This ensures accurate reporting on how many times a specific customer has renewed their service.
+The `delugeSubscriptionCycleHandler` is a standalone utility designed to track and increment the renewal history of a subscription within the Zoho CRM "Conversions" module. When triggered (typically by an external subscription renewal event), it locates the corresponding record and increments the `Renewal_Cycle` field by 1. This ensures accurate reporting on how many times a specific customer has renewed their service, and triggers the [[delugeConversionPricingHandler]] script.
 
 ## Technical Contract
 - **Input:** `String crmAPIRequest` (A JSON string containing a `params` object with `subscriptionId`).

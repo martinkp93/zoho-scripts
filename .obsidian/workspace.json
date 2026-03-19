@@ -192,6 +192,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.md",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
     "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
     "standalone.delugePopulaceConnector.md",
@@ -213,7 +214,6 @@
     "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.md",
     "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
     "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.ds",
-    "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.md",
     "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler",
     "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.md",
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.md",
