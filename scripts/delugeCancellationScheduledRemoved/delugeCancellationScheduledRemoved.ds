@@ -1,0 +1,38 @@
+// Initialise error message
+errorMessage = "";
+errorDetails = "";
+orgId = organization.get("organization_id");
+zdeskOrgId = "20087400249";
+subscriptionId = subscriptions.get("subscription_id");
+info "Subscription ID:" + subscriptionId;
+customer = subscriptions.get("customer");
+// ========================
+// Step 1: Find Ticket relating to cancellation
+// ========================
+findTicket = invokeurl
+[
+	url :"https://desk.zoho.eu/api/v1/tickets/search?limit=1&customField1=cf_subscription_id:" + subscriptionId
+	type :GET
+	detailed:true
+	connection:"zohodeskall"
+];
+info findTicket;
+ticketId = "";
+// === If ticket is found in Zoho Desk === // 
+// Update Ticket to Closed and set Cancellation Status to "Scheduled Cancellation Removed"
+if(findTicket.get("responseText") != "")
+{
+	ticket = findTicket.get("responseText").get("data").toMap();
+	ticketId = ticket.get("id");
+	info "Ticket ID: " + ticketId;
+	info "Ticket ID: " + ticketId;
+	// Create Custom Fields Map
+	updateTicketMap = Map();
+	updateTicketMap.put("status","Closed");
+	customFields = Map();
+	customFields.put("Cancellation Status","Scheduled Cancellation Removed");
+	updateTicketMap.put("customFields",customFields);
+	// Update Ticket in Zoho Desk
+	updateZdeskTicket = zoho.desk.update(zdeskOrgId,"tickets",ticketId,updateTicketMap);
+	info "Update Ticket Response: " + updateZdeskTicket;
+}
