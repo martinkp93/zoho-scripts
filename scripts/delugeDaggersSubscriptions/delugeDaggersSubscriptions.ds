@@ -1,0 +1,49 @@
+string related_list.delugeDaggersSubscriptions(String workspaceId)
+{
+// Function Name: get_daggers_subscriptions
+// Category: Related List
+// Argument: Map request
+// --- 3. Make the API call to Daggers ---
+// Only proceed if a workspace ID exists on the account.
+if(workspaceId != null && workspaceId != "")
+{
+	info "Fetching Daggers subscriptions for workspace: " + workspaceId;
+	action = "getSubscriptions";
+	daggersResponse = standalone.delugeDaggersConnector(action,workspaceId,null);
+	info "Daggers Resp: " + daggersResponse;
+	// --- 4. Process the response and format it as XML ---
+	xmlResponse = "<RelatedList><Row no=\"1\"><FL val=\"Status\">No subscriptions found in Daggers.</FL></Row></RelatedList>";
+	if(daggersResponse.get("response").get("responseCode") == 200 && daggersResponse.get("response").get("responseText").get("subscriptions") != null)
+	{
+		subscriptionsList = daggersResponse.get("response").get("responseText").get("subscriptions");
+		if(subscriptionsList.size() > 0)
+		{
+			xmlResponse = "<RelatedList>";
+			rowNumber = 1;
+			for each  sub in subscriptionsList
+			{
+				// For each subscription, create a <Row> in the XML
+				xmlResponse = xmlResponse + "<Row no=\"" + rowNumber + "\">";
+				xmlResponse = xmlResponse + "<FL val=\"Catalog\">" + sub.get("catalog") + "</FL>";
+				xmlResponse = xmlResponse + "<FL val=\"History Delta\">" + sub.get("historyDelta") + "</FL>";
+				xmlResponse = xmlResponse + "<FL val=\"Forecast Delta\">" + sub.get("forecastDelta") + "</FL>";
+				xmlResponse = xmlResponse + "<FL val=\"Geometry\">" + if(sub.get("geometry") != null,sub.get("geometry"),"") + "</FL>";
+				xmlResponse = xmlResponse + "</Row>";
+				rowNumber = rowNumber + 1;
+			}
+			xmlResponse = xmlResponse + "</RelatedList>";
+		}
+	}
+	else
+	{
+		// Handle API call failure
+		xmlResponse = "<RelatedList><Row no=\"1\"><FL val=\"Error\">Failed to fetch data from Daggers. Response Code: " + daggersResponse.get("code") + "</FL></Row></RelatedList>";
+	}
+	return xmlResponse;
+}
+else
+{
+	// Handle case where workspace ID is missing
+	return "<RelatedList><Row no=\"1\"><FL val=\"Status\">No Daggers Workspace ID found on this account.</FL></Row></RelatedList>";
+}
+}
