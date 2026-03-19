@@ -1,0 +1,101 @@
+string standalone.delugeTieredDiscountsHandler(Int zbCustomerId)
+{
+// --- 1. CONFIGURATION ---
+orgId = "20087400261";
+allowedPlanCodes = {"1200","1200-SM"};
+updateMap = Map();
+// Use a List of Maps to ensure ordered threshold checking
+// Tier 1: 3-4 units | Tier 2: 5-9 units | Tier 3: 10+ units
+tiers = {{"name":"Tier_1_3","lower":3,"upper":4,"code":"1200-10"},{"name":"Tier_2_5","lower":5,"upper":9,"code":"1200-15"},{"name":"Tier_3_10","lower":10,"upper":9999,"code":"1200-20"}};
+resp = invokeapi
+[
+	service :zohobilling
+	path :"billing/v1/customers/" + zbCustomerId
+	type :GET
+	connection:"zohobillingconnection"
+];
+zcrmAccountId = resp.get("customer").get("zcrm_account_id");
+resp = zoho.crm.getRecordById("Accounts",zcrmAccountId);
+if(resp.get("Distributor_Lookup").get("name") != "Danish Agro")
+{
+	return "Distributor is not Danish Agro. Exiting script.";
+}
+// --- 2. FETCH SUBSCRIPTIONS ---
+// Fetch all active subscriptions for the customer
+resp = invokeapi
+[
+	service :zohobilling
+	path :"billing/v1/subscriptions?filter_by=SubscriptionStatus.ACTIVE&customer_id=" + zbCustomerId
+	type :GET
+	connection:"zohobillingconnection"
+];
+// info resp;
+subs = ifnull(resp.get("subscriptions"),List());
+quantitySum = 0;
+// --- 3. CALCULATE QUANTITY SUM ---
+// info subs;
+for each  sub in subs
+{
+	planCode = sub.get("plan_code");
+	if(allowedPlanCodes.contains(planCode))
+	{
+		info planCode;
+		subId = sub.get("subscription_id");
+		subRecord = zoho.billing.retrieve("Subscriptions",orgId,subId,"zohobillingconnection").get("subscription");
+		subQty = ifnull(subRecord.get("plan").get("quantity"),0).toLong();
+		quantitySum = quantitySum + subQty;
+	}
+}
+// --- 4. RESOLVE PRICE LIST & TIER ---
+appliedTierIndex = null;
+if(quantitySum > 0)
+{
+	info "Total Quantity: " + quantitySum;
+	acc = zoho.crm.getRecordById("Accounts",zcrmAccountId.toLong());
+	distributorLookup = acc.get("Invoiced_By_Lookup");
+	if(distributorLookup == null)
+	{
+		info "No distributor found for this account.";
+		return "No Distributor";
+	}
+	distributorId = distributorLookup.get("id");
+	priceListRecords = zoho.crm.getRelatedRecords("Related_Price_List","Accounts",distributorId.toLong());
+	if(priceListRecords.size() == 0)
+	{
+		info "No Price List found for distributor: " + distributorId;
+		return "No Price List";
+	}
+	priceList = priceListRecords.get(0);
+	// --- 5. RANGE-BASED MATCHING LOGIC ---
+	// Checks if the quantitySum falls strictly between the lower and upper bounds
+	for each  tier in tiers
+	{
+		lower = tier.get("lower").toLong();
+		upper = tier.get("upper").toLong();
+		if(quantitySum >= lower && quantitySum <= upper)
+		{
+			fieldName = tier.get("name");
+			appliedTierIndex = priceList.get(fieldName);
+			appliedTierCode = tier.get("code");
+			info "Match Found: " + fieldName + " (Range: " + lower + "-" + upper + ") | Value: " + appliedTierIndex;
+			updateMap.put("Weather_Station_s",quantitySum.toString());
+			updateMap.put("Tiered_Discount",appliedTierIndex);
+			updateMap.put("E_conomic_Product_Code_Discount_Tier",appliedTierCode);
+			break;
+		}
+	}
+}
+if(appliedTierIndex == null)
+{
+	info "Quantity " + quantitySum + " does not fall into any defined tier range.";
+	updateMap.put("Weather_Station_s",quantitySum.toString());
+	updateMap.put("Tiered_Discount",0);
+	updateMap.put("E_conomic_Product_Code_Discount_Tier",null);
+	resp = zoho.crm.updateRecord("Accounts",zcrmAccountId,updateMap);
+	info resp;
+	return "No Applicable Tier";
+}
+resp = zoho.crm.updateRecord("Accounts",zcrmAccountId,updateMap);
+info resp;
+return appliedTierIndex;
+}
