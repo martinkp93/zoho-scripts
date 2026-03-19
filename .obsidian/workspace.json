@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "scripts/delugeFeatureAggregator/delugeFeatureAggregator.md",
+                "file": "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
                 "mode": "source",
                 "source": false
               },
@@ -33,7 +33,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "scripts/delugeFeatureAggregator/delugeFeatureAggregator.md",
+                "file": "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
                 "mode": "source",
                 "source": false
               },
@@ -204,12 +204,13 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
-    "scripts/delugeFeatureAggregator/delugeFeatureAggregator.md",
-    "scripts/delugeDaggersConnector/delugeDaggersConnector.md",
-    "scripts/delugeDaggersConnector/delugeDaggersConnector.ds",
-    "scripts/delugeDaggersConnector",
+    "Connectors",
+    "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
+    "Connectors/delugeDaggersConnector/delugeDaggersConnector.md",
+    "Connectors/delugeDaggersConnector/delugeDaggersConnector.ds",
+    "Connectors/delugeDaggersConnector",
     "scripts/delugeSendErrorAlert/delugeSendErrorAlert.md",
     "scripts/delugeSendErrorAlert/delugeSendErrorAlert.ds",
     "scripts/delugeSendErrorAlert",
