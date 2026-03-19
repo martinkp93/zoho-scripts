@@ -212,8 +212,10 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Watchtower",
+    "scripts/getVisits1/getVisits1.md",
     "scripts/getVisits1/getVisits1.ds",
     "scripts/getVisits1",
     "scripts/delugegetzohoidsfromdeviceoremaildev/delugegetzohoidsfromdeviceoremaildev.md",
@@ -228,7 +230,6 @@
     "Buttons",
     "Validation Rules",
     "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
-    "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.ds",
     "Environment Lifecycle/Update/Update Populace User/delugeTriggerUpdatePopulaceUser.md",
     "Environment Lifecycle/Delete/Delete Populace Workspace/delugeTriggerDeletePopulaceWorkspace.md",
     "Environment Lifecycle/Create/Create Populace Distributor/delugeTriggerCreatePopulaceDistributor.md",
@@ -248,7 +249,6 @@
     "Connectors/Daggers/delugeDaggersConnector.md",
     "Schlechtwetter Service/Get Workspace IDs for Schlechtwetter Accounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
     "Errors and Messages/Send Success Message to Slack/delugePostSuccessMessageToSlack.md",
-    "conflict-files-obsidian-git.md",
-    "Schlechtwetter Service/Schlechtwetter REST API/delugeSchlechtwetterRestAPI.md"
+    "conflict-files-obsidian-git.md"
   ]
 }
