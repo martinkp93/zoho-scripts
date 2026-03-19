@@ -31,10 +31,14 @@
             "id": "be42622720ea9833",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "Connectors/delugeDaggersConnector/delugeDaggersConnector.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "delugeDaggersConnector"
             }
           }
         ]
