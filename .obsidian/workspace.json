@@ -212,8 +212,13 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Untitled",
+    "Revenue and Finance/Price Increases",
+    "Revenue and Finance/Data Exports",
+    "Revenue and Finance/Conversion Pricing",
+    "Revenue and Finance",
     "scripts/delugeSyncActiveCampaignContactEmail/delugeSyncActiveCampaignContactEmail.md",
     "scripts/delugeSyncActiveCampaignContactEmail/delugeSyncActiveCampaignContactEmail.ds",
     "scripts/delugeSyncActiveCampaignContactEmail",
@@ -224,10 +229,6 @@
     "scripts/delugeDaggersSubscriptions/delugeDaggersSubscriptions.ds",
     "scripts/delugeDaggersSubscriptions",
     "scripts/delugeChurnReasonUpdate/delugeChurnReasonUpdate.md",
-    "scripts/delugeChurnReasonUpdate/delugeChurnReasonUpdate.ds",
-    "scripts/delugeChurnReasonUpdate",
-    "scripts/delugeUpdatePurchaseConversionsUpcomingRenewalDetails1/delugeUpdatePurchaseConversionsUpcomingRenewalDetails1.ds",
-    "scripts/delugeUpdatePurchaseConversionsUpcomingRenewalDetails1",
     "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
     "Acquisition and Onboarding/Marketing/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
     "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
@@ -248,7 +249,6 @@
     "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.md",
     "Environment Lifecycle/Create/Create SectorWeather Series Subscription/delugeTriggerCreateSectorWeatherWorkspaceSeries.md",
     "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.md",
-    "Environment Lifecycle/Update/Update SectorWeather Series/delugeTriggerUpdateSectorWeatherSeries.md",
-    "Environment Lifecycle/Create/Create SectorWeather Series/delugeTriggerCreateSectorWeatherSeries.md"
+    "Environment Lifecycle/Update/Update SectorWeather Series/delugeTriggerUpdateSectorWeatherSeries.md"
   ]
 }
