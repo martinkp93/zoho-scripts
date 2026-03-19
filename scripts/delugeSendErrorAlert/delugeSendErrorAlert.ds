@@ -1,0 +1,23 @@
+string standalone.delugeSendErrorAlert(String functionName, String requestBody, String errorMessage)
+{
+info "❌ Sending Error Alert to Slack";
+info "Request body:" + requestBody;
+slackText = "🚨 *Deluge Script Error* 🚨\n" + "Function: `" + functionName + "`\n";
+if(requestBody != null && !requestBody.isEmpty())
+{
+	slackText = slackText + "\n";
+}
+slackText = slackText + "Error Details: \n>" + errorMessage + "\n" + "Request Body: \n>```" + requestBody + "```\n";
+slackPayload = {"channel":"C09JRNLLUHH","as_bot":true,"username":"Cordulus","icon_emoji":"cordulus-stare","unfurl_links":false,"text":slackText};
+// Send error notification to Slack
+slackResp = invokeurl
+[
+	url :"https://slack.com/api/chat.postMessage"
+	type :POST
+	parameters:slackPayload
+	detailed:true
+	connection:"slack"
+];
+info "Slack Alert Response: " + slackResp.get("responseCode");
+return "Request body: " + requestBody;
+}
