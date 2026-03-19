@@ -1,0 +1,117 @@
+string standalone.delugePopulaceConnector(String action, Map payload)
+{
+try 
+{
+	baseUrl = "https://populace.cordulus.com/svc/v1/zoho";
+	// --- Step 1: Config Maps --- 
+	config = Map();
+	// Users
+	config.put("createUser",{"m":"POST","p":"/users"});
+	config.put("updateUser",{"m":"PUT","p":"/users/{userId}"});
+	config.put("deleteUser",{"m":"DELETE","p":"/users/{userId}?contactId={contactId}"});
+	// Workspaces
+	config.put("createWorkspace",{"m":"POST","p":"/workspaces"});
+	config.put("updateWorkspace",{"m":"PUT","p":"/workspaces/{workspaceId}"});
+	config.put("deleteWorkspace",{"m":"DELETE","p":"/workspaces/{workspaceId}?accountId={accountId}"});
+	// Distributors
+	config.put("createDistributor",{"m":"POST","p":"/distributors"});
+	config.put("updateDistributor",{"m":"PUT","p":"/distributors/{distributorId}"});
+	config.put("addWorkspaceToDistributor",{"m":"PUT","p":"/workspaces/{workspaceId}/distributor"});
+	config.put("addUserToDistributor",{"m":"POST","p":"/distributors/{distributorId}/users"});
+	config.put("removeUserFromDistributor",{"m":"DELETE","p":"/distributors/{distributorId}/users/{userId}"});
+	// Memberships
+	config.put("addMembership",{"m":"PUT","p":"/workspaces/{workspaceId}/users/{userId}"});
+	config.put("deleteMembership",{"m":"DELETE","p":"/workspaces/{workspaceId}/users/{userId}"});
+	// Find and replace the keys in the url with key-values passed in input
+	actionData = config.get(action);
+	if(actionData == null)
+	{
+		errorMsg = "Populace API " + action + " failed: Invalid action specified";
+		standalone.delugeSendErrorAlert("populace_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":"Invalid action: " + action};
+	}
+	// --- Step 2: Build the URL ---
+	method = actionData.get("m");
+	path = actionData.get("p");
+	for each  key in payload.keys()
+	{
+		searchTarget = "{" + key + "}";
+		if(path.contains(searchTarget))
+		{
+			val = ifNull(payload.get(key),"").toString().encodeUrl();
+			parts = path.toList(searchTarget);
+			payload.remove(key);
+			if(parts.size() == 1)
+			{
+				path = parts.get(0) + val;
+			}
+			else
+			{
+				path = parts.toText(val);
+			}
+		}
+	}
+	url = baseUrl + path;
+	// --- Step 3: Execute ---
+	response = Map();
+	headerMap = {"Content-Type":"application/json"};
+	info "Sending a " + method + " request to URL: " + url;
+	info "Payload: " + payload;
+	if(method == "POST")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :POST
+			parameters:payload.toString()
+			headers:headerMap
+			detailed:true
+			connection:"populace"
+		];
+	}
+	else if(method == "PUT")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :PUT
+			parameters:payload.toString()
+			headers:headerMap
+			detailed:true
+			connection:"populace"
+		];
+	}
+	else if(method == "DELETE")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :DELETE
+			headers:headerMap
+			detailed:true
+			connection:"populace"
+		];
+	}
+	// --- Step 4: Handle Response ---
+	successCodes = {200,201,204};
+	responseCode = response.get("responseCode").toLong();
+	if(successCodes.contains(responseCode))
+	{
+		return {"success":true,"data":response.get("responseText")};
+	}
+	else
+	{
+		errorMsg = "Populace API " + action + " failed (" + responseCode + "): " + response.get("responseText");
+		standalone.delugeSendErrorAlert("populace_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":errorMsg};
+	}
+}
+catch (e)
+{
+	errorMsg = "Unexpected error in populace_connector: " + e;
+	info errorMsg;
+	standalone.delugeSendErrorAlert("populace_connector",payload.toString(),errorMsg);
+	return {"success":false,"error_message":errorMsg};
+}
+return "";
+}
