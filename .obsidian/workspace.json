@@ -190,8 +190,11 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/Deluge_ Partial Cancellation/Deluge_ Partial Cancellation.md",
+    "scripts/Deluge_ Partial Cancellation/Deluge_ Partial Cancellation.ds",
+    "scripts/Deluge_ Partial Cancellation",
     "Support/Subscription Deletion",
     "Support/Subscription Reactivation",
     "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.md",
@@ -210,12 +213,9 @@
     "Watchtower/Duplicate Zoho Desk Blueprint",
     "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker/delugeTieredDiscountsHandler.ds",
     "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker",
-    "Acquisition and Onboarding/Lead Generation/Zapier",
-    "Support/Chat",
     "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
     "Validation Rules/Account Validation (on moving Contact to another Account)/ownerProtection.md",
     "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
-    "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.ds",
     "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.md",
     "Revenue and Finance/Conversion Pricing/Conversion Pricing Handler/delugeConversionPricingHandler.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Resolve Request a Quote Pricing (for ActiveCampaign)/delugeResolveRaQPricing.md",
