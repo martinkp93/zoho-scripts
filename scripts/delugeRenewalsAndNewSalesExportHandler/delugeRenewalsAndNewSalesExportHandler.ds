@@ -1,0 +1,364 @@
+string standalone.delugeRenewalsAndNewSalesExportHandler(String task, String segment)
+{
+variables = invokeurl
+[
+	url :"https://www.zohoapis.eu/crm/v8/settings/variables"
+	type :GET
+	connection:"zohocrmconnection"
+];
+for each  variable in variables.get("variables")
+{
+	if(variable.get("name") == "Temporary " + task + " Export Job")
+	{
+		jobId = variable.get("value");
+	}
+}
+type = if(task == "Renewals","Upcoming","Current");
+// ============================================================
+// 1. INITIAL CONFIGURATION & CRM DATA FETCHING
+// ============================================================
+// Fetch Distributors with valid spreadsheet URLs 
+criteria = "(Renewals_and_New_Sales_Data:not_equal:null)";
+distributors = zoho.crm.searchRecords("Accounts",criteria);
+// Build Config Map
+distributorConfig = Map();
+for each  d in distributors
+{
+	regularSsId = if(d.get("Renewals_and_New_Sales_Data") != null,d.get("Renewals_and_New_Sales_Data").getSuffix("/d/").getPrefix("/"),"");
+	croplineSsId = if(d.get("Renewals_and_New_Sales_Data_Cropline") != null,d.get("Renewals_and_New_Sales_Data_Cropline").getSuffix("/d/").getPrefix("/"),"");
+	ssId = if(segment == "Cordulus",regularSsId,croplineSsId);
+	innerMap = Map();
+	innerMap.put("ssId",ssId);
+	innerMap.put("name",d.get("Account_Name"));
+	distributorConfig.put(d.get("id").toString(),innerMap);
+}
+info distributorConfig;
+// ============================================================
+// 2. ZOHO ANALYTICS DATA RETRIEVAL
+// ============================================================
+workspaceId = 188580000000003017;
+orgId = 20087400271;
+headers = Map();
+headers.put("ZANALYTICS-ORGID",orgId);
+config = Map();
+config.put("responseFormat","json");
+paramsMap = Map();
+paramsMap.put("CONFIG",config.toString());
+// Fetch the data from the Export Job
+fetchData = invokeurl
+[
+	url :"https://analytics.zoho.eu/restapi/v2/bulk/workspaces/" + workspaceId + "/exportjobs/" + jobId + "/data"
+	type :GET
+	parameters:paramsMap
+	headers:headers
+	connection:"zohooauth"
+];
+jsonRecords = fetchData.get("data");
+// ============================================================
+// 3. DATA PROCESSING & CURRENCY CONVERSION
+// ============================================================
+defaultHeaderMap = {"Distributor","Invoiced By","Account Name","Customer ID","Email Address","Phone","VAT Number","Billing Street","Billing Code","Billing City","Billing Country",if(task == "Renewals","Next Billing Date","Created Date"),"Product Name","Item Name","E-conomic Product Code","Quantity","Unit Price (" + type + " Renewal)","Total Price (" + type + " Renewal)","Tiered Discount (%)","E-conomic Product Code (Discount Tier)","Unit Price End-User (" + type + " Renewal)","Unit Discount End-User (" + type + " Renewal)","Total Unit Price End-User (" + type + " Renewal)","Total Price End-User (" + type + " Renewal)","Total Discount End-User (" + type + " Renewal)","Final Total Price End-User (" + type + " Renewal)","Price List Currency","Sales Sprint","Notes"};
+if(segment == "Cordulus")
+{
+	allowedProducts = {"Cordulus Farm","Cordulus Farm Connect","Cordulus Data Platform","Cordulus Road","Cordulus Miscellaneous","Softmoney Projects","Cordulus Weather API"};
+	dashboardId = "1iM5nTGyOOndU4zJsnfwIkfCG4K8757ZEntsvccT9NlA";
+}
+else if(segment == "Cropline")
+{
+	allowedProducts = {"Cropline"};
+	dashboardId = "15NpCTxmg2RMjb8Rc4eAzY7l_QsMSLt9iBmYyhz8896M";
+}
+finalSheetData = Map();
+for each  record in jsonRecords
+{
+	rowDistId = record.get("Invoiced By ID");
+	rowProductName = record.get("Product Name");
+	// Only process if distributor is valid and product is in allowed list
+	if(distributorConfig.containsKey(rowDistId) && allowedProducts.contains(rowProductName))
+	{
+		config = distributorConfig.get(rowDistId);
+		distName = config.get("name");
+		if(!finalSheetData.containsKey(distName))
+		{
+			finalSheetData.put(distName,{defaultHeaderMap});
+		}
+		rowData = List();
+		for each  header in defaultHeaderMap
+		{
+			// 1. Get the raw value
+			val = ifnull(record.get(header),"0");
+			// 2. If the value is an empty string, set it to "0"
+			if(val == "")
+			{
+				val = "0";
+			}
+			rowData.add(val);
+		}
+		currentData = finalSheetData.get(distName);
+		currentData.add(rowData);
+		finalSheetData.put(distName,currentData);
+	}
+}
+// ============================================================
+// 4. MASTER DASHBOARD GID LOOKUP
+// ============================================================
+// 1. Determine the relevant month based on the task
+if(task == "Renewals")
+{
+	monthDate = zoho.currenttime.addMonth(1);
+}
+else if(task == "New Sales")
+{
+	// New Sales processes the month that just finished
+	monthDate = zoho.currenttime.subMonth(1);
+}
+info monthDate;
+// 2. Extract the target year (e.g., "2025" or "2026")
+targetYear = monthDate.toString("yyyy");
+// 3. Dynamically set the Dashboard Tab name
+// This ensures if monthDate is Dec 2025, it targets "Tracking Dashboard 2025"
+dashboardTab = "Tracking Dashboard " + targetYear;
+// 4. Set the tab name for the individual distributor sheets
+tabName = monthDate.toString("MMMM yyyy") + " (" + task + ")";
+sheetMetadata = invokeurl
+[
+	url :"https://sheets.googleapis.com/v4/spreadsheets/" + dashboardId + "?fields=sheets.properties"
+	type :GET
+	connection:"googlesheets"
+];
+targetSheetGid = 0;
+allSheets = sheetMetadata.get("sheets");
+for each  s in allSheets
+{
+	properties = s.get("properties");
+	if(properties.get("title") == dashboardTab)
+	{
+		targetSheetGid = properties.get("sheetId");
+		break;
+	}
+}
+// ============================================================
+// 5. GOOGLE SHEETS UPDATES (Individual Tabs & Master Dashboard)
+// ============================================================
+// Fetch dashboard rows once to optimize lookup
+dashboardMeta = invokeurl
+[
+	url :"https://sheets.googleapis.com/v4/spreadsheets/" + dashboardId + "/values/" + dashboardTab + "!A:B"
+	type :GET
+	connection:"googlesheets"
+];
+rowValues = dashboardMeta.get("values");
+// Initialize Slack Summary Message
+slackSummary = "*" + segment + " " + task + " Invoicing Data Sheet Generation Successful* (" + tabName + ")\n\n*Distributor Breakdown:*";
+for each  rowDistributorName in finalSheetData.keys()
+{
+	// A. Find correct Spreadsheet ID
+	targetSpreadsheetId = "";
+	for each  cid in distributorConfig.keys()
+	{
+		if(distributorConfig.get(cid).get("name") == rowDistributorName)
+		{
+			targetSpreadsheetId = distributorConfig.get(cid).get("ssId");
+		}
+	}
+	if(targetSpreadsheetId != "")
+	{
+		// B. Ensure Tab Exists
+		sheetMeta = invokeurl
+		[
+			url :"https://sheets.googleapis.com/v4/spreadsheets/" + targetSpreadsheetId + "?fields=sheets.properties.title,sheets.properties.sheetId"
+			type :GET
+			connection:"googlesheets"
+		];
+		tabExists = false;
+		for each  sheet in sheetMeta.get("sheets")
+		{
+			if(sheet.get("properties").get("title") == tabName)
+			{
+				sheetId = sheet.get("properties").get("sheetId");
+				tabExists = true;
+				break;
+			}
+		}
+		if(!tabExists)
+		{
+			createBody = {"requests":{{"addSheet":{"properties":{"title":tabName}}}}};
+			createResponse = invokeurl
+			[
+				url :"https://sheets.googleapis.com/v4/spreadsheets/" + targetSpreadsheetId + ":batchUpdate"
+				type :POST
+				parameters:createBody.toString()
+				headers:{"Content-Type":"application/json"}
+				connection:"googlesheets"
+			];
+			if(createResponse.get("error") != null)
+			{
+				errorMessage = "ERROR: Could not create tab for " + rowDistributorName + ". Response: " + createResponse.toString();
+				standalone.delugeSendErrorAlert("InvoicingHandler",rowDistributorName,errorMessage);
+			}
+			else
+			{
+				sheetId = createResponse.get("replies").get(0).get("addSheet").get("properties").get("sheetId");
+				info "Created tab with sheetId: " + sheetId;
+			}
+		}
+		// C. Overwrite Distributor Spreadsheet Data
+		sheetRows = finalSheetData.get(rowDistributorName);
+		// --- Sort Data Alphabetically
+		// Column C is index 2 in row list
+		sortMap = Map();
+		sortKeys = List();
+		headerRow = sheetRows.get(0);
+		// Save the header
+		dataOnly = sheetRows.subList(1,sheetRows.size());
+		// Grab just the data
+		for each  row in dataOnly
+		{
+			// We use the value in Column C (Index 2) as the key
+			// We add a unique suffix (row index) to handle cases with identical names
+			rowKey = row.get(2) + "_" + dataOnly.indexOf(row);
+			sortMap.put(rowKey,row);
+			sortKeys.add(rowKey);
+		}
+		// Sort the list of keys alphabetically
+		sortKeys.sort();
+		// Rebuild sheetRows with sorted data
+		sortedSheetRows = List();
+		sortedSheetRows.add(headerRow);
+		// Put header back at the top
+		for each  k in sortKeys
+		{
+			sortedSheetRows.add(sortMap.get(k));
+		}
+		payloadRows = List();
+		payloadRows.add({monthDate.toString("MMMM yyyy") + " " + task});
+		payloadRows.add({"Quantity","=SUM(O8:O)"});
+		payloadRows.add({"Total Price","=SUM(Q8:Q)"});
+		payloadRows.add({});
+		payloadRows.add({});
+		payloadRows.add({});
+		payloadRows.add({});
+		// Add the sorted rows
+		for each  r in sortedSheetRows
+		{
+			payloadRows.add(r);
+		}
+		payload = {"values":payloadRows};
+		// Clear previous data
+		clearResponse = invokeurl
+		[
+			url :"https://sheets.googleapis.com/v4/spreadsheets/" + targetSpreadsheetId + "/values/'" + tabName + "'!A1:Z1000:clear"
+			type :POST
+			connection:"googlesheets"
+		];
+		if(clearResponse.get("error") != null)
+		{
+			errorMessage = "ERROR: Failed to clear old data for " + rowDistributorName + ". Tab: " + tabName;
+			standalone.delugeSendErrorAlert("InvoicingHandler",targetSpreadsheetId,errorMessage + " Resp: " + clearResponse.toString());
+		}
+		// Push new data
+		pushResponse = invokeurl
+		[
+			url :"https://sheets.googleapis.com/v4/spreadsheets/" + targetSpreadsheetId + "/values/'" + tabName + "'!A1?valueInputOption=USER_ENTERED"
+			type :PUT
+			parameters:payload.toString()
+			headers:{"Content-Type":"application/json"}
+			detailed:true
+			connection:"googlesheets"
+		];
+		// D. Update Master Tracking Dashboard Cell
+		monthToColMap = {"January":"C","February":"D","March":"E","April":"F","May":"G","June":"H","July":"I","August":"J","September":"K","October":"L","November":"M","December":"N"};
+		targetCol = monthToColMap.get(monthDate.toString("MMMM"));
+		targetRow = 0;
+		currentRow = 1;
+		for each  row in rowValues
+		{
+			if(row.get(0) == rowDistributorName && row.get(1) == task)
+			{
+				targetRow = currentRow;
+				break;
+			}
+			currentRow = currentRow + 1;
+		}
+		if(targetRow > 0)
+		{
+			totalQty = 0;
+			isHeader = true;
+			for each  dataRow in sheetRows
+			{
+				if(isHeader)
+				{
+					isHeader = false;
+					continue;
+				}
+				if(dataRow.get(13).contains("Subscription") || dataRow.get(13).contains("Cropline"))
+				{
+					totalQty = totalQty + ifnull(dataRow.get(15),"0").toLong();
+				}
+			}
+			// Update Cell Quantity
+			targetCell = dashboardTab + "!" + targetCol + targetRow;
+			info targetCell;
+			updatePayload = {"values":{{totalQty}}};
+			dashboardResponse = invokeurl
+			[
+				url :"https://sheets.googleapis.com/v4/spreadsheets/" + dashboardId + "/values/" + targetCell + "?valueInputOption=USER_ENTERED"
+				type :PUT
+				parameters:updatePayload.toString()
+				headers:{"Content-Type":"application/json"}
+				connection:"googlesheets"
+			];
+			// Add Dashboard Note (Timestamp and Detail)
+			colIndexMap = {"C":2,"D":3,"E":4,"F":5,"G":6,"H":7,"I":8,"J":9,"K":10,"L":11,"M":12,"N":13};
+			colIndex = colIndexMap.get(targetCol);
+			cellNote = task + " updated with total quantity of " + totalQty + " on " + zoho.currenttime.toString("MM/dd/yyyy, h:mm:ss a");
+			notePayload = {"requests":{{"repeatCell":{"range":{"sheetId":targetSheetGid,"startRowIndex":targetRow - 1,"endRowIndex":targetRow,"startColumnIndex":colIndex,"endColumnIndex":colIndex + 1},"cell":{"note":cellNote},"fields":"note"}}}};
+			// Why index -1?
+			response = invokeurl
+			[
+				url :"https://sheets.googleapis.com/v4/spreadsheets/" + dashboardId + ":batchUpdate"
+				type :POST
+				parameters:notePayload.toString()
+				headers:{"Content-Type":"application/json"}
+				connection:"googlesheets"
+			];
+			info "Successfully updated " + rowDistributorName + " in both individual sheet and master dashboard.";
+			// Build Slack Summary Line
+			slackSummary = slackSummary + "\n• *" + rowDistributorName + "*: " + totalQty;
+		}
+		// E. Send data sheet to distributor (Cropline only)
+		if(segment == "Cropline")
+		{
+			mimeType = "application/pdf";
+			exportUrl = "https://docs.google.com/spreadsheets/d/" + targetSpreadsheetId + "/export?format=xlsx&gid=" + sheetId;
+			exportResponse = invokeurl
+			[
+				url :exportUrl
+				type :GET
+				connection:"googlesheets"
+			];
+			// Encode to Base64
+			if(exportResponse != null)
+			{
+				base64String = zoho.encryption.base64Encode(exportResponse);
+				// Send Base64 string as .xlsx attachment through Mailersend
+				mailersendPayload = {"from":{"email":"info@cordulus.com","name":"Cordulus"},"to":{{"email":"dela@danishagro.dk","name":"Dennis"}},"subject":rowDistributorName + " - " + segment + " " + tabName,"html":"</p><p>Please find your renewals report " + tabName + " attached to this email." + "</p><p>Sincerely,</p><p>Cordulus</p>","attachments":{{"content":base64String,"filename":rowDistributorName + " - " + segment + " " + tabName + ".xlsx"}}};
+				sendMailersendEmailResp = invokeurl
+				[
+					url :"https://api.mailersend.com/v1/email"
+					type :POST
+					body:mailersendPayload.toString()
+					detailed:true
+					connection:"mailersend"
+				];
+			}
+		}
+	}
+}
+// ============================================================
+// 6. SEND FINAL SLACK NOTIFICATION
+// ============================================================
+slackChannelId = "C09PTU8KKT3";
+// standalone.delugePostSuccessMessageToSlack(slackSummary,slackChannelId);
+return "";
+}
