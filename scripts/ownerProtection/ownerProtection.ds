@@ -1,0 +1,34 @@
+map validation_rule.ownerProtection(String crmAPIRequest)
+{
+// Initialise a map to hold the response (success or error)
+response = Map();
+// Get the record
+entityMap = crmAPIRequest.toMap().get("record");
+contactId = entityMap.get("id");
+contact = zoho.crm.getRecordById("Contacts",contactId);
+userType = entityMap.get("User_Type");
+existingAccountId = contact.get("Account_Name").get("id");
+// Get the target Account details
+targetAccountId = entityMap.get("Account_Name").get("id");
+if(existingAccountId != targetAccountId)
+{
+	targetAccount = zoho.crm.getRecordById("Accounts",targetAccountId);
+	targetWorkspaceId = targetAccount.get("Kanisa_Farm_ID");
+	// Check if target Account has a workspaceId; return error if null
+	if(targetWorkspaceId == null)
+	{
+		response.put("status","error");
+		response.put("message","Target Account does not have a Workspace ID. Unable to move to another Account/Workspace");
+		return response;
+	}
+	// Check of moving Contact is owner; return error if true
+	if(userType == "Owner")
+	{
+		response.put("status","error");
+		response.put("message","Contact's Populace User is Owner. Unable to move to another Account/Workspace");
+		return response;
+	}
+}
+response.put("status","success");
+return response;
+}
