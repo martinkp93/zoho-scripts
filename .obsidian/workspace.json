@@ -11,10 +11,14 @@
             "id": "be42622720ea9833",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Price List Updates/delugeUpdateConversionPricing.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "delugeUpdateConversionPricing"
             }
           }
         ]
