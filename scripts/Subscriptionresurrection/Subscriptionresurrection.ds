@@ -1,0 +1,71 @@
+void automation.subscriptionResurrection(Int subId)
+{
+try 
+{
+	// 0. Start
+	orgId = "20087400261";
+	// 1. FETCH OLD SUBSCRIPTION DATA
+	subdata = zoho.billing.retrieve("Subscriptions",orgId,subId,"zohobillingconnection");
+	old_sub = subdata.get("subscription");
+	// 2. BUILD THE NEW SUBSCRIPTION MAP
+	newsub_payload = Map();
+	newsub_payload.put("customer_id",old_sub.get("customer_id"));
+	newsub_payload.put("starts_at",old_sub.get("activated_at"));
+	newsub_payload.put("auto_collect",false);
+	old_plan = old_sub.get("plan");
+	plan_details = Map();
+	plan_details.put("plan_code",old_plan.get("plan_code"));
+	plan_details.put("quantity",old_plan.get("quantity"));
+	newsub_payload.put("plan",plan_details);
+	// 3. CREATE NEW SUBSCRIPTION IN ZOHO BILLING
+	create_response = zoho.billing.create("Subscriptions",orgId,newsub_payload,"zohobillingconnection");
+	info create_response;
+	// 4. SWAP ID IN CRM PURCHASE CONVERSION
+	if(create_response.get("subscription") != null)
+	{
+		new_sub_id = create_response.get("subscription").get("subscription_id");
+	}
+	if(new_sub_id == null)
+	{
+		info "No subscriptions.";
+		errorMessage = "No subscriptions.";
+		standalone.delugePostSuccessMessageToSlack("purchase_conversions",errorMessage);
+		return;
+	}
+	search_criteria = "(Subscription_ID:equals:" + subId + ")";
+	purchase_conversions = zoho.crm.searchRecords("Conversions",search_criteria);
+	if(purchase_conversions.size() > 1)
+	{
+		info "Purchase conversions not equal to 1";
+		errorMessage = "Purchase conversions not equal to 1";
+		standalone.delugePostSuccessMessageToSlack("purchase_conversions",errorMessage);
+		return;
+	}
+	if(purchase_conversions.size() == 1)
+	{
+		conversionId = purchase_conversions.get(0).get("id");
+		update_data = Map();
+		update_data.put("Subscription_ID",new_sub_id);
+		update_resp = zoho.crm.updateRecord("Conversions",conversionId,update_data);
+		info update_resp;
+	}
+	else
+	{
+		info "No conversion record found in CRM to update.";
+	}
+	// 5. DELETE THE OLD SUBSCRIPTION FROM BILLING
+	deleteResp = invokeurl
+	[
+		url :"https://www.zohoapis.eu/billing/v1/subscriptions/" + subId + "?organization_id=" + orgId
+		type :DELETE
+		detailed:true
+		connection:"zohobillingconnection"
+	];
+	info deleteResp;
+}
+catch (e)
+{
+	errorMsg = "Unexpected error in Subscriptionresurrection: " + e;
+	standalone.delugeSendErrorAlert("Subscriptionresurrection",subId,errorMsg);
+}
+}
