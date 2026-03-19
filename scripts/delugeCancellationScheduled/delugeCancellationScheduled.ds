@@ -1,0 +1,28 @@
+// Initialise error message
+errorMessage = "";
+errorDetails = "";
+orgId = organization.get("organization_id");
+zdeskOrgId = "20087400249";
+zdeskDepartmentId = "138065000000006907";
+subscriptionId = subscriptions.get("subscription_id");
+customer = subscriptions.get("customer");
+// Find Zoho Desk Contact and Account
+findZdeskContact = zoho.desk.searchRecords(zdeskOrgId,"contacts",{"email":subscriptions.get("customer").get("email")},0,5,"zohodeskall");
+//info "Zoho Desk Contact Search: " + findZdeskContact;
+zdeskContact = findZdeskContact.get("data").toMap();
+// Create Zoho Desk Ticket Map
+createTicketMap = Map();
+createTicketMap.put("contactId",zdeskContact.get("id"));
+createTicketMap.put("departmentId",zdeskDepartmentId);
+createTicketMap.put("subject","[Cancellation] Subscription cancellation date: " + subscriptions.get("scheduled_cancellation_date"));
+// Create Custom Fields Map
+customFields = Map();
+customFields.put("Subscription ID",subscriptionId);
+customFields.put("Cancellation Registered Date",subscriptions.get("updated_time").getPrefix("T"));
+customFields.put("Cancellation Effective Date",subscriptions.get("current_term_ends_at"));
+customFields.put("Cancellation Status","Cancellation Scheduled");
+createTicketMap.put("customFields",customFields);
+// Create Ticket in Zoho Desk
+createZdeskTicket = zoho.desk.create(zdeskOrgId,"tickets",createTicketMap);
+ticketId = createZdeskTicket.get("id");
+// info "Create Ticket Response: " + createZdeskTicket;
