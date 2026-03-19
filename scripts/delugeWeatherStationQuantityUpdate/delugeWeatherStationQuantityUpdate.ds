@@ -1,0 +1,40 @@
+orgId = organization.get("organization_id");
+customerSubscriptions = invokeurl
+[
+	url :"https://www.zohoapis.eu/billing/v1/subscriptions?customer_id=" + subscriptions.get("customer").get("customer_id") + "&filter_by=SubscriptionStatus.ACTIVE"
+	type :GET
+	connection:"zohobilling"
+];
+totalQuantity = 0;
+for each  subscription in customerSubscriptions.get("subscriptions")
+{
+	if(subscription.get("plan_code").contains("1200"))
+	{
+		subscriptionId = subscription.get("subscription_id");
+		subscriptionDetails = zoho.billing.retrieve("Subscriptions",orgId,subscriptionId,"zohobilling");
+		quantity = subscriptionDetails.get("subscription").get("plan").get("quantity");
+		totalQuantity = totalQuantity + quantity;
+	}
+}
+info "Total Quantity:" + totalQuantity;
+account_id = subscriptions.get("customer").get("zcrm_account_id");
+updateMap = Map();
+updateMap.put("Weather_Station_s",totalQuantity.toString());
+updateAccount = zoho.crm.updateRecord("Accounts",account_id,updateMap);
+info "Update Account: " + updateAccount;
+fieldValuesList = List();
+fieldValuesList.add({"field":"13","value":totalQuantity});
+contactMap = Map();
+contactMap.put("email",subscriptions.get("customer").get("email"));
+contactMap.put("fieldValues",fieldValuesList);
+updateMap = Map();
+updateMap.put("contact",contactMap);
+info "Sync payload to ActiveCampaign: " + updateMap;
+response = invokeurl
+[
+	url :"https://cordulus.api-us1.com/api/3/contact/sync"
+	type :POST
+	parameters:updateMap.toString()
+	detailed:true
+	connection:"activecampaignall"
+];

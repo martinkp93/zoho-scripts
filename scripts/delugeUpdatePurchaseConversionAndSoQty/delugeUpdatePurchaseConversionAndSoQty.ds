@@ -1,0 +1,104 @@
+//
+// Initialise Org ID    
+org_id = organization.get("organization_id");
+//
+// Initialise Subscription Data
+subscription_id = subscriptions.get("subscription_id");
+quantity = subscriptions.get("plan").get("quantity");
+customer_id = subscriptions.get("customer_id");
+//
+// Find Purchase Conversion with Subscription ID of deleted Subscription
+purchase_conversion = zoho.crm.searchRecords("Conversions","(Subscription_ID:equals:" + subscription_id + ")",1,1,"zohocrmall");
+// Check if records are returned
+if(purchase_conversion != null && purchase_conversion.size() > 0)
+{
+	// Records found, access the first record
+	conversion_record = purchase_conversion.get(0);
+	purchase_conversion_map = purchase_conversion.toMap();
+	purchase_conversion_id = purchase_conversion_map.get("id");
+	sales_order_id = purchase_conversion_map.get("Sales_Order_ID");
+	sales_order_item_id = purchase_conversion_map.get("Item_ID");
+	sales_order_warehouse_id = purchase_conversion_map.get("Warehouse_ID");
+	info "Purchase Conversion ID: " + purchase_conversion_id;
+	info "Sales Order ID: " + sales_order_id;
+	// info "Conversion Record: " + conversion_record;
+	//
+	// Update Purchase Conversion Quantity
+	update_pc_map = Map();
+	update_pc_map.put("Quantity_Sold",quantity);
+	update_pc_map.put("Sales_Order_Quantity",quantity);
+	info "Update Purchase Conversion Map: " + update_pc_map;
+	response_update_purchase_conversion = zoho.crm.updateRecord("Conversions",purchase_conversion_id,update_pc_map);
+	info "Response Update Purchase Conversion: " + response_update_purchase_conversion;
+}
+else
+{
+	// No records found, exit script
+	info "No records found with the given Subscription_ID";
+	return;
+}
+// Ensure salesorder_id is defined
+if(sales_order_id != null)
+{
+	// Mark Sales Order as Unfulfilled
+	response_unfulfilled = invokeurl
+	[
+		url :"https://www.zohoapis.eu/inventory/v1/salesorders/" + sales_order_id + "/status/unfulfilled?organization_id=" + org_id
+		type :POST
+		connection:"zohoinventory"
+	];
+	info "Response Unfulfilled: " + response_unfulfilled.get("message");
+	// Check if the sales order was successfully marked as unfulfilled
+	if(response_unfulfilled.get("code") == 0)
+	{
+		// Once sales order has been marked as unfulfilled, it can be updated
+		update_so_map = Map();
+		update_so_map.put("customer_id",customer_id);
+		so_line_items = List();
+		so_line_item = Map();
+		so_line_item.put("quantity",quantity);
+		so_line_item.put("item_id",sales_order_item_id);
+		so_line_item.put("warehouse_id",sales_order_warehouse_id);
+		so_line_items.add(so_line_item);
+		update_so_map.put("line_items",so_line_items);
+		update_so_map_json = update_so_map.toString();
+		update_response = invokeurl
+		[
+			url :"https://www.zohoapis.eu/inventory/v1/salesorders/" + sales_order_id + "?organization_id=" + org_id
+			type :PUT
+			parameters:update_so_map_json
+			connection:"zohoinventory"
+		];
+		info "Response Updated: " + update_response.get("message");
+		if(update_response.get("code") == 0)
+		{
+			// Once updated, change the sales order back to fulfilled
+			// Mark Sales Order as Fulfilled
+			response_fulfilled = invokeurl
+			[
+				url :"https://www.zohoapis.eu/inventory/v1/salesorders/" + sales_order_id + "/status/fulfilled?organization_id=" + org_id
+				type :POST
+				connection:"zohoinventory"
+			];
+			info "Response Fulfilled: " + response_fulfilled.get("message");
+		}
+	}
+	else
+	{
+		// Return the response message if marking as unfulfilled failed
+		info "Failed to mark as unfulfilled: " + response_unfulfilled.get("message");
+		sendmail
+		[
+			from :zoho.adminuserid
+			to :"mp@cordulus.com"
+			subject :"Failure: Delete Purchase Conversion and Sales Order Function"
+			message :"View logs: https://billing.zoho.eu/app/20087400261#/settings/automation/logs/customfunctions"
+		]
+	}
+}
+else
+{
+	// Handle the case where salesorder_id is not defined
+	info "Error: sales_order_id is not defined.";
+	// return "Error: sales_order_id is not defined.";
+}
