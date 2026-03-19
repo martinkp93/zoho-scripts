@@ -1,0 +1,269 @@
+string standalone.delugeGLSLabelHandler(String crmAPIRequest)
+{
+// --- Initial Setup for Error Reporting ---
+functionName = "delugeGLSLabelHandler";
+// Capture the request for the catch block, ensuring it's not null
+crmAPIRequestForCatch = if(crmAPIRequest != null,crmAPIRequest,"");
+try 
+{
+	info crmAPIRequest;
+	body = crmAPIRequest.get("body");
+	customerId = body.get("customerId");
+	quantity = body.get("quantity");
+	info "Customer ID: " + customerId + ", Quantity: " + quantity;
+	// Initialisation
+	product_name = "cordulus farm";
+	event_type = "gls return label";
+	// Error initialisation
+	hasError = false;
+	errorMessage = "";
+	errorDetails = "";
+	// Lists for results and attachments
+	label_results = List();
+	attachments_list = List();
+	total_labels_attempted = 0;
+	// --- 1. CRM Lookup and Data Extraction (Runs Once) ---
+	contact = zoho.crm.getRecordById("Contacts",customerId.toLong());
+	contactName = if(contact != null,contact.get("Full_Name"),null);
+	contactEmail = if(contact != null,contact.get("Email"),null);
+	account = null;
+	if(contact != null && contact.get("Account_Name") != null)
+	{
+		account = zoho.crm.getRecordById("Accounts",contact.get("Account_Name").get("id").toLong());
+	}
+	// Perform initial CRM checks
+	if(contact == null || contact.get("id") == null)
+	{
+		hasError = true;
+		errorMessage = "CRITICAL: Contact not found in CRM for Customer ID: " + customerId;
+		errorDetails = contact;
+		standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage);
+	}
+	else if(account == null || account.get("id") == null)
+	{
+		hasError = true;
+		errorMessage = "CRITICAL: Account not found in CRM for Contact: " + contactName;
+		errorDetails = account;
+		standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage);
+	}
+	// Proceed with address and template lookups only if CRM records are found
+	if(!hasError)
+	{
+		// Determine Pickup Address
+		if(account.get("Shipping_Street") != null && account.get("Shipping_City") != null && account.get("Shipping_Code") != null)
+		{
+			pickupStreet = account.get("Shipping_Street");
+			pickupCity = account.get("Shipping_City");
+			pickupZip = account.get("Shipping_Code");
+			countryForTemplate = account.get("Shipping_Country");
+		}
+		else
+		{
+			pickupStreet = account.get("Billing_Street");
+			pickupCity = account.get("Billing_City");
+			pickupZip = account.get("Billing_Code");
+			countryForTemplate = account.get("Billing_Country");
+		}
+		// --- 2. Template Lookup (Runs Once) ---
+		searchTemplateCriteria = "(Product_Name == \"" + product_name.toLowerCase() + "\" && Event_Type == \"" + event_type + "\" && Country == \"" + countryForTemplate.toLowerCase() + "\")";
+		info searchTemplateCriteria;
+		searchTemplate = zoho.creator.getRecords("cordulus","email-template-manager","TemplateMapping_Report",searchTemplateCriteria,1,1,"zohocreator");
+		if(searchTemplate.get("code") != 3000 || searchTemplate.get("data").isEmpty())
+		{
+			hasError = true;
+			// Specific error message and alert for missing template
+			errorMessage = "CRITICAL: Could not find a template for event type '" + event_type + "' in " + functionName + ". Country: " + countryForTemplate;
+			errorDetails = searchTemplate.get("message");
+			// Send the alert to Slack
+			standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage);
+		}
+		else
+		{
+			template_id = searchTemplate.get("data").get(0).get("Template_ID");
+			info "Template ID found: " + template_id;
+		}
+	}
+	// --- 3. Execute Loop for Label Generation if no fundamental errors ---
+	if(!hasError)
+	{
+		if(quantity < 1)
+		{
+			quantity = 1;
+			label_results.add("Warning: Quantity was set to less than 1. Defaulting to 1 label.");
+		}
+		total_labels_attempted = quantity;
+		quantityList = if(quantity < 1,list(),"".leftpad(quantity).toList(""));
+		for each index i in quantityList
+		{
+			label_number = i + 1;
+			label_status = "Label " + label_number + " - ";
+			labelPdfBase64 = null;
+			// === GLS Label Generation (Inside Loop) ===
+			try 
+			{
+				shipmentDate = zoho.currentdate.toString("yyyyMMdd");
+				// Address Maps
+				deliveryAddress = Map();
+				deliveryAddress.put("Name1","Cordulus A/S");
+				deliveryAddress.put("Street1","Agro Food Park 13");
+				deliveryAddress.put("CountryNum","208");
+				deliveryAddress.put("ZipCode","8200");
+				deliveryAddress.put("City","Aarhus N");
+				deliveryAddress.put("Email","info@cordulus.com");
+				pickupAddress = Map();
+				pickupAddress.put("Name1",contactName);
+				pickupAddress.put("Street1",pickupStreet);
+				pickupAddress.put("CountryNum","208");
+				pickupAddress.put("ZipCode",pickupZip);
+				pickupAddress.put("City",pickupCity);
+				pickupAddress.put("Email",contactEmail);
+				addresses = Map();
+				addresses.put("Delivery",deliveryAddress);
+				addresses.put("Pickup",pickupAddress);
+				parcel = Map();
+				parcel.put("Weight",1.0);
+				parcelsList = list();
+				parcelsList.add(parcel);
+				services = Map();
+				services.put("ShopReturn","Y");
+				glsPayloadMap = Map();
+				glsPayloadMap.put("UserName","2080021323");
+				glsPayloadMap.put("Password","vXKcKdsfk5!");
+				glsPayloadMap.put("Customerid","2080021323");
+				glsPayloadMap.put("Contactid","208a79jXDE");
+				glsPayloadMap.put("ShipmentDate",shipmentDate);
+				glsPayloadMap.put("LabelFormat","PDF");
+				glsPayloadMap.put("Addresses",addresses);
+				glsPayloadMap.put("Parcels",parcelsList);
+				glsPayloadMap.put("Services",services);
+				glsHeaders = Map();
+				glsHeaders.put("Content-Type","application/json");
+				getGlsLabel = invokeurl
+				[
+					url :"http://api.gls.dk/ws/DK/V1/CreateShipment"
+					type :POST
+					parameters:glsPayloadMap.toString()
+					headers:glsHeaders
+					detailed:true
+				];
+				// Error check for GLS
+				if(getGlsLabel.get("responseCode") != 200)
+				{
+					failMsg = label_status + "GLS Label Generation FAILED. Details: " + getGlsLabel.get("responseText");
+					label_results.add(failMsg);
+					info getGlsLabel.get("responseText");
+				}
+				else
+				{
+					labelPdfBase64 = getGlsLabel.get("responseText").get("PDF");
+					attachment = Map();
+					attachment.put("filename","Return Label_" + label_number + ".pdf");
+					attachment.put("content",labelPdfBase64);
+					attachments_list.add(attachment);
+					label_results.add(label_status + "SUCCESS: Label generated.");
+				}
+			}
+			catch (gls_e)
+			{
+				// Catch individual label failures
+				info "Error generating label " + label_number + ": " + gls_e;
+				label_results.add(label_status + "ERROR: Exception occurred. " + gls_e);
+			}
+		}
+	}
+	// --- 4. Send Email with ALL Generated Labels using Mailersend (Runs Once) ---
+	if(!hasError)
+	{
+		if(attachments_list.size() > 0)
+		{
+			try 
+			{
+				data = Map();
+				from = Map();
+				from.put("email","support@cordulus.com");
+				data.put("from",from);
+				to_list = List();
+				to = Map();
+				to.put("email",contactEmail);
+				to_list.add(to);
+				data.put("to",to_list);
+				data.put("template_id",template_id);
+				personalization_list = List();
+				personalization_item = Map();
+				personalization_item.put("email",contactEmail);
+				personalization_data = Map();
+				personalization_data.put("name",contactName);
+				personalization_data.put("email",contactEmail);
+				personalization_item.put("data",personalization_data);
+				personalization_list.add(personalization_item);
+				data.put("personalization",personalization_list);
+				data.put("attachments",attachments_list);
+				bcc_list = List();
+				bcc = Map();
+				bcc.put("email","q0dz604t_8u6v36af@mails2.eu.zohocrm.com");
+				bcc_list.add(bcc);
+				data.put("bcc",bcc_list);
+				headers = Map();
+				headers.put("Authorization","Bearer mlsn.904bd5e0ff5312afbb01f2c7113d6e66b36d3a37d7570f5b8c495174a9d0f5a5");
+				headers.put("Content-Type","application/json");
+				sendGlsLabelEmail = invokeurl
+				[
+					url :"https://api.mailersend.com/v1/email"
+					type :POST
+					parameters:data.toString()
+					headers:headers
+					detailed:true
+				];
+				if(sendGlsLabelEmail.get("responseCode") != 202)
+				{
+					// This is an email sending error, affecting all generated labels
+					errorDetails = sendGlsLabelEmail.get("responseText");
+					errorMessage = "CRITICAL: Mailersend API call failed for " + contactEmail;
+					info errorMessage + " Details: " + errorDetails;
+					//  Alert for email sending failure
+					standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage + " | " + errorDetails);
+				}
+				label_results.add("Email Send - SUCCESS: " + attachments_list.size() + " label(s) sent to " + contactEmail);
+			}
+			catch (email_e)
+			{
+				hasError = true;
+				errorMessage = "CRITICAL: Exception while sending email with labels.";
+				errorDetails = email_e;
+				// Alert for email exception
+				standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage + " | " + errorDetails);
+			}
+		}
+		else
+		{
+			hasError = true;
+			errorMessage = "No labels were generated successfully to send in the email.";
+			errorDetails = "Total labels attempted: " + total_labels_attempted + ". See label_results for individual errors.";
+			// Alert if no labels could be generated
+			standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage + " | " + errorDetails);
+		}
+	}
+	// --- 5. Final Return ---
+	if(hasError)
+	{
+		// Determine return status based on where the error occurred
+		if(attachments_list.size() > 0)
+		{
+			return {"status":"email_failed","message":errorMessage,"labels_generated":attachments_list.size(),"details":label_results};
+		}
+		else
+		{
+			return {"status":"fatal_error","message":errorMessage,"details":label_results};
+		}
+	}
+	return {"status":"success","sent_to":contactEmail,"labels_generated":attachments_list.size(),"details":label_results};
+}
+catch (e)
+{
+	// Master catch block sends a detailed error alert
+	errorMessage = "CRITICAL: An unexpected, unhandled error occurred in " + functionName + ". Details: " + e;
+	standalone.delugeSendErrorAlert(functionName,crmAPIRequestForCatch,errorMessage);
+	return {"status":"fatal_error","message":errorMessage};
+}
+return "";
+}
