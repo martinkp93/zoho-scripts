@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
+                "file": "Validation Rules/Contact Email Validation (on creating or editing Contact)/delugeVerifyEmailInPopulace.md",
                 "mode": "source",
                 "source": false
               },
@@ -194,8 +194,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Revenue and Finance/Data Exports/Invoicing",
     "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
     "scripts/delugeSyncActiveCampaignContact/delugeSyncActiveCampaignContact.md",
     "scripts/delugeTriggerAddWorkspaceToDistributor/delugeTriggerAddWorkspaceToDistributor.md",
@@ -230,7 +231,6 @@
     "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.md",
     "Related Lists/Sync Products to Price List's Related Products/delugeSyncProductsToRelatedProducts.md",
-    "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
-    "Environment Lifecycle/Update/Update Populace User/delugeTriggerUpdatePopulaceUser.md"
+    "Validation Rules/Contact Email Validation (on creating or editing Contact)/delugeVerifyEmailInPopulace.md"
   ]
 }
