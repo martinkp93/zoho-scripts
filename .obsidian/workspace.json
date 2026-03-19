@@ -218,6 +218,7 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Related List Syncs",
     "scripts/delugeUpdateConversionPricing/delugeUpdateConversionPricing.md",
     "scripts/delugeUpdateConversionPricing/delugeUpdateConversionPricing.ds",
     "scripts/delugeUpdateConversionPricing",
@@ -229,9 +230,9 @@
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.ds",
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)",
     "Acquisition and Onboarding/Marketing/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
-    "scripts/delugeSyncProductsToRelatedProducts/delugeSyncProductsToRelatedProducts.md",
-    "scripts/delugeSyncProductsToRelatedProducts/delugeSyncProductsToRelatedProducts.ds",
-    "scripts/delugeSyncProductsToRelatedProducts",
+    "scripts/Sync Products to Price List's Related Products/delugeSyncProductsToRelatedProducts.md",
+    "scripts/Sync Products to Price List's Related Products/delugeSyncProductsToRelatedProducts.ds",
+    "scripts/Sync Products to Price List's Related Products",
     "Acquisition and Onboarding/Marketing/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.ds",
     "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
     "Environment Lifecycle/Update/Update Populace User/delugeTriggerUpdatePopulaceUser.md",
@@ -252,7 +253,6 @@
     "Connectors/SectorWeather/delugeSectorWeatherConnector.md",
     "Connectors/Daggers/delugeDaggersConnector.md",
     "Schlechtwetter Service/Get Workspace IDs for Schlechtwetter Accounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
-    "Errors and Messages/Send Success Message to Slack/delugePostSuccessMessageToSlack.md",
-    "conflict-files-obsidian-git.md"
+    "Errors and Messages/Send Success Message to Slack/delugePostSuccessMessageToSlack.md"
   ]
 }
