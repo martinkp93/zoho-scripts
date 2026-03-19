@@ -364,13 +364,10 @@ try
 		info "Zoho CRM Account Update Response: " + updateAccountResponse;
 		// Prepare and execute the update for the Zoho CRM Contact ---
 		contactUpdateMap = Map();
-		// Add the ActiveCampaign Contact ID
 		contactUpdateMap.put("ActiveCampaign_Contact_ID",activeCampaignContactId);
-		// Add the new user ID
 		contactUpdateMap.put("Kanisa_User_ID",userId.toString());
 		contactUpdateMap.put("User_Status","Active");
 		contactUpdateMap.put("User_Type","Owner");
-		// Also update the credentials status if password was returned by the Tickets connector
 		info "Updating Zoho CRM Contact with data: " + contactUpdateMap;
 		// Execute the update for the Contact record
 		updateContactResponse = zoho.crm.updateRecord("Contacts",zcrmContactId,contactUpdateMap);
@@ -389,7 +386,7 @@ try
 	if(password != null || apiKey != null)
 	{
 		info "Preparing to send activation email(s)...";
-		// --- Dynamically determine which email events to send ---
+		// Dynamically determine which email events to send 
 		eventTypesToSend = List();
 		if(password != null)
 		{
@@ -399,22 +396,21 @@ try
 		{
 			eventTypesToSend.add("API Token Activation");
 		}
-		// --- Define fallback logic and map initialization ---
+		// Define fallback logic and map initialization 
 		// Language is assumed to be determined correctly in SECTION 3.
 		// We use a map to store the final template ID for each event type.
 		finalTemplateMap = Map();
 		fallbackLanguage = "en";
-		// --- Loop through the required events and find the template for each ---
+		// Loop through the required events and find the template for each
 		for each  eventType in eventTypesToSend
 		{
 			templateUrl = null;
 			servicePlanRecord = null;
-			// --- Look up the Service Plan record for the current activated subscription ---
+			// Look up the Service Plan record for the current activated subscription 
 			servicePlanSearch = zoho.crm.searchRecords("Service_Plans","(Zoho_Billing_Plan_Code:equals:" + activatedPlanCode + ")");
 			if(servicePlanSearch.size() > 0)
 			{
 				servicePlanRecord = zoho.crm.getRecordById("Service_Plans",servicePlanSearch.get(0).get("id"));
-				// info servicePlanRecord;
 			}
 			if(servicePlanRecord != null)
 			{
@@ -422,7 +418,7 @@ try
 				info templatesSubform;
 				if(templatesSubform != null)
 				{
-					// --- SEARCH TIER 1: Match Specific Language ---
+					// --- SEARCH TIER 1: Match Specific Language 
 					for each  templateEntry in templatesSubform
 					{
 						if(templateEntry.get("Language") == language && templateEntry.get("Event_Type") == eventType)
@@ -432,7 +428,7 @@ try
 							break;
 						}
 					}
-					// --- SEARCH TIER 2: Match Fallback Language if no specific match was found ---
+					// --- SEARCH TIER 2: Match Fallback Language if no specific match was found 
 					if(templateUrl == null && language != fallbackLanguage)
 					{
 						for each  templateEntry in templatesSubform
