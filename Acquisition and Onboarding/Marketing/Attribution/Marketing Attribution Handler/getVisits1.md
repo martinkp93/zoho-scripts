@@ -9,7 +9,7 @@ Status: Functional
 ---
 
 ## Overview
-The `getVisits1` function is a marketing attribution and synchronization script within the Cordulus ecosystem. It is triggered by a "Visit" record (via automation when a web session is logged). Its primary role is to analyze a user's navigation history (Actions Performed), identify if a "Success" page was reached, extract UTM parameters for attribution, and then back-fill that data into both Zoho CRM "Conversions" records and the external ActiveCampaign marketing platform.
+The `getVisits1` function is a marketing attribution and synchronization script within the Cordulus ecosystem. It is triggered by a "Visit" record  (via automation when a web session is logged). Its primary role is to analyze a user's navigation history (Actions Performed), identify if a "Success" page was reached, extract UTM parameters for attribution, and then back-fill that data into both Zoho CRM "Conversions" records and the external ActiveCampaign marketing platform.
 
 ## Technical Contract
 - **Input:** `Int visit_id`
