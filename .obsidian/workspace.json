@@ -11,14 +11,10 @@
             "id": "5656ca36876b2fb0",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "Deluge_ Workspace and Permissions Handler"
+              "title": "New tab"
             }
           }
         ]
@@ -200,7 +196,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "5656ca36876b2fb0",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
     "scripts/Deluge_ Populace Membership Handler.md",
     "scripts/Deluge_ Populace Connector/Deluge_ Populace Connector.md",
