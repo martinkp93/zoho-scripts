@@ -1,0 +1,150 @@
+string standalone.delugeSalesSprintPricingHandler(Int sales_sprint_id, Int current_renewal_cycle, String billing_country)
+{
+try 
+{
+	// 1. Data Retrieval
+	sprintRecord = zoho.crm.getRecordById("Sales_Sprints",sales_sprint_id);
+	if(sprintRecord == null)
+	{
+		return {"success":false,"error":"Sprint not found"};
+	}
+	sprintAccrual = sprintRecord.get("Accrual_Period_in_Months");
+	subform = sprintRecord.get("Pricing_and_Renewal_Detai");
+	addonSubform = sprintRecord.get("Sales_Sprint_Addons");
+	// 2. Map target rows by type to avoid re-looping
+	rows = Map();
+	for each  row in subform
+	{
+		pName = row.get("Products").get("name");
+		if(pName.contains("Subscription"))
+		{
+			rows.put("sub",row);
+		}
+		else if(pName.contains("Startup"))
+		{
+			rows.put("startup",row);
+		}
+	}
+	for each  row in addonSubform
+	{
+		aName = row.get("Addons").get("name");
+		if(aName.contains("Subscription"))
+		{
+			rows.put("addon",row);
+		}
+	}
+	info rows;
+	// 3. Initialize Response Maps
+	initial = Map();
+	regular = Map();
+	upcoming = Map();
+	addon = Map();
+	info = Map();
+	// Helper for Price Tiering
+	tiers = {"Initial_Year","First_Renewal","Second_Renewal","Third_Renewal","Fourth_Renewal","Fifth_Renewal"};
+	// 4. Process Subscription & Startup
+	for each  type in {"sub","startup"}
+	{
+		if(!rows.containsKey(type))
+		{
+			continue;
+		}
+		currRow = rows.get(type);
+		pId = currRow.get("Products").get("id");
+		pRec = zoho.crm.getRecordById("Products",pId);
+		countryCode = if(billing_country == "Denmark","Product_Code_Denmark","Product_Code_Other");
+		// Map results based on type
+		if(type == "startup")
+		{
+			initial.put("startup_price",currRow.get("Initial_Year"));
+			initial.put("startup_product_id",pId);
+			for each  c in pRec.get("Product_Codes")
+			{
+				if(c.get("Product_Code_Type") == "New Sales")
+				{
+					initial.put("startup_product_code",c.get(countryCode));
+				}
+			}
+		}
+		else if(type == "sub")
+		{
+			initial.put("subscription_price",currRow.get("Initial_Year"));
+			initial.put("subscription_product_id",pId);
+			// Handle Accrual Based Codes
+			if(current_renewal_cycle == 0 && sprintAccrual == 12)
+			{
+				for each  c in pRec.get("Product_Codes")
+				{
+					if(c.get("Product_Code_Type") == "New Sales")
+					{
+						initial.put("subscription_product_code",c.get(countryCode));
+					}
+				}
+			}
+			else
+			{
+				for each  c in pRec.get("Accrual_Based_Product_Cod")
+				{
+					if(c.get("Accrual_Period_in_Months") == sprintAccrual)
+					{
+						initial.put("subscription_product_code",c.get(countryCode));
+					}
+					if(c.get("Accrual_Period_in_Months") == 12)
+					{
+						upcoming.put("subscription_product_code",c.get(countryCode));
+					}
+				}
+			}
+			// Handle Tiered Pricing (Regular vs Upcoming)
+			if(current_renewal_cycle < tiers.size())
+			{
+				regular.put("subscription_price",currRow.get(tiers.get(current_renewal_cycle)));
+			}
+			nextIndex = current_renewal_cycle + 1;
+			if(nextIndex < tiers.size())
+			{
+				upcoming.put("subscription_price",currRow.get(tiers.get(nextIndex)));
+			}
+		}
+	}
+	// Check if Sales Sprint pricing is effective (to validate whether discount can be applied)
+	sales_sprint_pricing_effective_current_cycle = false;
+	sales_sprint_pricing_effective_upcoming_cycle = false;
+	current_renewal_cycle_months = current_renewal_cycle * 12;
+	upcoming_renewal_cycle_months = (current_renewal_cycle + 1) * 12;
+	if(current_renewal_cycle_months < sprintAccrual)
+	{
+		sales_sprint_pricing_effective_current_cycle = true;
+		info "Sprint pricing effective for current cycle";
+	}
+	if(upcoming_renewal_cycle_months < sprintAccrual)
+	{
+		sales_sprint_pricing_effective_upcoming_cycle = true;
+		info "Sprint pricing effective for upcoming cycle";
+	}
+	info.put("sales_sprint_pricing_effective_current_cycle",sales_sprint_pricing_effective_current_cycle);
+	info.put("sales_sprint_pricing_effective_upcoming_cycle",sales_sprint_pricing_effective_upcoming_cycle);
+	// 5. Process Addon
+	if(rows.containsKey("addon"))
+	{
+		aRow = rows.get("addon");
+		aId = aRow.get("Addons").get("id");
+		aRec = zoho.crm.getRecordById("Products",aId);
+		addon.put("subscription_price",aRow.get("Initial_Year"));
+		addon.put("subscription_product_id",aId);
+		for each  c in aRec.get("Product_Codes")
+		{
+			if(c.get("Product_Code_Type") == "New Sales")
+			{
+				addon.put("subscription_product_code",c.get(if(billing_country == "Denmark","Product_Code_Denmark","Product_Code_Other")));
+			}
+		}
+	}
+	return {"success":true,"initial":initial,"regular":regular,"upcoming":upcoming,"addon":addon,"info":info};
+}
+catch (e)
+{
+	return {"success":false,"error":e};
+}
+return "";
+}
