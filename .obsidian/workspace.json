@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.md",
+                "file": "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeMobileAppRequestAQuote"
+              "title": "delugeTrialHandler"
             }
           }
         ]
@@ -212,12 +212,14 @@
   },
   "active": "5656ca36876b2fb0",
   "lastOpenFiles": [
+    "Acquisition and Onboarding/Lead Ingestion/delugeLeadSheetHandler/delugeLeadSheetHandler.md",
+    "Acquisition and Onboarding/Lead Ingestion/delugeLeadHandler/delugeLeadHandler.md",
+    "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.md",
     "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
     "conflict-files-obsidian-git.md",
     "Environment Lifecycle/Delete",
     "Environment Lifecycle/Update",
     "Environment Lifecycle/Read",
-    "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.md",
     "Environment Lifecycle/Create",
     "Environment Lifecycle",
     "Acquisition and Onboarding/Lead Generation/Mobile App",
@@ -230,8 +232,6 @@
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionHandler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
-    "Acquisition and Onboarding/Lead Ingestion/delugeLeadSheetHandler/delugeLeadSheetHandler.md",
-    "Acquisition and Onboarding/Lead Ingestion/delugeLeadHandler/delugeLeadHandler.md",
     "Connectors/delugeDaggersConnector/delugeDaggersConnector.md",
     "scripts/delugeSendErrorAlert/delugeSendErrorAlert.md",
     "Connectors/delugeMailersendConnector/delugeMailersendConnector.md",
