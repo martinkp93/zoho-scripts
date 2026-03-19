@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
+                "file": "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
                 "mode": "source",
                 "source": false
               },
@@ -210,12 +210,12 @@
     "Validation Rules/Account Validation (on moving Contact to another Account)",
     "scripts/delugeSalesSprintPricingHandler/delugeSalesSprintPricingHandler.ds",
     "scripts/delugeSalesSprintPricingHandler",
-    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
+    "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
     "scripts/delugeResolveRaQPricing/delugeResolveRaQPricing.ds",
     "scripts/delugeResolveRaQPricing/delugeResolveRaQPricing.md",
     "scripts/delugeResolveRaQPricing",
     "scripts/Subscription Resurrection Handler/Subscriptionresurrection.md",
-    "scripts/delugePriceListPricingHandler/delugePriceListPricingHandler.md",
+    "Revenue and Finance/Conversion Pricing/Price List Pricing Handler/delugePriceListPricingHandler.md",
     "scripts/delugeSalesIQMissedChat/delugeSalesIQMissedChat.md",
     "Revenue and Finance/Invoicing Automation/Draft Invoicing Handler/delugeProcessRenewalsOrNewSalesForInvoicingV2.md",
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Exports Handler/delugeRenewalsAndNewSalesExportHandler.md",
