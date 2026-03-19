@@ -1,0 +1,166 @@
+string standalone.delugeTrialHandler(Int zcrmAccountId, Int zcrmContactId, String customerEmail)
+{
+functionName = "delugeTrialHandler";
+payloadForCatch = {"zcrmAccountId":zcrmAccountId,"email":customerEmail};
+billingBaseUrl = "https://www.zohoapis.eu/billing/v1";
+// Or use the base URL for Zoho Billing API 
+// Configuration
+planCodeToCreate = "1400";
+try 
+{
+	// =====================================================================
+	// 1. RETRIEVE ZOHO BILLING CUSTOMER BY ZCRM ID
+	// =====================================================================
+	info "Searching Zoho Billing Customer using ZCRM Account ID: " + zcrmAccountId;
+	// Note: Replace "zoho_billing" with your actual Deluge Connection Name for Zoho Billing
+	customerSearchParams = Map();
+	customerSearchParams.put("reference_id_type","zcrm_account_id");
+	headers = Map();
+	headers.put("X-com-zoho-subscriptions-organizationid","20087400261");
+	customerSearchResp = invokeurl
+	[
+		url :"https://subscriptions.zoho.eu/api/v1/crm/account/import?reference_id=" + zcrmAccountId + "&organization_id=20087400261"
+		type :POST
+		parameters:customerSearchParams
+		headers:headers
+		detailed:true
+		connection:"zohobillingconnection"
+	];
+	info customerSearchResp;
+	billingCustomer = null;
+	if(customerSearchResp.get("responseText").get("code") == 0 && customerSearchResp.get("responseText").get("data").get("customer_id") != null)
+	{
+		billingCustomerId = customerSearchResp.get("responseText").get("data").get("customer_id");
+		info "Found Zoho Billing Customer ID: " + billingCustomerId;
+	}
+	else
+	{
+		// CRITICAL: Customer was not found in Zoho Billing.
+		errorMessage = "Customer not found in Zoho Billing for ZCRM ID: " + zcrmAccountId;
+		standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+		// We cannot proceed without a customer, so we exit.
+		return {"success":false,"status":"CustomerNotFound","message":errorMessage};
+	}
+	// =====================================================================
+	// 2. CHECK FOR EXISTING LIVE SUBSCRIPTIONS
+	// =====================================================================
+	info "Checking for live subscriptions for Customer ID: " + billingCustomerId;
+	subscriptionSearchResp = invokeurl
+	[
+		url :billingBaseUrl + "/subscriptions?customer_id=" + billingCustomerId
+		type :GET
+		detailed:true
+		connection:"zohobillingconnection"
+	];
+	info subscriptionSearchResp;
+	hasLiveSubscription = false;
+	hasPreviousSubscription = false;
+	subscriptions = subscriptionSearchResp.get("responseText").get("subscriptions");
+	if(subscriptionSearchResp.get("responseText").get("code") == 0 && subscriptions.size() > 0)
+	{
+		for each  subscription in subscriptions
+		{
+			if(subscription.get("status") == "live")
+			{
+				hasLiveSubscription = true;
+			}
+			if(subscription.get("status") == "expired" || subscription.get("status") == "cancelled")
+			{
+				hasPreviousSubscription = true;
+			}
+		}
+	}
+	else if(subscriptionSearchResp.get("responseText").get("code") == 0 && subscriptionSearchResp.get("responseText").get("subscriptions").size() = 0)
+	{
+		hasLiveSubscription = false;
+	}
+	else
+	{
+		// Error retrieving subscriptions, but we must decide whether to proceed or halt. 
+		// Assuming we halt if we can't confirm subscription status safely.
+		errorMessage = "Error retrieving subscription status from Zoho Billing. Response: " + subscriptionSearchResp;
+		standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+		return {"success":false,"status":"SubscriptionCheckError","message":errorMessage};
+	}
+	// =====================================================================
+	// 3. EXECUTE ACTION BASED ON SUBSCRIPTION STATUS
+	// =====================================================================
+	info "Customer has live subscription(s): " + hasLiveSubscription;
+	info "Customer has previous subscription(s): " + hasPreviousSubscription;
+	if(hasLiveSubscription == true || hasPreviousSubscription == true)
+	{
+		// A. HAS LIVE SUBSCRIPTION: Call MailerSend Connector
+		info "Contact has live or previous subscriptions. Calling MailerSend connector to send email about existing account...";
+		accountRecordResp = zoho.crm.getRecordById("Accounts",zcrmAccountId);
+		contactRecordResp = zoho.crm.getRecordById("Contacts",zcrmContactId);
+		language = if(accountRecordResp.get("Language") != null,accountRecordResp.get("Language"),"en");
+		info language;
+		email = contactRecordResp.get("Email");
+		firstName = contactRecordResp.get("First_Name");
+		lastName = contactRecordResp.get("Last_Name");
+		eventType = "Account Already Exists";
+		vertical = "Farm";
+		info "Language: " + language;
+		templateResponse = standalone.delugeEmailTemplateHandler(eventType,vertical,language);
+		templateId = templateResponse.get("templates").get(eventType);
+		if(templateId != null)
+		{
+			// Build the payload
+			mailerSendPayload = Map();
+			mailerSendPayload.put("from",{"email":"support@cordulus.com"});
+			mailerSendPayload.put("to",{{"email":email}});
+			mailerSendPayload.put("bcc",{{"email":"q0dz604t_8u6v36af@mails2.eu.zohocrm.com"}});
+			mailerSendPayload.put("template_id",templateId);
+			personalizationData = Map();
+			personalizationData.put("firstName",firstName);
+			personalizationData.put("lastName",lastName);
+			personalizationData.put("email",email);
+			mailerSendPayload.put("personalization",{{"email":email,"data":personalizationData}});
+			// Call the MailerSend connector
+			emailResponse = standalone.delugeMailersendConnector(mailerSendPayload);
+			if(emailResponse.get("success"))
+			{
+				info "Email for '" + eventType + "' sent successfully!";
+			}
+		}
+	}
+	if(hasLiveSubscription == false)
+	{
+		// B. NO LIVE SUBSCRIPTION: Create Subscription with Plan Code 1400
+		info "No live subscription found. Creating new subscription with Plan Code " + planCodeToCreate;
+		// Build Subscription Payload
+		subscriptionData = Map();
+		subscriptionData.put("customer_id",billingCustomerId);
+		subscriptionData.put("plan",{"plan_code":planCodeToCreate});
+		subscriptionPayload = Map();
+		subscriptionPayload.put("subscription",subscriptionData);
+		createSubResp = invokeurl
+		[
+			url :billingBaseUrl + "/subscriptions"
+			type :POST
+			parameters:subscriptionData.toString()
+			detailed:true
+			connection:"zohobillingconnection"
+		];
+		if(createSubResp.get("responseText").get("code") == 0)
+		{
+			newSubscriptionId = createSubResp.get("responseText").get("subscription").get("subscription_id");
+			info "Successfully created subscription ID: " + newSubscriptionId;
+			return {"success":true,"status":"SubscriptionCreated","subscriptionId":newSubscriptionId,"message":"Subscription created successfully."};
+		}
+		else
+		{
+			errorMessage = "Failed to create subscription. Response: " + createSubResp;
+			standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+			return {"success":false,"status":"SubscriptionCreationFailed","message":errorMessage};
+		}
+	}
+}
+catch (e)
+{
+	errorMessage = "An unexpected error occurred in " + functionName + ". Details: " + e;
+	standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+	return {"success":false,"status":"DelugeError","message":errorMessage};
+}
+return "";
+}
