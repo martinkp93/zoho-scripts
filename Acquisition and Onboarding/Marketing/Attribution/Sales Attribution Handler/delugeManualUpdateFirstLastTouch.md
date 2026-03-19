@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000000564029"
 Name: delugeManualUpdateFirstLastTouch
-Revision Timestamp: 2026-03-19T16:04:13.074Z
+Revision Timestamp: 2026-03-19T19:35:31.937Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -58,7 +58,7 @@ graph TD
 The script fetches all related records from the `Demo_Conversions` list for the given account. Zoho Deluge returns these in an order where the newest is usually at index 0 and the oldest is at the final index (`size - 1`).
 
 ### 2. First Touch Attribution
-The script identifies the oldest record. It validates that this record isn't already a "Purchase Conversion" (to avoid circular attribution). If valid, it extracts the ID, Name, Created Date, and calculates the `daysBetween` the first touch and the current purchase.
+The script identifies the oldest record (index `size - 1`). It validates that this record isn't already a "Purchase Conversion" (to avoid circular attribution). If valid, it extracts the ID, Name, Created Date, and calculates the `daysBetween` the first touch and the current purchase.
 
 ### 3. Last Touch (Second-to-Last) Attribution
 The script identifies the second-to-last conversion record (index 1). Since the current purchase is often the "Last" record in the list (index 0), the interaction immediately before it provides the "Last Touch" context. Similar validation and duration calculations are performed.
@@ -74,8 +74,12 @@ If either the First or Last touch data is valid, a `Map` is populated and sent t
 > [!WARNING]
 > This function uses `.left(10)` on the `Created_Time` string. This assumes the standard Zoho ISO date format. If the date format is modified at the organization level, this substring logic might fail.
 
+> [!CAUTION]
+> The variable `org_id` is hardcoded as `"20087400261"` at the start of the script but is currently unused by the Zoho CRM API tasks. This should be cleaned up or utilized to ensure multi-DC compatibility if needed.
+
 > [!TIP]
 > This script is optimized to only perform an API update if there is actually data to change (`purchase_conversion_data.size() > 0`), which saves on API limits.
 
 ## Change Log
 - **2026-03-19T16:04:13.074Z:** Initial creation of documentation via DeluluDocu.
+- **2026-03-19T19:35:31.937Z:** Verified logic for first and second-to-last conversion attribution. Added caution regarding hardcoded Organization ID and updated Mermaid diagram for syntax compliance.
