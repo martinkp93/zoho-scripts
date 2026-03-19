@@ -1,0 +1,40 @@
+string standalone.delugeSubscriptionCycleHandler(String crmAPIRequest)
+{
+try 
+{
+	// 1. Initialisation
+	functionName = "delugeSubscriptionCyclelHandler";
+	data = crmAPIRequest.get("params");
+	subscriptionId = data.get("subscriptionId");
+	payloadForCatch = {"subscriptionId":subscriptionId};
+	// 2. Find the matching Purchase Conversion, if any
+	conversionSearch = zoho.crm.searchRecords("Conversions","(Subscription_ID:equals:" + subscriptionId + ")");
+	if(conversionSearch.isEmpty())
+	{
+		infoMessage = "No Purchase Conversion found for Subscription ID " + subscriptionId + ". Nothing to update. Exiting script.";
+		info infoMessage;
+		return infoMessage;
+	}
+	// 3. Access and update the matching Purchase Conversion record
+	conversionRecord = conversionSearch.get(0);
+	conversionId = conversionRecord.get("id");
+	// Retrieve current renewal cycle from Purchase Conversion
+	existingCycle = conversionRecord.get("Renewal_Cycle");
+	info "Existing Renewal Cycle: " + existingCycle;
+	// Add new renewal to existing renewal cycle counter
+	newCycle = existingCycle + 1;
+	info "New Renewal Cycke: " + newCycle;
+	// Update Renewal Cycle counter on related Purchase Conversion
+	updateMap = Map();
+	updateMap.put("id",conversionId.toString());
+	updateMap.put("Renewal_Cycle",newCycle);
+	updateConversionResponse = zoho.crm.updateRecord("Conversions",conversionId,updateMap,{"trigger":{"workflow"}});
+	info "Renewal Cycle was updated for Purchase Conversion: " + updateConversionResponse;
+}
+catch (e)
+{
+	errorMessage = "A critical error occurred in " + functionName + ". Details: " + e;
+	standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+}
+return "Function successfully executed.";
+}
