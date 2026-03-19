@@ -1,0 +1,62 @@
+void automation.delugeTriggerUpdatePopulaceWorkspace(Int accountId)
+{
+try 
+{
+	// --- 1. Get all necessary data from the updated Account record
+	accountRecord = zoho.crm.getRecordById("Accounts",accountId);
+	workspaceId = accountRecord.get("Kanisa_Farm_ID");
+	// Only proceed if there's a workspace ID to update
+	if(workspaceId != null)
+	{
+		// --- 2. Build the payload using fields from the Account record 
+		payload = Map();
+		payload.put("workspaceId",workspaceId);
+		// For the connector to build the URL
+		payload.put("accountId",accountId.toLong());
+		payload.put("cvr",accountRecord.get("CVR_VAT_number"));
+		payload.put("active",if(accountRecord.get("Account_Status") == "Active",true,false));
+		// Create the nested "features" object directly from CRM fields
+		featuresMap = Map();
+		featuresMap.put("legacyWeather",accountRecord.get("Legacy_Weather"));
+		featuresMap.put("legacySatellite",accountRecord.get("Legacy_Satellite"));
+		featuresMap.put("weatherDemo",accountRecord.get("Weather_Demo"));
+		featuresMap.put("weatherNetwork",accountRecord.get("Weather_Network"));
+		featuresMap.put("addFieldsByOutlines",accountRecord.get("Add_Fields_by_Outline"));
+		featuresMap.put("addFieldsByCvr",accountRecord.get("Add_Fields_by_CVR"));
+		featuresMap.put("heightMapsKortforsyningen",accountRecord.get("Height_Maps_Kortforsyningen"));
+		// Create the nested "trial" object
+		trialMap = Map();
+		if(accountRecord.get("Weather_Demo") == true)
+		{
+			trialMap.put("start",accountRecord.get("Weather_Demo_Start"));
+			trialMap.put("end",accountRecord.get("Weather_Demo_End"));
+			trialMap.put("country",accountRecord.get("Billing_Country"));
+			featuresMap.put("trial",trialMap);
+		}
+		// Add the "features" map to the main payload
+		payload.put("features",featuresMap);
+		// --- 3. Call the Populace connector with the final payload ---
+		info "Triggering Populace Workspace update for Account ID: " + accountId;
+		response = standalone.delugePopulaceConnector("updateWorkspace",payload);
+		info "PUT Populace Workspace response: " + response;
+		// --- 4. Add a note to the CRM record with the result 
+		noteContent = if(response.get("success"),"Successfully synced Account with Populace Workspace.","ERROR: Failed to sync Account with Populace Workspace. Check Slack for details.");
+		noteMap = Map();
+		noteMap.put("Note_Title","Populace Workspace Sync");
+		noteMap.put("Note_Content",noteContent + " (Triggered by field update)");
+		noteMap.put("Parent_Id",accountId);
+		noteMap.put("se_module","Accounts");
+		zoho.crm.createRecord("Notes",noteMap);
+	}
+}
+catch (e)
+{
+	// Log any unexpected errors
+	noteMap = Map();
+	noteMap.put("Note_Title","Populace Workspace Sync Status");
+	noteMap.put("Note_Content","CRITICAL ERROR: The trigger_update_populace_workspace function failed unexpectedly. Details: " + e);
+	noteMap.put("Parent_Id",accountId);
+	noteMap.put("se_module","Accounts");
+	zoho.crm.createRecord("Notes",noteMap);
+}
+}
