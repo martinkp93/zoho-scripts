@@ -1,0 +1,76 @@
+void schedule.delugePriceListIncreaseHandlerSchedule()
+{
+moduleId = 520877000309876284;
+// Retrieved from GET Modules request
+today = zoho.currentdate.toString("yyyy-MM-dd");
+// 1. Fetch Price Lists that have pending updates
+priceLists = zoho.crm.getRecords("Price_Lists");
+for each  priceList in priceLists
+{
+	plistId = priceList.get("id");
+	plist = zoho.crm.getRecordById("Price_Lists",plistId);
+	subform = plist.get("Subform_2");
+	updatedSubform = List();
+	isUpdated = false;
+	noteContent = "";
+	if(subform != null)
+	{
+		for each  row in subform
+		{
+			effectiveDate = row.get("New_Price_Effective_Date");
+			info effectiveDate;
+			info today;
+			currentPriceNet = row.get("Price");
+			currentPriceEndUser = row.get("Price_End_User");
+			upcomingPriceNet = row.get("New_Price_Net");
+			upcomingPriceEndUser = row.get("New_Price_End_User");
+			// 2. Check if the price should be promoted today
+			if(upcomingPriceNet != null && effectiveDate == today)
+			{
+				row.put("Price",upcomingPriceNet);
+				row.put("Price_End_User",upcomingPriceEndUser);
+				row.put("New_Price_Net",null);
+				row.put("New_Price_End_User",null);
+				row.put("New_Price_Effective_Date",null);
+				isUpdated = true;
+				lines = List();
+				lines.add("<strong>Product:</strong> " + row.get("Products").get("name"));
+				lines.add("Price (Net) updated from " + currentPriceNet + " to " + upcomingPriceNet);
+				lines.add("Price (End-User) updated from " + currentPriceEndUser + " to " + upcomingPriceEndUser);
+				lines.add("Effective Date: " + effectiveDate);
+				lines.add("<hr>");
+				for each  line in lines
+				{
+					noteContent = noteContent + line + "<br>";
+				}
+			}
+			updatedSubform.add(row);
+		}
+		info updatedSubform;
+		info noteContent;
+	}
+	// 3. Update the record only if changes were made
+	if(isUpdated)
+	{
+		updateMap = Map();
+		updateMap.put("Subform_2",updatedSubform);
+		info updateMap;
+		noteTitle = "Price Increase Deployed";
+		parentMap = {"Parent_Id":{"module":{"api_name":"Price_Lists","id":moduleId},"id":plistId},"Note_Title":noteTitle,"Note_Content":noteContent};
+		data = List();
+		data.add(parentMap);
+		params = Map();
+		params.put("data",data);
+		response = invokeurl
+		[
+			url :"https://www.zohoapis.eu/crm/v8/Price_Lists/" + plistId + "/Notes"
+			type :POST
+			parameters:params.toString()
+			connection:"zohocrmconnection"
+		];
+		info response;
+		zoho.crm.updateRecord("Price_Lists",plistId,updateMap);
+		info "Promoted prices for Price List ID: " + plistId;
+	}
+}
+}
