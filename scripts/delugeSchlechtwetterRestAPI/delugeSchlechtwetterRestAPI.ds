@@ -1,0 +1,380 @@
+string standalone.delugeSchlechtwetterRestAPI(String crmAPIRequest)
+{
+//------------------ Initialization and Extraction ------------------//
+try 
+{
+	functionName = "delugeSchlechtwetterRestAPI";
+	crmAPIRequestBody = crmAPIRequest.get("body");
+	workspaceId = crmAPIRequestBody.get("workspaceId");
+	chainId = crmAPIRequestBody.get("chainId");
+	entries = crmAPIRequestBody.get("entries");
+	responseCode = 200;
+	code = "success";
+	responseMessage = "Script executed successfully";
+	parentFolderId = "1QKAw18ejhyeJfnkg4aXGEgSnn9DGR2nV";
+	//------------------ Guard Clause for Required Input Validation ------------------//
+	if(workspaceId == null || workspaceId == "" || chainId == null || chainId == "" || entries == null || entries.size() == 0)
+	{
+		return {"crmAPIResponse":{"status_code":400,"body":{"code":"error","message":"Missing workspaceId, label, or entries from request body."}}};
+	}
+	//------------------ Step 1: Find Matching CRM Account ------------------//
+	accountList = zoho.crm.searchRecords("Accounts","(Kanisa_Farm_ID:equals:" + workspaceId + ")");
+	if(accountList == null || accountList.size() == 0)
+	{
+		return {"crmAPIResponse":{"status_code":200,"body":{"code":"success","message":"No matching account found for workspaceId: " + workspaceId}}};
+	}
+	account = accountList.get(0);
+	accountName = account.get("Account_Name");
+	encodedAccountName = encodeUrl(accountName);
+	//------------------ Step 2: Find or Create Drive Folder ------------------//
+	folderId = null;
+	searchFolderUrl = "https://www.googleapis.com/drive/v3/files?q=name='" + encodedAccountName + "' and mimeType='application/vnd.google-apps.folder' and '" + parentFolderId + "' in parents and trashed=false";
+	folderResponse = invokeurl
+	[
+		url :searchFolderUrl
+		type :GET
+		detailed:true
+		connection:"googlesheets"
+	];
+	// info "Folder Response: " + folderResponse;
+	if(folderResponse.get("responseCode") != "200")
+	{
+		errorMessage = "CRITICAL: Failed to search Google Drive folder. Halting execution.";
+		standalone.delugeSendErrorAlert(functionName,crmAPIRequest,errorMessage);
+		return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Error searching Drive folder: " + folderResponse}}};
+	}
+	if(folderResponse.get("responseText").get("files").size() > 0 && folderResponse.get("responseCode") == "200")
+	{
+		folderId = folderResponse.get("responseText").get("files").get(0).get("id");
+	}
+	else
+	{
+		folderPayload = {"name":accountName,"mimeType":"application/vnd.google-apps.folder","parents":{parentFolderId}};
+		createFolderUrl = "https://www.googleapis.com/drive/v3/files";
+		folderBody = {"name":accountName,"mimeType":"application/vnd.google-apps.folder","parents":{"1QKAw18ejhyeJfnkg4aXGEgSnn9DGR2nV"}};
+		folderCreateResponse = invokeurl
+		[
+			url :createFolderUrl
+			type :POST
+			parameters:folderBody.toString()
+			detailed:true
+			connection:"googlesheets"
+		];
+		info "Folder Create Response: " + folderCreateResponse;
+		if(folderCreateResponse.get("responseCode") != "200")
+		{
+			return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Folder creation failed: " + folderCreateResponse}}};
+		}
+		folderId = folderCreateResponse.get("responseText").get("id");
+		// Set folder sharing permissions.
+		sharingUrl = "https://www.googleapis.com/drive/v3/files/" + folderId + "/permissions";
+		sharingBody = {"role":"reader","type":"anyone"};
+		sharingResponse = invokeurl
+		[
+			url :sharingUrl
+			type :POST
+			parameters:sharingBody.toString()
+			detailed:true
+			connection:"googlesheets"
+		];
+		if(sharingResponse.get("responseCode") != "200")
+		{
+			return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Failed to set sharing permissions: " + sharingResponse}}};
+		}
+	}
+	info "Folder ID: " + folderId;
+	latestLabel = null;
+	latestDate = null;
+	// Loop through entries to find the most recent label
+	for each  entry in entries
+	{
+		entryDateStr = entry.get("date");
+		entryDate = entryDateStr.toDate("yyyy-MM-dd");
+		// Convert string to date
+		if(latestDate == null || entryDate > latestDate)
+		{
+			latestDate = entryDate;
+			latestLabel = entry.get("label");
+		}
+	}
+	info "Latest Label: " + latestLabel;
+	spreadsheetId = null;
+	// Step 1: Retrieve all files in the folder
+	searchSheetUrl = "https://www.googleapis.com/drive/v3/files?q='" + folderId + "' in parents and trashed=false";
+	searchSheetResponse = invokeurl
+	[
+		url :searchSheetUrl
+		type :GET
+		detailed:true
+		connection:"googlesheets"
+	];
+	info "Search Sheet Response: " + searchSheetResponse;
+	// Error handling for search request
+	if(searchSheetResponse.get("responseCode") != "200")
+	{
+		return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Error searching files: " + searchSheetResponse}}};
+	}
+	// Step 2: Loop through the retrieved files
+	spreadsheetId = null;
+	if(searchSheetResponse.get("responseText").get("files").size() > 0)
+	{
+		files = searchSheetResponse.get("responseText").get("files");
+		for each  file in files
+		{
+			// spreadsheetId = file.get("id");
+			// Step 3: Retrieve custom properties for each file
+			getPropertiesUrl = "https://www.googleapis.com/drive/v3/files/" + file.get("id") + "?fields=properties";
+			getPropertiesResponse = invokeurl
+			[
+				url :getPropertiesUrl
+				type :GET
+				detailed:true
+				connection:"googlesheets"
+			];
+			// info getPropertiesResponse;
+			// Check if response is valid and properties exist
+			if(getPropertiesResponse.get("responseCode") == "200")
+			{
+				properties = getPropertiesResponse.get("responseText").get("properties");
+				// Step 4: Check if 'chainId' matches
+				if(properties != null && properties.get("chainId") == chainId)
+				{
+					// Match found
+					spreadsheetId = file.get("id");
+					info "Found matching file: " + spreadsheetId;
+					if(latestLabel != file.get("name"))
+					{
+						updatePropertiesUrl = "https://www.googleapis.com/drive/v3/files/" + spreadsheetId;
+						updatePropertiesBody = {"name":latestLabel,"properties":{"chainId":chainId}};
+						updatePropertiesResponse = invokeurl
+						[
+							url :updatePropertiesUrl
+							type :PATCH
+							parameters:updatePropertiesBody.toString()
+							detailed:true
+							connection:"googlesheets"
+						];
+						info "Update Properties Response: " + updatePropertiesResponse;
+						continue;
+					}
+				}
+			}
+		}
+	}
+	info "Matched Spreadsheet ID:" + spreadsheetId;
+	// Step 5: If no match is found, copy the template file and set properties
+	if(spreadsheetId == null)
+	{
+		templateSheetId = "1VS-l3xCR6Tj4_m_VkpYHAMqyoDHXw6yaPGJph9_is3E";
+		sheetCopyUrl = "https://www.googleapis.com/drive/v3/files/1VS-l3xCR6Tj4_m_VkpYHAMqyoDHXw6yaPGJph9_is3E/copy";
+		sheetCopyBody = {"name":latestLabel,"parents":{folderId}};
+		sheetCopyResponse = invokeurl
+		[
+			url :sheetCopyUrl
+			type :POST
+			parameters:sheetCopyBody.toString()
+			detailed:true
+			connection:"googlesheets"
+		];
+		info "Sheet Copy Response: " + sheetCopyResponse;
+		// Error handling for sheet copy response
+		if(sheetCopyResponse.get("responseCode") != "200")
+		{
+			return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Spreadsheet creation failed: " + sheetCopyResponse}}};
+		}
+		// Get the new copied file ID
+		spreadsheetId = sheetCopyResponse.get("responseText").get("id");
+		info "New Spreadsheet ID: " + spreadsheetId;
+		// Step 6: Set custom properties on the copied file
+		updatePropertiesUrl = "https://www.googleapis.com/drive/v3/files/" + spreadsheetId;
+		updatePropertiesBody = {"name":latestLabel,"properties":{"chainId":chainId}};
+		updatePropertiesResponse = invokeurl
+		[
+			url :updatePropertiesUrl
+			type :PATCH
+			parameters:updatePropertiesBody.toString()
+			detailed:true
+			connection:"googlesheets"
+		];
+		info "Update Properties Response: " + updatePropertiesResponse;
+		// Error handling for properties update
+		if(updatePropertiesResponse.get("responseCode") != "200")
+		{
+			return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Failed to update custom properties on the copied file."}}};
+		}
+	}
+	//------------------ Step 4: Set Label in Spreadsheet (Cell B1) ------------------//
+	setLabelUrl = "https://sheets.googleapis.com/v4/spreadsheets/" + spreadsheetId + "/values/B1?valueInputOption=RAW";
+	setLabelBody = {"values":{{latestLabel}}};
+	setLabelResponse = invokeurl
+	[
+		url :setLabelUrl
+		type :PUT
+		parameters:setLabelBody.toString()
+		detailed:true
+		connection:"googlesheets"
+	];
+	if(setLabelResponse.get("responseCode") != "200")
+	{
+		return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Spreadsheet insert label in cell B2 failed: " + setLabelResponse}}};
+	}
+	//------------------ Step 5: Get Existing Dates from Spreadsheet ------------------//
+	getRowsUrl = "https://sheets.googleapis.com/v4/spreadsheets/" + spreadsheetId + "/values/A2:J";
+	getRowsResponse = invokeurl
+	[
+		url :getRowsUrl
+		type :GET
+		detailed:true
+		connection:"googlesheets"
+	];
+	info "Get Rows Response: " + getRowsResponse;
+	if(getRowsResponse.get("responseCode") != "200")
+	{
+		return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Get rows from spreadsheet failed: " + getRowsResponse}}};
+	}
+	// Find existing rows based on date values in Column A (Date)
+	existingRows = getRowsResponse.get("values");
+	existingDates = list();
+	rowIndexMap = Map();
+	if(existingRows != null)
+	{
+		rowIndex = 1;
+		for each  rowData in existingRows
+		{
+			if(rowData.size() > 0)
+			{
+				dateValue = rowData.get(0);
+				existingDates.add(dateValue);
+				rowIndexMap.put(dateValue,rowIndex);
+			}
+			rowIndex = rowIndex + 1;
+		}
+	}
+	//------------------ Step 6: Prepare Update/Append Data ------------------//
+	updates = list();
+	appends = list();
+	for each  entry in entries
+	{
+		// Parse "rainDuration7to14" from minutes to hours
+		rainDuration7to14 = null;
+		if(entry.get("rainDuration7to14Mins") != null)
+		{
+			minutes = entry.get("rainDuration7to14Mins").toLong();
+			full_hours = floor(minutes / 60);
+			remaining_minutes = minutes % 60;
+			rainDuration7to14 = full_hours.concat(" Std. ").concat(remaining_minutes).concat(" Min.");
+		}
+		// Extract location and check if it exists for the entry
+		location = entry.get("location");
+		lat = null;
+		lng = null;
+		if(location != null && location.contains("lat") && location.contains("lng"))
+		{
+			lat = location.get("lat");
+			lng = location.get("lng");
+		}
+		// Extract classification and translate to German in case of "INSUFFICIENT_DATA" and "No classification"
+		classification = entry.get("classification");
+		if(classification == "INSUFFICIENT_DATA")
+		{
+			classification = "Nur Teil-Daten verfügbar - Kontaktieren Sie Cordulus bei Bedarf";
+		}
+		if(classification == null)
+		{
+			classification = "-";
+		}
+		rain7to7 = null;
+		if(entry.get("rain7to7") != null)
+		{
+			rain7to7 = entry.get("rain7to7").round(1);
+		}
+		rain7to14 = null;
+		if(entry.get("rain7to14") != null)
+		{
+			rain7to14 = entry.get("rain7to14").round(1);
+		}
+		maxAirTemp = null;
+		if(entry.get("maxAirTemp") != null)
+		{
+			maxAirTemp = entry.get("maxAirTemp").round(1);
+		}
+		minAirTemp = null;
+		if(entry.get("minAirTemp") != null)
+		{
+			minAirTemp = entry.get("minAirTemp").round(1);
+		}
+		// Construct rowData
+		rowData = {entry.get("date"),classification,maxAirTemp,minAirTemp,rain7to7,rainDuration7to14,rain7to14,latestLabel,lat,lng};
+		if(existingDates.contains(entry.get("date")))
+		{
+			rowIndex = existingDates.indexOf(entry.get("date")) + 2;
+			updates.add({"range":"A" + rowIndex + ":J" + rowIndex,"values":{rowData}});
+		}
+		else
+		{
+			appends.add(rowData);
+		}
+	}
+	//------------------ Step 7: Execute Updates and Appends in Sheets ------------------//
+	// Update
+	if(updates.size() > 0)
+	{
+		updateUrl = "https://sheets.googleapis.com/v4/spreadsheets/" + spreadsheetId + "/values:batchUpdate";
+		updatePayload = {"valueInputOption":"RAW","data":updates};
+		updateResponse = invokeurl
+		[
+			url :updateUrl
+			type :POST
+			parameters:updatePayload.toString()
+			detailed:true
+			connection:"googlesheets"
+		];
+		if(updateResponse.get("responseCode") != "200")
+		{
+			return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Update spreadsheet failed: " + updateResponse}}};
+		}
+	}
+	// Append
+	if(appends.size() > 0)
+	{
+		appendUrl = "https://sheets.googleapis.com/v4/spreadsheets/" + spreadsheetId + "/values/A3:J:append?valueInputOption=RAW";
+		appendPayload = {"values":appends};
+		appendResponse = invokeurl
+		[
+			url :appendUrl
+			type :POST
+			parameters:appendPayload.toString()
+			detailed:true
+			connection:"googlesheets"
+		];
+		if(appendResponse.get("responseCode") != "200")
+		{
+			return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Append spreadsheet failed: " + appendResponse}}};
+		}
+	}
+	//------------------ Step 8: Final Sorting Call ------------------//
+	sortPayload = {"requests":{{"sortRange":{"range":{"sheetId":0,"startRowIndex":1,"startColumnIndex":0,"endColumnIndex":10},"sortSpecs":{{"dimensionIndex":0,"sortOrder":"DESCENDING"}}}}}};
+	sortUrl = "https://sheets.googleapis.com/v4/spreadsheets/" + spreadsheetId + ":batchUpdate";
+	sortResponse = invokeurl
+	[
+		url :sortUrl
+		type :POST
+		parameters:sortPayload.toString()
+		detailed:true
+		connection:"googlesheets"
+	];
+	if(sortResponse.get("responseCode") != "200")
+	{
+		return {"crmAPIResponse":{"status_code":500,"body":{"code":"error","message":"Sort spreadsheet failed: " + sortResponse}}};
+	}
+}
+catch (e)
+{
+	// Final safety net
+	errorMessage = "CRITICAL: An unexpected, unhandled error occurred in " + functionName + ". Details: " + e;
+	standalone.delugeSendErrorAlert(functionName,crmAPIRequest,errorMessage);
+	return "{\"crmAPIResponse\":{\"status_code\":500,\"body\":{\"code\":\"failure\",\"message\":\"" + errorMessage + "\"}}}";
+}
+//------------------ Success Response ------------------//
+return {"crmAPIResponse":{"status_code":responseCode,"body":{"code":code,"message":responseMessage}}};
+}
