@@ -29,10 +29,10 @@
       }
     },
     {
-      "query": "\"",
+      "query": "path:\"Environment Lifecycle\"  ",
       "color": {
         "a": 1,
-        "rgb": 5431378
+        "rgb": 1760490
       }
     }
   ],
@@ -42,10 +42,10 @@
   "nodeSizeMultiplier": 1.36689670138889,
   "lineSizeMultiplier": 1.43495225694444,
   "collapse-forces": false,
-  "centerStrength": 0.430425347222222,
+  "centerStrength": 0,
   "repelStrength": 13.6345486111111,
   "linkStrength": 0.534201388888889,
   "linkDistance": 500,
-  "scale": 0.5096189814282754,
+  "scale": 0.3586188974270196,
   "close": false
 }
