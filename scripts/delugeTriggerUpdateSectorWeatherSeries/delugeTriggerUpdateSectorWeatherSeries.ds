@@ -1,0 +1,20 @@
+void automation.delugeTriggerUpdateSectorWeatherSeries(Int zohoSeriesId)
+{
+// 1. Initialisation
+action = "updateSeries";
+// 2. Retrieve record, build payload
+seriesRecord = zoho.crm.getRecordById("Race_Series",zohoSeriesId);
+info seriesRecord;
+seriesName = seriesRecord.get("Name");
+seriesShortName = seriesRecord.get("Race_Series_Short_Name");
+seriesId = seriesRecord.get("SectorWeather_Series_ID");
+payload = Map();
+payload.put("zohoSeriesId",zohoSeriesId);
+payload.put("seriesId",seriesId.toNumber());
+payload.put("name",seriesName);
+payload.put("shortName",seriesShortName);
+// 3. Call standalone connector
+info "Triggering SectorWeather Series update.";
+response = standalone.delugeSectorWeatherConnector(action,payload);
+info "PUT SectorWeather Series response: " + response;
+}
