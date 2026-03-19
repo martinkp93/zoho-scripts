@@ -1,0 +1,15 @@
+void schedule.delugeDeleteVisitsOlderThan365Days()
+{
+mp = Map();
+mp.put("cvid","520877000303959500");
+mp.put("portalName","allportals");
+// Make a bulk delete request for the specific view
+response = invokeurl
+[
+	url :"https://crm.zoho.eu/crm/v2.2/Visits/actions/mass_delete"
+	type :POST
+	parameters:mp.tostring()
+	connection:"crm_oauth_visits"
+];
+info "response" + response;
+}

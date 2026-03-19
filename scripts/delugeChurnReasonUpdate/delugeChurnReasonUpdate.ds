@@ -1,0 +1,67 @@
+string standalone.delugeChurnReasonUpdate(String crmAPIRequest, String body)
+{
+info crmAPIRequest;
+crmAPIRequestBody = crmAPIRequest.get("body");
+bodyDecoded = zoho.encryption.urlDecode(crmAPIRequestBody);
+info bodyDecoded;
+bodyMap = Map();
+params = bodyDecoded.toList("&");
+for each  param in params
+{
+	kv = param.toList("=");
+	if(kv.size() == 2)
+	{
+		key = kv.get(0);
+		value = kv.get(1);
+		bodyMap.put(key,value);
+	}
+}
+info bodyMap;
+zcrmContactId = bodyMap.get("contact[fields][contact_id]").toString();
+info "Zoho CRM Contact ID: " + zcrmContactId;
+deskOrgId = 20087400249;
+if(bodyMap != null)
+{
+	email = bodyMap.get("contact[email]");
+	zcrmContactId = bodyMap.get("contact[fields][contact_id]").toString();
+	info "Zoho CRM Contact ID: " + zcrmContactId;
+	searchValue = {"email":email};
+	searchDeskContacts = zoho.desk.searchRecords(20087400249,"contacts",searchValue,0,5,"zohodesk");
+	contacts = searchDeskContacts.get("data");
+	//info searchDeskContacts;
+	info contacts;
+	for each  contact in contacts
+	{
+		deskZcrmContact = contact.get("zohoCRMContact");
+		if(deskZcrmContact != null)
+		{
+			deskContactZcrmId = contact.get("zohoCRMContact").get("id").toString();
+			//info "Desk CRM Contact ID: " + deskContactZcrmId;
+			if(deskContactZcrmId == zcrmContactId)
+			{
+				deskContactId = contact.get("id").toLong();
+			}
+		}
+	}
+	info "Desk Contact ID: " + deskContactId;
+	queryValue = Map();
+	searchDeskTickets = zoho.desk.getRelatedRecords(20087400249,"tickets","contacts",deskContactId,0,20,queryValue,"zohodesk");
+	tickets = searchDeskTickets.get("data");
+	info "Ticket:" + tickets;
+	for each  ticket in tickets
+	{
+		if(ticket.get("subject").contains("[Cancellation]"))
+		{
+			ticketId = ticket.get("id").toLong();
+		}
+	}
+	info "Ticket ID: " + ticketId;
+	updateTicketMap = Map();
+	customFields = Map();
+	customFields.put("Cancellation Reason",bodyMap.get("contact[fields][churn_feedback]"));
+	updateTicketMap.put("customFields",customFields);
+	updateTicket = zoho.desk.update("20087400249","tickets",ticketId,updateTicketMap,"zohodesk");
+	info "Update Ticket Response: " + updateTicket;
+}
+return "";
+}
