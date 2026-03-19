@@ -214,6 +214,11 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "scripts/delugeTriggerUpdatePopulaceUser/delugeTriggerUpdatePopulaceUser.ds",
+    "scripts/delugeTriggerUpdatePopulaceUser",
+    "scripts/delugeSyncUserToPopulaceDistributor/delugeSyncUserToPopulaceDistributor.md",
+    "scripts/delugeSyncUserToPopulaceDistributor/delugeSyncUserToPopulaceDistributor.ds",
+    "scripts/delugeSyncUserToPopulaceDistributor",
     "Environment Lifecycle/Update/Update Populace Workspace/delugeTriggerUpdatePopulaceWorkspace.ds",
     "Environment Lifecycle/Update/Update Populace Workspace/delugeTriggerUpdatePopulaceWorkspace.md",
     "Environment Lifecycle/Update/Update Populace Workspace",
@@ -225,14 +230,10 @@
     "Environment Lifecycle/Delete/Delete Populace User",
     "Environment Lifecycle/Update/Update Populace Membership/delugePopulaceMembershipHandler.md",
     "Environment Lifecycle/Update/Update Populace Membership/delugePopulaceMembershipHandler.ds",
-    "Environment Lifecycle/Update/Update Populace Membership",
     "Schlechtwetter Service/Schlechtwetter Schedule/delugeSchlechtwettertageSchedule.md",
     "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.md",
     "Environment Lifecycle/Create/Create SectorWeather Series Subscription/delugeTriggerCreateSectorWeatherWorkspaceSeries.md",
-    "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.ds",
-    "Environment Lifecycle/Delete/Delete SectorWeather Series Subscription",
     "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.md",
-    "Environment Lifecycle/Update/Update SectorWeather Series Subscription/delugeTriggerUpdateSectorWeatherWorkspaceSeries.ds",
     "Environment Lifecycle/Update/Update SectorWeather Series/delugeTriggerUpdateSectorWeatherSeries.md",
     "Environment Lifecycle/Create/Create SectorWeather Series/delugeTriggerCreateSectorWeatherSeries.md",
     "Connectors/SectorWeather/delugeSectorWeatherConnector.md",
@@ -248,7 +249,6 @@
     "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
     "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.md",
     "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
-    "Acquisition and Onboarding/Lead Ingestion/Lead Sheet Handler/delugeLeadSheetHandler.md",
-    "Acquisition and Onboarding/Lead Ingestion/Lead Handler/delugeLeadHandler.md"
+    "Acquisition and Onboarding/Lead Ingestion/Lead Sheet Handler/delugeLeadSheetHandler.md"
   ]
 }
