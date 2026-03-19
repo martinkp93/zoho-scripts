@@ -212,6 +212,8 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "scripts/delugeTriggerDeleteSectorWeatherSeriesSubscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.md",
+    "scripts/delugeTriggerCreateSectorWeatherWorkspaceSeries/delugeTriggerCreateSectorWeatherWorkspaceSeries.md",
     "scripts/delugeTriggerDeleteSectorWeatherSeriesSubscription/delugeTriggerDeleteSectorWeatherSeriesSubscription.ds",
     "scripts/delugeTriggerDeleteSectorWeatherSeriesSubscription",
     "scripts/delugeTriggerUpdateSectorWeatherWorkspaceSeries/delugeTriggerUpdateSectorWeatherWorkspaceSeries.md",
@@ -226,7 +228,6 @@
     "scripts/delugeTriggerCreateSectorWeatherSeries/delugeTriggerCreateSectorWeatherSeries.ds",
     "scripts/delugeTriggerCreateSectorWeatherSeries",
     "Connectors/delugeSectorWeatherConnector/delugeSectorWeatherConnector.md",
-    "Connectors/delugeSectorWeatherConnector/delugeSectorWeatherConnector.ds",
     "Connectors/delugeDaggersConnector/delugeDaggersConnector.md",
     "Schlechtwetter Service/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
     "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.md",
@@ -246,7 +247,6 @@
     "Environment Lifecycle/Read/delugeFeatureAggregator/delugeFeatureAggregator.md",
     "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.md",
     "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch/delugeManualUpdateFirstLastTouch.md",
-    "Errors and Messages/delugeSendErrorAlert/delugeSendErrorAlert.md",
-    "Connectors/delugeMailersendConnector/delugeMailersendConnector.md"
+    "Errors and Messages/delugeSendErrorAlert/delugeSendErrorAlert.md"
   ]
 }
