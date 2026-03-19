@@ -1,0 +1,104 @@
+void automation.delugeWAT03(Int d_contact_id, Int d_account_id, String d_user_id, String d_watchtower_access)
+{
+// Make a decision on whether to associate or dissociate distributor's Contact from customers' Accounts
+if(d_watchtower_access == "Active")
+{
+	// Associate contacts
+	associateUrl = "/associateAccounts";
+	action = "Associated";
+}
+else if(d_watchtower_access == "Inactive")
+{
+	// Dissociate contacts
+	associateUrl = "/dissociateAccounts";
+	action = "Dissociated";
+}
+zdesk_org_id = "20087400249";
+search_contact_value = Map();
+search_contact_value.put("customField1","User ID:" + d_user_id);
+zoho_desk_contact = zoho.desk.searchRecords(zdesk_org_id,"Contacts",search_contact_value,0,5);
+// nfo "Zoho Desk Contact: " + zoho_desk_contact;
+response_data = zoho_desk_contact.get("data").toString();
+d_zdesk_c_id = response_data.get("id");
+// info "Distributor ZDesk Contact ID: " + d_zdesk_c_id;
+queryMap = Map();
+queryMap.put("select_query","select Kanisa_Farm_ID from Accounts where ((Distributor_Lookup = '" + d_account_id + "') and (Legacy_Weather = true)) limit 2000");
+accounts_query = invokeurl
+[
+	url :"https://www.zohoapis.eu/crm/v6/coql"
+	type :POST
+	parameters:queryMap.toString()
+	connection:"crm_oauth_visits"
+];
+// info "Accounts Query:" + accounts_query;
+workspaces = accounts_query.get("data");
+associate_data = Map();
+associate_ids = List();
+associate_map = Map();
+request_url = "https://desk.zoho.eu/api/v1/contacts/" + d_zdesk_c_id + associateUrl;
+for each  workspace in workspaces
+{
+	search_value = Map();
+	search_value.put("customField1","Workspace ID:" + workspace.get("Kanisa_Farm_ID"));
+	zoho_desk_account = zoho.desk.searchRecords(zdesk_org_id,"Accounts",search_value,0,5,"zohodesk");
+	response_data = zoho_desk_account.get("data").toString();
+	c_zdesk_a_id = response_data.get("id");
+	associate_ids.add(c_zdesk_a_id);
+}
+associate_map.put("ids",associate_ids);
+associate_data.put("data",associate_map);
+// As there is a limit on the number of account ids that can be associated
+// we need to chunk the list into chunks of 50 ids and make a request for each chunk
+chunk_list = List();
+count = 0;
+total_count = 0;
+for each  id in associate_ids
+{
+	chunk_list.add(id);
+	count = count + 1;
+	total_count = total_count + 1;
+	if(count == 50)
+	{
+		// Send this chunk
+		associate_map = Map();
+		associate_map.put("ids",chunk_list);
+		associate_data = Map();
+		associate_data.put("data",associate_map);
+		response = invokeurl
+		[
+			url :request_url
+			type :POST
+			parameters:associate_map.toString()
+			headers:{"Content-Type":"application/json"}
+			detailed:true
+			connection:"zohodesk"
+		];
+		info action + " chunk, response code: " + response;
+		// info action + " chunk, response code: " + response.get("responseCode");
+		// Reset for next chunk
+		chunk_list.clear();
+		count = 0;
+	}
+}
+// Handle any remaining ids that could not fit in a chunk of 50
+if(chunk_list.size() > 0)
+{
+	total_count = total_count + chunk_list.size();
+	associate_map = Map();
+	associate_map.put("ids",chunk_list);
+	associate_data = Map();
+	associate_data.put("data",associate_map);
+	response = invokeurl
+	[
+		url :request_url
+		type :POST
+		parameters:associate_map.toString()
+		headers:{"Content-Type":"application/json"}
+		detailed:true
+		connection:"zohodesk"
+	];
+	info action + " final chunk, response code: " + response;
+	// info action + " final chunk, response code: " + response.get("responseCode");
+	info "Total " + action + " Accounts: " + total_count;
+}
+}
