@@ -20,8 +20,23 @@
               "icon": "lucide-file",
               "title": "delugeFeatureAggregator"
             }
+          },
+          {
+            "id": "3e6e3221ab3c2e72",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "conflict-files-obsidian-git.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "conflict-files-obsidian-git"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       },
       {
         "id": "f3afbe6afa2a9b40",
@@ -210,9 +225,15 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "3e6e3221ab3c2e72",
   "lastOpenFiles": [
-    "Environment Lifecycle/Untitled",
+    "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
+    "conflict-files-obsidian-git.md",
+    "Environment Lifecycle/Delete",
+    "Environment Lifecycle/Update",
+    "Environment Lifecycle/Read",
+    "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.md",
+    "Environment Lifecycle/Create",
     "Environment Lifecycle",
     "Acquisition and Onboarding/Lead Generation/Mobile App",
     "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.md",
@@ -220,17 +241,12 @@
     "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId",
     "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.ds",
     "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote",
-    "Acquisition and Onboarding/Lead Generation",
-    "Acquisition and Onboarding/Inventory",
     "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch/delugeManualUpdateFirstLastTouch.md",
-    "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch/delugeManualUpdateFirstLastTouch.ds",
-    "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionHandler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeLeadSheetHandler/delugeLeadSheetHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeLeadHandler/delugeLeadHandler.md",
-    "Connectors/delugeFeatureAggregator/delugeFeatureAggregator.md",
     "Connectors/delugeDaggersConnector/delugeDaggersConnector.md",
     "scripts/delugeSendErrorAlert/delugeSendErrorAlert.md",
     "Connectors/delugeMailersendConnector/delugeMailersendConnector.md",
