@@ -33,10 +33,14 @@
             "id": "be42622720ea9833",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "scripts/delugeVisitsToActiveCampaign/delugeVisitsToActiveCampaign.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "delugeVisitsToActiveCampaign"
             }
           }
         ]
@@ -212,23 +216,23 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeUpdateConversionPricing/delugeUpdateConversionPricing.md",
+    "scripts/delugeUpdateConversionPricing/delugeUpdateConversionPricing.ds",
+    "scripts/delugeUpdateConversionPricing",
     "Watchtower",
     "scripts/getVisits1/getVisits1.md",
     "scripts/getVisits1/getVisits1.ds",
     "scripts/getVisits1",
-    "scripts/delugegetzohoidsfromdeviceoremaildev/delugegetzohoidsfromdeviceoremaildev.md",
-    "scripts/delugegetzohoidsfromdeviceoremaildev/delugegetzohoidsfromdeviceoremaildev.ds",
-    "scripts/delugegetzohoidsfromdeviceoremaildev",
+    "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.md",
+    "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.ds",
+    "Watchtower/Get Zoho IDs for Device ID or Email (Dev)",
     "scripts/delugeVisitsToActiveCampaign/delugeVisitsToActiveCampaign.md",
     "scripts/delugeSyncProductsToRelatedProducts/delugeSyncProductsToRelatedProducts.md",
     "scripts/delugeSyncProductsToRelatedProducts/delugeSyncProductsToRelatedProducts.ds",
     "scripts/delugeSyncProductsToRelatedProducts",
     "scripts/delugeVisitsToActiveCampaign/delugeVisitsToActiveCampaign.ds",
-    "scripts/delugeVisitsToActiveCampaign",
-    "Buttons",
-    "Validation Rules",
     "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
     "Environment Lifecycle/Update/Update Populace User/delugeTriggerUpdatePopulaceUser.md",
     "Environment Lifecycle/Delete/Delete Populace Workspace/delugeTriggerDeletePopulaceWorkspace.md",

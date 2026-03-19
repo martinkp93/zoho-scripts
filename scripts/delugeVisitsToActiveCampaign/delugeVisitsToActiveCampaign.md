@@ -27,10 +27,10 @@ The `delugeVisitsToActiveCampaign` function serves as a bridge between Zoho CRM 
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service | Purpose | Criticality |
-| --- | --- | --- |
-| [[ActiveCampaign API]] | External endpoint for syncing contact field data (`/api/3/contact/sync`). | High |
-| [[Zoho CRM Modules]] | Source of Contact, Account, and Visit behavioral data. | High |
+| Function / Service | Purpose                                                                   | Criticality |
+| ------------------ | ------------------------------------------------------------------------- | ----------- |
+| ActiveCampaign API | External endpoint for syncing contact field data (`/api/3/contact/sync`). | High        |
+| Zoho CRM Modules   | Source of Contact, Account, and Visit behavioral data.                    | High        |
 
 ## Logic Flow
 
