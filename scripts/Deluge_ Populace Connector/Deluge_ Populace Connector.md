@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001170034"
 Name: Deluge: Populace Connector
-Revision Timestamp: 2026-03-19T14:28:08.009Z
+Revision Timestamp: 2026-03-19T14:29:09.413Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -91,5 +91,9 @@ The script standardizes the `invokeurl` call using a named connection (`populace
 > [!CAUTION]
 > If a path parameter is missing from the `payload` map but required by the URL template (e.g., `{userId}`), the literal string `{userId}` will remain in the URL, likely causing a 404 or 400 error from the API.
 
+> [!SUCCESS]
+> The interpolation logic handles complex paths with multiple parameters (e.g., `/distributors/{distributorId}/users/{userId}`) by iteratively updating the path and cleaning the payload body.
+
 ## Change Log
 - **2026-03-19T14:28:08.009Z:** Initial creation of documentation via DeluluDocu.
+- **2026-03-19T14:29:09.413Z:** Maintenance update; minor comment adjustment in Step 1 to clarify configuration maps. No logic changes were made to the core execution flow.
