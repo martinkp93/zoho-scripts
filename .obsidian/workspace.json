@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Environment Lifecycle/Update/Move User to another Workspace/delugeMoveUserToOtherWorkspace.md",
+                "file": "Revenue and Finance/Data Exports/Invoicing/delugeInvoicingDataExportHandler/delugeInvoicingDataExportHandler.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeMoveUserToOtherWorkspace"
+              "title": "delugeInvoicingDataExportHandler"
             }
           }
         ]
@@ -196,6 +196,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Environment Lifecycle/Update/Move User to another Workspace/delugeMoveUserToOtherWorkspace.md",
     "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
     "Validation Rules/Contact Email Validation (on creating or editing Contact)/delugeVerifyEmailInPopulace.md",
     "Revenue and Finance/Invoicing Automation",
@@ -209,13 +210,12 @@
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md",
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.ds",
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)",
-    "scripts/delugeRenewalsAndNewSalesExportHandler/delugeRenewalsAndNewSalesExportHandler.md",
+    "Revenue and Finance/Data Exports/Invoicing/delugeRenewalsAndNewSalesExportHandler/delugeRenewalsAndNewSalesExportHandler.md",
     "scripts/delugeProcessRenewalsOrNewSalesForInvoicingV2/delugeProcessRenewalsOrNewSalesForInvoicingV2.md",
     "scripts/delugeProcessRenewalsOrNewSalesForInvoicingV2/delugeProcessRenewalsOrNewSalesForInvoicingV2.ds",
     "scripts/delugeProcessRenewalsOrNewSalesForInvoicingV2",
     "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.ds",
-    "scripts/delugeInvoicingDataExportHandler/delugeInvoicingDataExportHandler.md",
-    "Environment Lifecycle/Update/Move User to another Workspace/delugeMoveUserToOtherWorkspace.md",
+    "Revenue and Finance/Data Exports/Invoicing/delugeInvoicingDataExportHandler/delugeInvoicingDataExportHandler.md",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT03/delugeWAT03.md",
     "Acquisition and Onboarding/Marketing/Attribution/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md",
