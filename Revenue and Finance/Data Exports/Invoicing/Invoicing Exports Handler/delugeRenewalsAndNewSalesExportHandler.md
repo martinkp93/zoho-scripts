@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001307001"
 Name: delugeRenewalsAndNewSalesExportHandler
-Revision Timestamp: 2026-03-19T20:30:02.120Z
+Revision Timestamp: 2026-03-19T21:12:49.368Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -30,7 +30,7 @@ This script orchestrates the following internal functions and external services:
 | Function / Service | Purpose | Criticality |
 | --- | --- | --- |
 | [[delugeSendErrorAlert]] | Handles error reporting to administrators if sheet creation or data clearing fails. | High |
-| [[delugePostSuccessMessageToSlack]] | Sends a summary breakdown of processed quantities to Slack. | Low |
+| [[delugePostSuccessMessageToSlack]] | Sends a summary breakdown of processed quantities to Slack (Currently Commented Out). | Low |
 | **Zoho Analytics API** | Source of truth for the processed data records via Export Jobs. | Blockers |
 | **Google Sheets API** | Target destination for data visualization and distribution. | Blockers |
 | **Mailersend API** | Used to deliver XLSX exports to Cropline distributors. | Medium |
@@ -93,6 +93,10 @@ The script locates the correct row in the "Master Tracking Dashboard" by matchin
 > [!TIP]
 > **Performance**: The script fetches the Master Dashboard row values once per execution (`dashboardMeta`) rather than per-distributor to avoid hitting Google Sheets API rate limits during large batch runs.
 
+> [!NOTE]
+> **Slack Notifications**: The call to `standalone.delugePostSuccessMessageToSlack` is currently commented out at the end of the script. This can be re-enabled to provide real-time visibility into successful runs.
+
 ## Change Log
 - **2026-03-19T19:39:37.540Z:** Initial creation of documentation via DeluluDocu. Added logic for dynamic Year/Month tab targeting and Mailersend integration for Cropline.
 - **2026-03-19T20:30:02.120Z:** Re-validation of script logic. Confirmed identical operational logic for both "Renewals" and "New Sales" modes regarding Google Sheet clearing and dashboard note updates. Verified no functional changes in this revision code block.
+- **2026-03-19T21:12:49.368Z:** Logic verification pass. Confirmed consistency across API endpoints (CRM v8 and Analytics v2). No functional code changes; updated documentation to reflect "commented out" status of Slack notifications and added standard developer notes for observability.
