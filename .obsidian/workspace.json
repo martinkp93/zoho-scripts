@@ -212,6 +212,13 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "scripts/delugeSchlechtwetterRestAPI/delugeSchlechtwetterRestAPI.md",
+    "scripts/delugeSchlechtwetterRestAPI/delugeSchlechtwetterRestAPI.ds",
+    "scripts/delugeSchlechtwetterRestAPI",
+    "scripts/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.md",
+    "scripts/delugeGetWorkspaceIdsForSchlechtwetterAccounts/delugeGetWorkspaceIdsForSchlechtwetterAccounts.ds",
+    "scripts/delugeGetWorkspaceIdsForSchlechtwetterAccounts",
+    "scripts/Deluge_ Schlechtwetter Schedule/Deluge_ Schlechtwetter Schedule.md",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
     "conflict-files-obsidian-git.md",
     "scripts/Deluge_ Schlechtwetter Schedule/Deluge_ Schlechtwetter Schedule.ds",
@@ -224,12 +231,8 @@
     "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.md",
     "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.ds",
     "Errors and Messages/delugePostSuccessMessageToSlack",
-    "Errors and Messages",
     "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.md",
-    "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.ds",
-    "scripts/delugeConversionCustomPricingHandler",
     "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
-    "scripts/delugePopulaceConnector/delugePopulaceConnector.ds",
     "Acquisition and Onboarding/Lead Ingestion/delugeLeadSheetHandler/delugeLeadSheetHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeLeadHandler/delugeLeadHandler.md",
     "Acquisition and Onboarding/Lead Generation/Mobile App/delugeMobileAppRequestAQuote/delugeMobileAppRequestAQuote.md",
@@ -244,8 +247,6 @@
     "Connectors/delugePopulaceConnector/delugePopulaceConnector.md",
     "Connectors/delugeTicketsConnector/delugeTicketsConnector.md",
     "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
-    "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
-    "scripts/Deluge_ Populace Membership Handler.md",
-    "scripts/Deluge_ Populace Connector/Deluge_ Populace Connector.md"
+    "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md"
   ]
 }
