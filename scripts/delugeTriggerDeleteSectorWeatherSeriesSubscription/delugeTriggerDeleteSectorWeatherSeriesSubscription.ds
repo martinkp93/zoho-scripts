@@ -1,0 +1,19 @@
+string standalone.delugeTriggerDeleteSectorWeatherSeriesSubscription(String crmAPIRequest)
+{
+// 1. Initialisation
+action = "deleteWorkspaceSeriesSubscription";
+// 2. Retrieve data, build payload 
+params = crmAPIRequest.get("params");
+payload = Map();
+seriesSubId = params.get("seriesSubId");
+payload.put("seriesSubId",seriesSubId);
+if(seriesSubId != null)
+{
+	// 3. Call standalone connector
+	info "Triggering SectorWeather Workspace Series Subscription delete for Series Sub ID: " + seriesSubId;
+	// info payload;
+	response = standalone.delugeSectorWeatherConnector(action,payload);
+	info response;
+}
+return response;
+}
