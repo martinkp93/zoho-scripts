@@ -1,0 +1,52 @@
+void schedule.delugeMirrorExportsHandler()
+{
+targetSpreadsheetId = "1-heczH-V8Q-JiqCDsp6J__N_TZ3qbBHOzZIL4d-qbQg";
+workspaceId = 188580000000003017;
+orgId = 20087400271;
+variablesFetch = invokeurl
+[
+	url :"https://www.zohoapis.eu/crm/v8/settings/variables"
+	type :GET
+	connection:"zohocrmconnection"
+];
+for each  variable in variablesFetch.get("variables")
+{
+	if(variable.get("name").contains("Mirror") && variable.get("name").contains("Export Job"))
+	{
+		jobId = variable.get("value");
+		targetSheetGid = variable.get("description");
+		headers = {"ZANALYTICS-ORGID":orgId};
+		csvData = invokeurl
+		[
+			url :"https://analytics.zoho.eu/restapi/v2/bulk/workspaces/" + workspaceId + "/exportjobs/" + jobId + "/data"
+			type :GET
+			headers:headers
+			connection:"zohooauth"
+		];
+		// Request 1: Clear all existing data and formatting in the specific sheet
+		clearReq = {"updateCells":{"range":{"sheetId":targetSheetGid},"fields":"userEnteredValue"}};
+		// Request 2: Paste the new CSV data
+		pasteReq = {"pasteData":{"data":csvData,"type":"PASTE_NORMAL","delimiter":",","coordinate":{"sheetId":targetSheetGid,"rowIndex":0,"columnIndex":0}}};
+		// Combine both requests into the batchUpdate payload
+		payload = {"requests":{clearReq,pasteReq}};
+		pushResponse = invokeurl
+		[
+			url :"https://sheets.googleapis.com/v4/spreadsheets/" + targetSpreadsheetId + ":batchUpdate"
+			type :POST
+			parameters:payload.toString()
+			headers:{"Content-Type":"application/json"}
+			detailed:true
+			connection:"googlesheets"
+		];
+		if(pushResponse.get("responseCode") != 200)
+		{
+			errorMsg = "FAILED to export " + variable.get("name") + ". Resp: " + pushResponse;
+			standalone.delugeSendErrorAlert("mirrorExportsHandler",variable.get("name"),errorMsg);
+		}
+		else
+		{
+			info "Export successful for " + variable.get("name");
+		}
+	}
+}
+}

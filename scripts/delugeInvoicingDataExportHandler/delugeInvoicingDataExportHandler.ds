@@ -1,0 +1,87 @@
+void schedule.delugeInvoicingDataExportHandler()
+{
+// --- 1. DATE CALCULATIONS ---
+today = zoho.currentdate;
+// Range for Renewals (Next Month)
+firstOfNextMonthDate = today.addMonth(1).toStartOfMonth();
+firstOfNextMonth = firstOfNextMonthDate.toString("yyyy-MM-dd");
+lastOfNextMonth = firstOfNextMonthDate.addMonth(1).subDay(1).toString("yyyy-MM-dd");
+// Range for New Sales (Previous Month)
+firstOfPrevMonthDate = today.subMonth(1).toStartOfMonth();
+firstOfPrevMonth = firstOfPrevMonthDate.toString("yyyy-MM-dd");
+lastOfPrevMonth = firstOfPrevMonthDate.addMonth(1).subDay(1).toString("yyyy-MM-dd");
+// --- 2. CONFIGURATION ---
+workspaceId = 188580000000003017;
+orgId = 20087400271;
+// Mapping task to [ViewID, CRM Variable Name, Criteria]
+tasks = {"Renewals","New Sales"};
+// Fetch CRM Variables once to get IDs
+variablesFetch = invokeurl
+[
+	url :"https://www.zohoapis.eu/crm/v8/settings/variables"
+	type :GET
+	connection:"zohocrmconnection"
+];
+allVariables = variablesFetch.get("variables");
+for each  task in tasks
+{
+	viewId = "";
+	targetVarName = "";
+	analyticsCriteria = "";
+	if(task == "Renewals")
+	{
+		viewId = 188580000006748400;
+		targetVarName = "Temporary Renewals Export Job";
+		analyticsCriteria = "(\"Consolidated\".\"Next Billing Date\" >= '" + firstOfNextMonth + "' AND \"Consolidated\".\"Next Billing Date\" <= '" + lastOfNextMonth + "' AND \"Consolidated\".\"Subscription Status\" = 'live')";
+	}
+	else if(task == "New Sales")
+	{
+		viewId = 188580000007380064;
+		targetVarName = "Temporary New Sales Export Job";
+		// Criteria for rows created in the previous month
+		analyticsCriteria = "(\"New Orders 7.0\".\"Created Date\" >= '" + firstOfPrevMonth + "' AND \"New Orders 7.0\".\"Created Date\" <= '" + lastOfPrevMonth + "')";
+	}
+	// --- 3. START ANALYTICS EXPORT ---
+	configMap = {"responseFormat":"json","criteria":analyticsCriteria};
+	exportJob = invokeurl
+	[
+		url :"https://analytics.zoho.eu/restapi/v2/bulk/workspaces/" + workspaceId + "/views/" + viewId + "/data"
+		type :GET
+		parameters:{"CONFIG":configMap.toString()}
+		headers:{"ZANALYTICS-ORGID":orgId}
+		connection:"zohooauth"
+	];
+	info exportJob;
+	if(exportJob.get("status") == "success")
+	{
+		newJobId = exportJob.get("data").get("jobId");
+		// --- 4. FIND & UPDATE CRM VARIABLE ---
+		varId = "";
+		for each  v in allVariables
+		{
+			if(v.get("name") == targetVarName)
+			{
+				varId = v.get("id");
+			}
+		}
+		if(varId != "")
+		{
+			updateBody = {"variables":{{"id":varId,"value":newJobId}}};
+			invokeurl
+			[
+				url :"https://www.zohoapis.eu/crm/v8/settings/variables"
+				type :PUT
+				parameters:updateBody.toString()
+				connection:"zohocrmconnection"
+			]
+			info "Task: " + task + " | Job ID: " + newJobId + " saved to " + targetVarName;
+		}
+	}
+	else
+	{
+		// Error Handling
+		errorMsg = "FAILED to start " + task + " job. Resp: " + exportJob.toString();
+		standalone.delugeSendErrorAlert("ExportHandler",task,errorMsg);
+	}
+}
+}
