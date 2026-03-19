@@ -1,0 +1,20 @@
+void automation.delugeTriggerDeletePopulaceUser(Int contactId, String userId)
+{
+// 1. Only proceed if a User ID exists 
+if(userId != null)
+{
+	// 2. Build the payload for the connector 
+	// The payload only needs the userId for the connector to build the URL
+	payload = Map();
+	payload.put("userId",userId);
+	payload.put("contactId",contactId);
+	// 3. Call reusable standalone connector with the 'deleteUser' action 
+	info "Triggering Populace user deletion for Contact ID: " + contactId;
+	response = standalone.delugePopulaceConnector("deleteUser",payload);
+	info "Delete Populace User response: " + response;
+}
+else
+{
+	info "Skipping deletion: No Populace User ID found on Contact ID: " + contactId;
+}
+}
