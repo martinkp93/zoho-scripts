@@ -196,6 +196,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/Subscriptionresurrection/Subscriptionresurrection.ds",
+    "scripts/Subscriptionresurrection",
+    "scripts/delugePriceListPricingHandler/delugePriceListPricingHandler.md",
     "scripts/delugeSalesIQMissedChat/delugeSalesIQMissedChat.md",
     "scripts/delugeSalesIQMissedChat/delugeSalesIQMissedChat.ds",
     "scripts/delugeSalesIQMissedChat",
@@ -216,7 +219,6 @@
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.ds",
     "Environment Lifecycle/Update/Update Populace Workspace Distributor",
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md",
-    "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.ds",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT03/delugeWAT03.md",
     "Acquisition and Onboarding/Marketing/Attribution/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md",
@@ -229,8 +231,6 @@
     "Support/Cancellation/Update Ticket with Churn Reason/delugeChurnReasonUpdate.md",
     "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
-    "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
-    "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.md",
-    "Related Lists/Sync Products to Price List's Related Products/delugeSyncProductsToRelatedProducts.md"
+    "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md"
   ]
 }
