@@ -196,6 +196,11 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeRenewalsAndNewSalesExportHandler/delugeRenewalsAndNewSalesExportHandler.ds",
+    "scripts/delugeRenewalsAndNewSalesExportHandler",
+    "scripts/delugeMoveUserToOtherWorkspace/delugeMoveUserToOtherWorkspace.md",
+    "scripts/delugeMoveUserToOtherWorkspace/delugeMoveUserToOtherWorkspace.ds",
+    "scripts/delugeMoveUserToOtherWorkspace",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT03/delugeWAT03.md",
     "Acquisition and Onboarding/Marketing/Attribution/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md",
@@ -209,9 +214,6 @@
     "Support/Shipment Labels/GLS Label Handler/delugeGLSLabelHandler.md",
     "Support/Shipment Labels/GLS Label Handler/delugeGLSLabelHandler.ds",
     "Support/Shipment Labels/GLS Label Handler",
-    "scripts/delugeWAT02/delugeWAT02.ds",
-    "scripts/delugeWAT02",
-    "scripts",
     "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Sales Sprint Updates/delugeUpdatePurchaseConversionsUpcomingRenewalDetails1.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Update ActiveCampaign Contact Email/delugeSyncActiveCampaignContactEmail.md",
     "Clean-Up/Delete Visits (> 365 Days)/delugeDeleteVisitsOlderThan365Days.md",
@@ -229,8 +231,6 @@
     "Buttons/Initiate Password Reset/delugePopulaceInitiatePasswordReset.md",
     "Environment Lifecycle/Update/Update Populace Distributor User/delugeSyncUserToPopulaceDistributor.md",
     "Environment Lifecycle/Update/Update Populace Workspace/delugeTriggerUpdatePopulaceWorkspace.md",
-    "Environment Lifecycle/Update/Update Populace Distributor/delugeTriggerUpdatePopulaceDistributor.md",
-    "Environment Lifecycle/Delete/Delete Populace User/delugeTriggerDeletePopulaceUser.md",
-    "Environment Lifecycle/Update/Update Populace Membership/delugePopulaceMembershipHandler.md"
+    "Environment Lifecycle/Update/Update Populace Distributor/delugeTriggerUpdatePopulaceDistributor.md"
   ]
 }
