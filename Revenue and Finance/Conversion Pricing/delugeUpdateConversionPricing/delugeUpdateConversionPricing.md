@@ -9,7 +9,7 @@ Status: Functional
 ---
 
 ## Overview
-The `delugeUpdateConversionPricing` function serves as an automation wrapper within the Cordulus ecosystem. Its primary role is to act as a trigger-ready entry point (likely used in Workflows or Blueprints) that delegates the complex logic of pricing updates to a dedicated standalone handler. By decoupling the trigger from the logic, it allows for better maintainability and reuse of the pricing calculation engine.
+The `delugeUpdateConversionPricing` function serves as an automation wrapper within the Cordulus ecosystem. Its primary role is to act as a trigger-ready entry point (used in a Workflow) that delegates the complex logic of pricing updates to a dedicated standalone handler. By decoupling the trigger from the logic, it allows for better maintainability and reuse of the pricing calculation engine.
 
 ## Technical Contract
 - **Input:** 
