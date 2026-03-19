@@ -1,0 +1,83 @@
+string standalone.delugeSchlechtwetterConnector(String action, String payload)
+{
+try 
+{
+	baseUrl = "https://schlechtwetter.cordulus.com/svc/v1/zoho";
+	// --- Step 1: Config Map --- 
+	config = Map();
+	// Workspace Sync & Deletion
+	config.put("syncSchlechtwetter",{"m":"POST","p":"/workspaces/{workspaceId}"});
+	config.put("deleteSchlechtwetter",{"m":"DELETE","p":"/workspaces/{workspaceId}"});
+	// Find and replace the keys in the url with key-values passed in input
+	actionData = config.get(action);
+	if(actionData == null)
+	{
+		errorMsg = "Schlechtwetter API " + action + " failed: Invalid action specified";
+		standalone.delugeSendErrorAlert("schlechtwetter_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":"Invalid action: " + action};
+	}
+	// --- Step 2: Build the URL ---
+	method = actionData.get("m");
+	path = actionData.get("p");
+	for each  key in payload.keys()
+	{
+		searchTarget = "{" + key + "}";
+		if(path.contains(searchTarget))
+		{
+			val = ifNull(payload.get(key),"").toString().encodeUrl();
+			parts = path.toList(searchTarget);
+			// Remove workspaceId from payload so it's not sent in the body
+			payload.remove(key);
+			if(parts.size() == 1)
+			{
+				path = parts.get(0) + val;
+			}
+			else
+			{
+				path = parts.toText(val);
+			}
+		}
+	}
+	url = baseUrl + path;
+	// --- Step 3: Execute ---
+	if(method == "POST")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :POST
+			detailed:true
+			connection:"schlechtwetter"
+		];
+	}
+	else if(method == "DELETE")
+	{
+		response = invokeurl
+		[
+			url :url
+			type :DELETE
+			detailed:true
+			connection:"schlechtwetter"
+		];
+	}
+	// --- Step 4: Handle Response ---
+	successCodes = {200,201,204};
+	responseCode = response.get("responseCode").toLong();
+	if(successCodes.contains(responseCode))
+	{
+		return {"success":true,"data":response.get("responseText")};
+	}
+	else
+	{
+		errorMsg = "Schlechtwetter API " + action + " failed (" + responseCode + "): " + response.get("responseText");
+		standalone.delugeSendErrorAlert("schlechtwetter_connector",payload.toString(),errorMsg);
+		return {"success":false,"error_message":errorMsg};
+	}
+}
+catch (e)
+{
+	errorMsg = "Unexpected error in schlechtwetter_connector: " + e;
+	standalone.delugeSendErrorAlert("schlechtwetter_connector",payload.toString(),errorMsg);
+	return {"success":false,"error_message":errorMsg};
+}
+}
