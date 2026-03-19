@@ -1,0 +1,89 @@
+info "Subscription event triggered for status: " + subscriptions.get("status");
+// --- 1. Get initial IDs from the incoming webhook payload ---
+// This data is available for all event types, including deletion
+org_id = organization.get("organization_id");
+customer_id = subscriptions.get("customer_id");
+subscription_id = subscriptions.get("subscription_id");
+planCode = subscriptions.get("plan").get("plan_code");
+activatedAt = subscriptions.get("activated_at");
+newActivation = activatedAt.toString("yyyy-MM-dd") == zoho.currentdate.toString("yyyy-MM-dd");
+status = subscriptions.get("status");
+if(status != "deleted")
+{
+	// Get subscription to fetch updated zcrm ids (fix race conditions)
+	subscription = zoho.billing.retrieve("Subscriptions",org_id,subscription_id,"zohobilling");
+	zcrm_contact_id = subscription.get("subscription").get("customer").get("zcrm_contact_id");
+	zcrm_account_id = subscription.get("subscription").get("customer").get("zcrm_account_id");
+}
+else
+{
+	zcrm_contact_id = subscriptions.get("customer").get("zcrm_contact_id");
+	zcrm_account_id = subscriptions.get("customer").get("zcrm_account_id");
+}
+// --- 2. Check if zcrm_contact_id is missing and attempt to fix it ---
+if(zcrm_contact_id == null || zcrm_contact_id == "")
+{
+	info "Primary contact is missing a ZCRM Contact ID. Attempting to set a new primary contact.";
+	// Find other available contact persons for the customer
+	customer_contacts_resp = invokeurl
+	[
+		url :"https://www.zohoapis.eu/billing/v1/customers/" + customer_id + "/contactpersons"
+		type :GET
+		connection:"zohobilling"
+	];
+	customer_contact_persons = customer_contacts_resp.get("contactpersons");
+	if(customer_contact_persons != null && customer_contact_persons.size() > 0)
+	{
+		first_contact_person_id = customer_contact_persons.get(0).get("contactperson_id");
+		info "Found contact person " + first_contact_person_id + ". Attempting to make primary.";
+		// Set the first available contact as the new primary
+		make_contact_primary_resp = invokeurl
+		[
+			url :"https://www.zohoapis.eu/billing/v1/customers/" + customer_id + "/contactpersons/" + first_contact_person_id + "/primary"
+			type :POST
+			connection:"zohobilling"
+		];
+		info "Make primary response: " + make_contact_primary_resp;
+		// This works even if the subscription was deleted.
+		customer_after_update = zoho.billing.retrieve("Customers",org_id,customer_id,"zohobilling").get("customer");
+		zcrm_contact_id = customer_after_update.get("zcrm_contact_id");
+		zcrm_account_id = customer_after_update.get("zcrm_account_id");
+		// Also refresh the account ID
+		info "New ZCRM Contact ID after update: " + zcrm_contact_id;
+	}
+	else
+	{
+		info "No other contact persons found for customer " + customer_id + ". Cannot set a ZCRM Contact ID.";
+	}
+}
+// --- 3. Final check: Only call the orchestrator if we have the required IDs ---
+if(zcrm_contact_id != null && zcrm_contact_id != "" && zcrm_account_id != null && zcrm_account_id != "")
+{
+	// Build the payload with the validated IDs
+	argumentsMap = Map();
+	argumentsMap.put("orgId",org_id);
+	argumentsMap.put("customerId",customer_id);
+	argumentsMap.put("activatedPlanCode",subscriptions.get("plan").get("plan_code"));
+	argumentsMap.put("activatedPlanStatus",subscriptions.get("status"));
+	argumentsMap.put("zcrmAccId",zcrm_account_id);
+	argumentsMap.put("zcrmContactId",zcrm_contact_id);
+	argumentsMap.put("newActivation",newActivation);
+	info argumentsMap;
+	// Call the main orchestrator function in Zoho CRM
+	info "Payload for Deluge: Workspace and Permissions Handler: " + argumentsMap;
+	crmFunctionResponse = invokeurl
+	[
+		url :"https://www.zohoapis.eu/crm/v7/functions/delugeWorkspaceAndPermissionsHandler/actions/execute?auth_type=oauth"
+		type :POST
+		parameters:argumentsMap.toString()
+		detailed:true
+		connection:"zohooauth"
+	];
+	info "Successfully called orchestrator function. Response: " + crmFunctionResponse;
+}
+else
+{
+	// If required IDs could not be found, stop and send an alert
+	errorMessage = "CRITICAL: Could not find a valid zcrm_contact_id or zcrm_account_id for customer " + customer_id + ". Halting workflow.";
+	info errorMessage;
+}
