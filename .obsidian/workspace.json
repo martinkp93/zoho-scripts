@@ -194,8 +194,13 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeSalesIQMissedChat/delugeSalesIQMissedChat.md",
+    "scripts/delugeSalesIQMissedChat/delugeSalesIQMissedChat.ds",
+    "scripts/delugeSalesIQMissedChat",
+    "scripts/delugePriceListPricingHandler/delugePriceListPricingHandler.ds",
+    "scripts/delugePriceListPricingHandler",
     "Revenue and Finance/Invoicing Automation/Draft Invoicing Handler/delugeProcessRenewalsOrNewSalesForInvoicingV2.md",
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Exports Handler/delugeRenewalsAndNewSalesExportHandler.md",
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Handler/delugeInvoicingDataExportHandler.md",
@@ -212,10 +217,6 @@
     "Environment Lifecycle/Update/Update Populace Workspace Distributor",
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.md",
     "Revenue and Finance/Price Increases/Price List Increase (Schedule)/delugePriceListIncreaseHandlerSchedule.ds",
-    "Revenue and Finance/Price Increases/Price List Increase (Schedule)",
-    "Revenue and Finance/Invoicing Automation/Draft Invoicing Handler/delugeProcessRenewalsOrNewSalesForInvoicingV2.ds",
-    "Revenue and Finance/Invoicing Automation/Draft Invoicing Handler",
-    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.ds",
     "scripts/delugeWAT02/delugeWAT02.md",
     "scripts/delugeWAT03/delugeWAT03.md",
     "Acquisition and Onboarding/Marketing/Attribution/Sales Attribution Handler/delugeManualUpdateFirstLastTouch.md",
