@@ -1,0 +1,219 @@
+string standalone.delugeActiveCampaignHandler(Int contactId, String accountId, String firstName, String lastName, String email, String country, String activeCampaignContactId, String tagsInput, String conversionName, String conversionId, String distributorName, String utmSource, String utmMedium, String utmCampaign, String phone, String targetListId)
+{
+functionName = "delugeActiveCampaignHandler";
+payloadForCatch = {"email":email,"contactId":contactId,"tags":tagsInput};
+baseUrl = "https://cordulus.api-us1.com/api/3";
+try 
+{
+	// =====================================================================
+	// 1. CREATE OR RETRIEVE CONTACT 
+	// =====================================================================
+	finalAcContactId = activeCampaignContactId;
+	// info "Syncing contact in ActiveCampaign...";
+	// --- Build Contact Payload and Custom Fields ---
+	info "AC First Name: " + firstName;
+	info "AC Last Name: " + lastName;
+	contactData = Map();
+	contactData.put("email",email);
+	contactData.put("phone",phone);
+	contactData.put("firstName",firstName);
+	contactData.put("lastName",lastName);
+	// Map of Custom Fields to their Values
+	customFields = Map();
+	customFields.put("1",accountId);
+	// Account ID
+	customFields.put("3",contactId);
+	// CRM Contact ID
+	customFields.put("4",country);
+	// Country
+	customFields.put("11",distributorName);
+	// Distributor Name
+	customFields.put("5",conversionName);
+	// Conversion Type
+	customFields.put("2",conversionId);
+	// Conversion ID
+	customFields.put("47",utmSource);
+	// UTM Source
+	customFields.put("48",utmMedium);
+	// UTM Medium
+	customFields.put("49",utmCampaign);
+	// UTM Campaign
+	if(conversionName != null && conversionName.contains("Request"))
+	{
+		customFields.put("60",utmSource);
+		// Request a Quote Source
+	}
+	// Filter out null/empty values and format for the API
+	fieldValuesList = List();
+	for each  fieldId in customFields.keys()
+	{
+		fieldValue = customFields.get(fieldId);
+		// Only include fields that have a non-null/non-empty value.
+		if(fieldValue != null && fieldValue != "" && fieldValue != 0)
+		{
+			fieldValuesList.add({"field":fieldId,"value":fieldValue});
+		}
+	}
+	contactData.put("fieldValues",fieldValuesList);
+	requestBody = Map();
+	requestBody.put("contact",contactData);
+	// info requestBody;
+	// Execute Sync Request
+	syncContactResp = invokeurl
+	[
+		url :baseUrl + "/contact/sync"
+		type :POST
+		parameters:requestBody.toString()
+		detailed:true
+		connection:"activecampaign"
+	];
+	// info syncContactResp;
+	responseCode = syncContactResp.get("responseCode");
+	// Handle Success (201 Created or 200 Synced)
+	if(responseCode == 200 || responseCode = 201)
+	{
+		finalAcContactId = syncContactResp.get("responseText").get("contact").get("id");
+		info "Successfully synced Contact. AC ID: " + finalAcContactId;
+		// Update Zoho CRM Contact immediately
+		if(contactId.toString() != "")
+		{
+			zoho.crm.updateRecord("Contacts",contactId.toLong(),{"ActiveCampaign_Contact_ID":finalAcContactId});
+		}
+	}
+	else
+	{
+		errorMessage = "CRITICAL: ActiveCampaign API failed to sync contact. Response: " + syncContactResp;
+		standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+		return "Error Syncing Contact";
+	}
+	// =====================================================================
+	// 3. ADD CONTACT TO LIST 
+	// =====================================================================
+	if(finalAcContactId != null && targetListId != null)
+	{
+		// info "Adding contact to List ID: " + targetListId;
+		listPayload = Map();
+		listData = Map();
+		listData.put("contact",finalAcContactId);
+		listData.put("list",targetListId);
+		listData.put("status","1");
+		// 1 = Active/Subscribed
+		listPayload.put("contactList",listData);
+		addListResp = invokeurl
+		[
+			url :baseUrl + "/contactLists"
+			type :POST
+			parameters:listPayload.toString()
+			detailed:true
+			connection:"activecampaign"
+		];
+		if(addListResp.get("responseCode") == 201 || addListResp.get("responseCode") == 200)
+		{
+			info "Successfully added contact to List ID: " + targetListId;
+		}
+		else
+		{
+			errorMessage = "Error adding contact to List ID " + targetListId + ". Response: " + addListResp;
+			standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+		}
+	}
+	// =====================================================================
+	// 2. PROCESS TAGS (DYNAMIC LOOKUP, CREATE, AND ADD)
+	// =====================================================================
+	if(finalAcContactId != null && tagsInput != null && tagsInput.size() > 0)
+	{
+		// info "Processing tags for AC Contact ID: " + finalAcContactId;
+		for each  tagName in tagsInput
+		{
+			tagIdToAdd = null;
+			if(tagName == "")
+			{
+				continue;
+			}
+			// A. Search for the Tag ID by Name
+			searchTagResp = invokeurl
+			[
+				url :baseUrl + "/tags?search=" + tagName
+				type :GET
+				connection:"activecampaign"
+			];
+			// info searchTagResp;
+			if(searchTagResp.get("tags") != null)
+			{
+				// Try to find an exact match
+				for each  tagObj in searchTagResp.get("tags")
+				{
+					if(tagObj.get("tag") == tagName)
+					{
+						tagIdToAdd = tagObj.get("id");
+						break;
+					}
+				}
+			}
+			// IF TAG NOT FOUND, CREATE IT
+			if(tagIdToAdd == null)
+			{
+				// info "Tag '" + tagName + "' not found. Attempting to create new tag...";
+				createTagPayload = Map();
+				createTagPayload.put("tag",{"tag":tagName,"tagType":"contact"});
+				// info createTagPayload;
+				createTagResp = invokeurl
+				[
+					url :baseUrl + "/tags"
+					type :POST
+					parameters:createTagPayload.toString()
+					detailed:true
+					connection:"activecampaign"
+				];
+				// info createTagResp;
+				if(createTagResp.get("responseCode") == 201)
+				{
+					tagIdToAdd = createTagResp.get("responseText").get("tag").get("id");
+					info "Successfully created new Tag ID: " + tagIdToAdd;
+				}
+				else
+				{
+					// If creation fails, we cannot proceed with tagging this item.
+					errorMessage = "CRITICAL: Failed to create tag '" + tagName + "'. Response: " + createTagResp;
+					standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+					continue;
+				}
+			}
+			// C. If ID is now available (found or created), add it to the contact
+			if(tagIdToAdd != null)
+			{
+				tagPayload = Map();
+				tagData = Map();
+				tagData.put("contact",finalAcContactId);
+				tagData.put("tag",tagIdToAdd);
+				tagPayload.put("contactTag",tagData);
+				addTagResp = invokeurl
+				[
+					url :baseUrl + "/contactTags"
+					type :POST
+					parameters:tagPayload.toString()
+					detailed:true
+					connection:"activecampaign"
+				];
+				if(addTagResp.get("responseCode") == 201 || addTagResp.get("responseCode") == 200)
+				{
+					info "Successfully added Tag: " + tagName;
+				}
+				else
+				{
+					errorMessage = "Error adding tag '" + tagName + "'. Response: " + addTagResp;
+					standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+				}
+			}
+		}
+		return {"success":true,"acContactId":finalAcContactId};
+	}
+}
+catch (e)
+{
+	errorMessage = "An unexpected error occurred in " + functionName + ". Details: " + e;
+	standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMessage);
+	return "Error";
+}
+return "";
+}
