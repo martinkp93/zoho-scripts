@@ -212,6 +212,8 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Connectors/delugeSchlechtwetterConnector/delugeSchlechtwetterConnector.ds",
+    "Connectors/delugeSchlechtwetterConnector",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionHandler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
     "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.md",
@@ -231,7 +233,6 @@
     "conflict-files-obsidian-git.md",
     "Environment Lifecycle/Delete",
     "Environment Lifecycle/Update",
-    "Environment Lifecycle/Read",
     "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.md",
     "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch/delugeManualUpdateFirstLastTouch.md",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
@@ -246,7 +247,6 @@
     "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
     "scripts/Deluge_ Populace Membership Handler.md",
     "scripts/Deluge_ Populace Connector/Deluge_ Populace Connector.md",
-    "Welcome.md",
-    "scripts/Deluge_ Subscription Handler.md"
+    "Welcome.md"
   ]
 }
