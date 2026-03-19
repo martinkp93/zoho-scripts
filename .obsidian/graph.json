@@ -8,7 +8,7 @@
   "collapse-color-groups": false,
   "colorGroups": [
     {
-      "query": " ",
+      "query": " path:",
       "color": {
         "a": 1,
         "rgb": 14701138
@@ -21,10 +21,10 @@
   "nodeSizeMultiplier": 1.36689670138889,
   "lineSizeMultiplier": 1.43495225694444,
   "collapse-forces": false,
-  "centerStrength": 0.400607638888889,
-  "repelStrength": 11.1475694444444,
-  "linkStrength": 0.434157986111111,
-  "linkDistance": 170,
-  "scale": 0.6616182204855433,
+  "centerStrength": 0.430425347222222,
+  "repelStrength": 13.6345486111111,
+  "linkStrength": 0.534201388888889,
+  "linkDistance": 500,
+  "scale": 0.4366303462547801,
   "close": false
 }
