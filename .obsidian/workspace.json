@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "scripts/Deluge_ Populace Membership Handler.md",
+                "file": "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Deluge_ Populace Membership Handler"
+              "title": "Deluge_ Workspace and Permissions Handler"
             }
           }
         ]
@@ -202,13 +202,13 @@
   },
   "active": "5656ca36876b2fb0",
   "lastOpenFiles": [
+    "scripts/Deluge_ Populace Membership Handler.md",
     "scripts/Deluge_ Populace Connector/Deluge_ Populace Connector.md",
     "Welcome.md",
     "scripts/Test folder",
     "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
     "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.ds",
     "scripts/Deluge_ Workspace and Permissions Handler",
-    "scripts/Deluge_ Populace Membership Handler.md",
     "scripts/Deluge_ Subscription Handler.md",
     "scripts/Deluge_ Populace Connector/Deluge_ Populace Connector.ds",
     "scripts/Deluge_ Sync User to Populace Distributor.md",
