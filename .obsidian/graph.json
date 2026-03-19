@@ -20,6 +20,13 @@
         "a": 1,
         "rgb": 12322797
       }
+    },
+    {
+      "query": "path:\"Acquisition and Onboarding\"  ",
+      "color": {
+        "a": 1,
+        "rgb": 11657298
+      }
     }
   ],
   "collapse-display": false,
@@ -32,6 +39,6 @@
   "repelStrength": 13.6345486111111,
   "linkStrength": 0.534201388888889,
   "linkDistance": 500,
-  "scale": 0.22545993728437222,
+  "scale": 0.5096189814282754,
   "close": false
 }
