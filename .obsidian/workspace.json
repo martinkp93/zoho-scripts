@@ -212,6 +212,10 @@
   },
   "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
+    "Errors and Messages",
+    "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.md",
+    "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.ds",
+    "scripts/delugeConversionCustomPricingHandler",
     "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
     "scripts/delugePopulaceConnector/delugePopulaceConnector.ds",
     "scripts/delugePopulaceConnector",
@@ -227,14 +231,12 @@
     "Environment Lifecycle",
     "Acquisition and Onboarding/Lead Generation/Mobile App",
     "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.md",
-    "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.ds",
-    "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId",
     "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch/delugeManualUpdateFirstLastTouch.md",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionHandler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
     "Connectors/delugeDaggersConnector/delugeDaggersConnector.md",
-    "scripts/delugeSendErrorAlert/delugeSendErrorAlert.md",
+    "Errors and Messages/delugeSendErrorAlert/delugeSendErrorAlert.md",
     "Connectors/delugeMailersendConnector/delugeMailersendConnector.md",
     "scripts/delugeCroplineMembershipHandler/delugeCroplineMembershipHandler.md",
     "Acquisition and Onboarding/Marketing/delugeActiveCampaignHandler/delugeActiveCampaignHandler.md",
@@ -245,8 +247,6 @@
     "scripts/Deluge_ Populace Membership Handler.md",
     "scripts/Deluge_ Populace Connector/Deluge_ Populace Connector.md",
     "Welcome.md",
-    "scripts/Deluge_ Subscription Handler.md",
-    "scripts/Deluge_ Sync User to Populace Distributor.md",
-    "README.md"
+    "scripts/Deluge_ Subscription Handler.md"
   ]
 }
