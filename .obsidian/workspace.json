@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Revenue and Finance/Conversion Pricing/delugeUpdateConversionPricing/delugeUpdateConversionPricing.md",
+                "file": "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Price List Updates/delugeUpdateConversionPricing.md",
                 "mode": "preview",
                 "source": false
               },
@@ -194,7 +194,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
     "Acquisition and Onboarding/Marketing/ActiveCampaign",
     "Support/Cancellation",
@@ -214,7 +214,7 @@
     "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
     "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
-    "Revenue and Finance/Conversion Pricing/delugeUpdateConversionPricing/delugeUpdateConversionPricing.md",
+    "Revenue and Finance/Conversion Pricing/Update Conversion Pricing on Price List Updates/delugeUpdateConversionPricing.md",
     "Watchtower/Get Zoho IDs for Device ID or Email (Dev)/delugegetzohoidsfromdeviceoremaildev.md",
     "Related Lists/Sync Products to Price List's Related Products/delugeSyncProductsToRelatedProducts.md",
     "Validation Rules/Verify Email in Populace/delugeVerifyEmailInPopulace.md",
