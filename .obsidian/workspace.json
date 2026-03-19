@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "scripts/delugeTriggerRenewalsAndNewSalesExportHandler/delugeTriggerRenewalsAndNewSalesExportHandler.md",
+                "file": "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Processor (Schedule)/delugeTriggerRenewalsAndNewSalesExportHandler.md",
                 "mode": "source",
                 "source": false
               },
@@ -198,9 +198,9 @@
   "lastOpenFiles": [
     "scripts/delugeWAT02/delugeWAT02.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
-    "scripts/delugeTriggerRenewalsAndNewSalesExportHandler/delugeTriggerRenewalsAndNewSalesExportHandler.ds",
-    "scripts/delugeTriggerRenewalsAndNewSalesExportHandler/delugeTriggerRenewalsAndNewSalesExportHandler.md",
-    "scripts/delugeTriggerRenewalsAndNewSalesExportHandler",
+    "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Processor (Schedule)/delugeTriggerRenewalsAndNewSalesExportHandler.ds",
+    "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Processor (Schedule)/delugeTriggerRenewalsAndNewSalesExportHandler.md",
+    "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Processor (Schedule)",
     "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker/delugeTieredDiscountsHandler.md",
     "Watchtower/Duplicate Zoho Desk Blueprint/delugeDuplicateBlueprint.md",
     "Watchtower/Duplicate Zoho Desk Blueprint/delugeDuplicateBlueprint.ds",
