@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
+                "file": "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionHandler/delugeSubscriptionHandler.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeTrialHandler"
+              "title": "delugeSubscriptionHandler"
             }
           }
         ]
@@ -210,8 +210,12 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "5656ca36876b2fb0",
   "lastOpenFiles": [
+    "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
+    "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.md",
+    "Errors and Messages/delugePostSuccessMessageToSlack/delugePostSuccessMessageToSlack.ds",
+    "Errors and Messages/delugePostSuccessMessageToSlack",
     "Errors and Messages",
     "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.md",
     "scripts/delugeConversionCustomPricingHandler/delugeConversionCustomPricingHandler.ds",
@@ -227,14 +231,10 @@
     "Environment Lifecycle/Delete",
     "Environment Lifecycle/Update",
     "Environment Lifecycle/Read",
-    "Environment Lifecycle/Create",
-    "Environment Lifecycle",
-    "Acquisition and Onboarding/Lead Generation/Mobile App",
     "Acquisition and Onboarding/Inventory/delugeZohoInventoryGetWarehouseId/delugeZohoInventoryGetWarehouseId.md",
     "Acquisition and Onboarding/Order Ingestion/delugeManualUpdateFirstLastTouch/delugeManualUpdateFirstLastTouch.md",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionReversalHandler/delugeSubscriptionReversalHandler.md",
     "Acquisition and Onboarding/Order Ingestion/delugeSubscriptionHandler/delugeSubscriptionHandler.md",
-    "Acquisition and Onboarding/Lead Ingestion/delugeTrialHandler/delugeTrialHandler.md",
     "Connectors/delugeDaggersConnector/delugeDaggersConnector.md",
     "Errors and Messages/delugeSendErrorAlert/delugeSendErrorAlert.md",
     "Connectors/delugeMailersendConnector/delugeMailersendConnector.md",
