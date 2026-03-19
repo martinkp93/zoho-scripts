@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
+                "file": "scripts/delugeFeatureAggregator/delugeFeatureAggregator.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeWorkspaceAndPermissionsHandler"
+              "title": "delugeFeatureAggregator"
             }
           }
         ]
@@ -202,17 +202,17 @@
   },
   "active": "5656ca36876b2fb0",
   "lastOpenFiles": [
+    "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
     "scripts/delugeTicketsConnector/delugeTicketsConnector.md",
+    "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
     "scripts/delugeTicketsConnector/delugeTicketsConnector.ds",
     "scripts/delugeTicketsConnector",
-    "scripts/delugePopulaceConnector/delugePopulaceConnector.md",
     "scripts/delugePopulaceConnector/delugePopulaceConnector.ds",
     "scripts/delugePopulaceConnector",
     "scripts/delugeFeatureAggregator/delugeFeatureAggregator.md",
     "scripts/delugeFeatureAggregator/delugeFeatureAggregator.ds",
     "scripts/delugeFeatureAggregator",
     "scripts/Deluge_ Workspace and Permissions Handler/Deluge_ Workspace and Permissions Handler.md",
-    "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.md",
     "scripts/delugeWorkspaceAndPermissionsHandler/delugeWorkspaceAndPermissionsHandler.ds",
     "scripts/delugeWorkspaceAndPermissionsHandler",
     "scripts/Deluge_ Populace Membership Handler.md",
