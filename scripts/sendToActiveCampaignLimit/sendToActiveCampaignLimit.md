@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001381060"
 Name: validation_rule.sendToActiveCampaignLimit
-Revision Timestamp: 2026-03-20T14:53:54.840Z
+Revision Timestamp: 2026-03-20T14:57:32.725Z
 Status: Functional (With Critical Logic Errors)
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -77,11 +77,11 @@ The script builds a human-readable string (`conflictMessage`) by iterating throu
 > 2. This string is added to `intersectList`.
 > 3. Consequently, `intersectList.distinct().size()` will be at least 1, triggering an error message even when no actual ID conflicts exist.
 
-> [!TIP]
-> **Partial Syntax Fix:** The equality operator in the message builder loop has been corrected from `=` (assignment) to `==` (comparison).
-
 > [!CAUTION]
-> **Type Mismatch in Message Builder:** Despite the syntax fix, the comparison `if(rec.get("Sales_Campaigns_2").get("id") == id)` will likely fail. The variable `id` is a stringified list (e.g., `"[520877...]"`), while the record ID is a Long/String. These will not match, causing the `conflictMessage` to remain empty even when the validation blocks the save.
+> **Unresolved Type Mismatch:** Although a comment was added claiming the type mismatch between stringified lists and IDs is fixed, the code remains identical to previous versions. The comparison `if(rec.get("Sales_Campaigns_2").get("id") == id)` will still fail because `id` is a stringified list (e.g., `"[520877...]"`) and cannot be directly compared to a Long ID.
+
+> [!TIP]
+> **Partial Syntax Fix:** The equality operator in the message builder loop was previously corrected from `=` (assignment) to `==` (comparison).
 
 ## Change Log
 - **2026-03-20T12:22:15.384Z:** Initial creation of documentation. Logic identified as a validation rule for distributor-campaign constraints.
@@ -93,3 +93,4 @@ The script builds a human-readable string (`conflictMessage`) by iterating throu
 - **2026-03-20T14:47:13.537Z:** **Reporting Logic Update:** Modified the loop to use `.toText()` when adding to the intersect list. Added a new nested loop intended to resolve Distributor names for the conflict message. Introduced several critical syntax and logic errors, including an invalid equality operator (`=`) and a type mismatch between stringified lists and IDs that prevents the conflict message from populating correctly while still triggering a false-positive validation error.
 - **2026-03-20T14:52:01.437Z:** **Code Cleanup:** Removed several `info` debugging statements that were outputting `intersectList` and its size. The core functional logic, including the hardcoded ID regression and the false-positive validation error caused by stringified empty lists, remains unchanged.
 - **2026-03-20T14:53:54.840Z:** **Syntax Fix and Debugging:** Corrected the assignment operator (`=`) to an equality operator (`==`) in the conflict message builder loop. Re-added `info` statements for `intersectList` and its distinct size to facilitate debugging of the false-positive validation issue. The hardcoded ID and type mismatch logic bugs persist.
+- **2026-03-20T14:57:32.725Z:** **Commentary Update:** Added a code comment claiming the type mismatch between stringified lists and record IDs is resolved. However, no functional code changes were implemented to parse the stringified IDs or handle the empty list string ("[]"), so the false-positive validation error and message population failure persist.
