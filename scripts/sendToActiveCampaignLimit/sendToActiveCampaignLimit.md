@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001381060"
 Name: validation_rule.sendToActiveCampaignLimit
-Revision Timestamp: 2026-03-20T14:52:01.437Z
+Revision Timestamp: 2026-03-20T14:53:54.840Z
 Status: Functional (With Critical Logic Errors)
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -40,7 +40,8 @@ graph TD
     Intersect --> Append["Append Intersect Result (.toText) to intersectList"]
     Append --> NextDistributor["Move to Next Distributor"]
     NextDistributor -- "More Distributors?" --> LoopDistributors
-    NextDistributor -- "End of Loop" --> BuildMsg["Loop intersectList.distinct to build conflictMessage"]
+    NextDistributor -- "End of Loop" --> Debug["Info: Debug intersectList and size"]
+    Debug --> BuildMsg["Loop intersectList.distinct to build conflictMessage"]
     BuildMsg --> FinalCheck{"Is intersectList.distinct.size > 0?"}
     FinalCheck -- "Yes" --> Error["Return 'error' status (Blocking)"]
     FinalCheck -- "No" --> Success["Return 'success' status"]
@@ -63,7 +64,7 @@ For every distributor linked to the current sprint, the script:
 3. Converts the resulting list of conflicting IDs to text (e.g., `"[]"` or `"[12345]"`) and adds it to `intersectList`.
 
 ### 4. Conflict Reporting
-The script attempts to build a human-readable string (`conflictMessage`) by iterating through the distinct results in the `intersectList`. It attempts to match record IDs back to names to provide context in the error message.
+The script builds a human-readable string (`conflictMessage`) by iterating through the distinct results in the `intersectList`. It attempts to match record IDs back to names to provide context in the error message.
 
 ## Developer Notes
 
@@ -76,10 +77,11 @@ The script attempts to build a human-readable string (`conflictMessage`) by iter
 > 2. This string is added to `intersectList`.
 > 3. Consequently, `intersectList.distinct().size()` will be at least 1, triggering an error message even when no actual ID conflicts exist.
 
+> [!TIP]
+> **Partial Syntax Fix:** The equality operator in the message builder loop has been corrected from `=` (assignment) to `==` (comparison).
+
 > [!CAUTION]
-> **Syntax and Type Errors in Message Builder:**
-> - **Assignment vs Equality:** The script uses `if(rec.get("Sales_Campaigns_2").get("id") = id)`. The single `=` is an assignment operator in Deluge; an equality check `==` is required.
-> - **Type Mismatch:** The `id` variable is a stringified list (e.g., `"[520877...]"`), while the record ID is a Long/String. These will never match, causing the `conflictMessage` to remain empty even when the validation fails.
+> **Type Mismatch in Message Builder:** Despite the syntax fix, the comparison `if(rec.get("Sales_Campaigns_2").get("id") == id)` will likely fail. The variable `id` is a stringified list (e.g., `"[520877...]"`), while the record ID is a Long/String. These will not match, causing the `conflictMessage` to remain empty even when the validation blocks the save.
 
 ## Change Log
 - **2026-03-20T12:22:15.384Z:** Initial creation of documentation. Logic identified as a validation rule for distributor-campaign constraints.
@@ -90,3 +92,4 @@ The script attempts to build a human-readable string (`conflictMessage`) by iter
 - **2026-03-20T14:25:18.159Z:** **Logic and Regression Update:** Re-introduced a hardcoded `recordId`. Modified the validation logic to use a collection list (`intersectList`) to attempt to solve the loop scoping issue. Introduced a new logical bug where the validation blocks any record with a distributor because it counts iterations rather than conflict counts.
 - **2026-03-20T14:47:13.537Z:** **Reporting Logic Update:** Modified the loop to use `.toText()` when adding to the intersect list. Added a new nested loop intended to resolve Distributor names for the conflict message. Introduced several critical syntax and logic errors, including an invalid equality operator (`=`) and a type mismatch between stringified lists and IDs that prevents the conflict message from populating correctly while still triggering a false-positive validation error.
 - **2026-03-20T14:52:01.437Z:** **Code Cleanup:** Removed several `info` debugging statements that were outputting `intersectList` and its size. The core functional logic, including the hardcoded ID regression and the false-positive validation error caused by stringified empty lists, remains unchanged.
+- **2026-03-20T14:53:54.840Z:** **Syntax Fix and Debugging:** Corrected the assignment operator (`=`) to an equality operator (`==`) in the conflict message builder loop. Re-added `info` statements for `intersectList` and its distinct size to facilitate debugging of the false-positive validation issue. The hardcoded ID and type mismatch logic bugs persist.
