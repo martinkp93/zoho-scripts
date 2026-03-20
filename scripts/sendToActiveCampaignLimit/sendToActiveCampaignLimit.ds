@@ -5,7 +5,7 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 	entityMap = crmAPIRequest.toMap();
 	recordMap = entityMap.get("record");
 	recordId = recordMap.get("id");
-	// recordId = 520877000208751093;
+	recordId = 520877000208751093;
 	relatedDistributorAccounts = zoho.crm.getRelatedRecords("Related_Distributor_Accounts", "Sales_Sprints", recordId);
 	info relatedDistributorAccounts;
 	
@@ -35,7 +35,7 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 	
 	distributorList = List();
 	distributorMap = Map();
-	
+	intersectList = List();
 	for each relatedDistributor in relatedDistributorAccounts
 	{
 		relatedSalesSprintIds = List();
@@ -55,11 +55,12 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 		}
 		
 		salesSprintIntersect = activeSalesSprintIds.intersect(relatedSalesSprintIds);
+		intersectList.add(salesSprintIntersect);
 		info salesSprintIntersect;
 	
 	}
-	
-	if(salesSprintIntersect.size() > 0)
+	info intersectList;
+	if(intersectList.size() > 0)
 		{
 			response.put("status","error");
 			response.put("message","Conflict with Sales Sprint (ID): " + salesSprintIntersect);
@@ -68,7 +69,7 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 		response.put("status","success");
 		return response;
 
-
+	
 		
 	
 
