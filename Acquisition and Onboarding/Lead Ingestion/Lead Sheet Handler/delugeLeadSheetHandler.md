@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001326061"
 Name: delugeLeadSheetHandler
-Revision Timestamp: 2026-03-19T15:58:37.329Z
+Revision Timestamp: 2026-03-20T09:42:22.181Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -44,17 +44,20 @@ graph TD
     CheckCont -- "No" --> ErrCont["[[delugeSendErrorAlert]]"]
     CheckCont -- "Yes" --> GetDist["Identify Distributor & Subform"]
     
-    GetDist --> MatchSheet{"Match Sheet by Country & Type"}
-    MatchSheet -- "Fail" --> ErrSheet["[[delugeSendErrorAlert]]"]
+    GetDist --> MatchSheet["Match Sheet by Country & Type"]
+    MatchSheet --> ValSheet{"Spreadsheet Found?"}
     
-    MatchSheet -- "Success" --> PrepData["Prepare Row Data List"]
+    ValSheet -- "No" --> ErrSheet["[[delugeSendErrorAlert]]"]
+    ValSheet -- "Yes" --> PrepData["Prepare Row Data List"]
     
     PrepData --> Route{"URL Type?"}
     Route -- "Google" --> GPush["Invoke Google Sheets API"]
     Route -- "SharePoint" --> ZPush["Invoke Zapier Hook"]
     
-    GPush --> CheckPush{"HTTP 200?"}
-    ZPush --> CheckPush
+    GPush --> LogRes["Log pushResponse"]
+    ZPush --> LogRes
+    
+    LogRes --> CheckPush{"HTTP 200?"}
     
     CheckPush -- "No" --> ErrPush["[[delugeSendErrorAlert]]"]
     CheckPush -- "Yes" --> MailerSend["Send MailerSend Notification"]
@@ -90,10 +93,14 @@ Once the spreadsheet is updated, the script sends a notification. It parses a co
 > **CC List Logic:** The current loop for CC recipients (`for each email in ccEmails { ccList = {{"email":email}}; }`) effectively overwrites the `ccList` variable. As a result, only the *last* email in the CC list will actually be included in the email. This should be updated to `.add()` if multiple CCs are required.
 
 > [!TIP]
+> **Improved Validation:** The latest update includes an explicit check for `spreadsheetUrl.isEmpty()`. This prevents the script from attempting to call `.contains()` on a null value, which would otherwise cause a runtime Deluge error.
+
+> [!TIP]
 > Phone numbers are prepended with a single quote (`'`) before being pushed to spreadsheets. This is a deliberate design choice to prevent spreadsheet applications from truncating leading zeros or formatting the phone number as a mathematical integer.
 
 > [!CAUTION]
 > The "Region" logic is hardcoded for specific distributors (`Hankkija Oy`, `Danish Agro`, `Baltic Agro Estonia`). If new distributors require regional filtering based on UTM Ad Set names, they must be added to the `regionColumnDistributors` list.
 
 ## Change Log
+- **2026-03-20T09:42:22.181Z:** Added explicit validation for empty spreadsheet URL to prevent runtime errors and improved logging of the push response.
 - **2026-03-19T15:58:37.329Z:** Initial creation of documentation via DeluluDocu.
