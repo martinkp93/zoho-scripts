@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001381060"
-Name: sendToActiveCampaignLimit
-Revision Timestamp: 2026-03-20T12:22:15.384Z
+Name: validation_rule.sendToActiveCampaignLimit
+Revision Timestamp: 2026-03-20T13:48:48.743Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -9,69 +9,69 @@ Status: Functional
 ---
 
 ## Overview
-The `sendToActiveCampaignLimit` function is designed as a **CRM Validation Rule** script. Its primary purpose is to enforce a business constraint: ensuring that a Distributor (Account) is not associated with more than one active Sales Sprint that is flagged for syncing with Active Campaign. 
-
-It prevents data duplication or conflicting campaign triggers by checking the intersection of "Sprints related to the Distributor" and "Globally Active Sprints" via a COQL query.
+The `validation_rule.sendToActiveCampaignLimit` function is a Zoho CRM Validation Rule script. Its purpose is to prevent a Sales Sprint from being activated (or sent to Active Campaign) if any of its associated Distributors (Accounts) are already participating in another active Sales Sprint. This prevents a single distributor from receiving conflicting campaign communications.
 
 ## Technical Contract
-- **Input:** `String crmAPIRequest` (The standard JSON payload sent by Zoho CRM Validation Rules).
-- **Output:** `String` (or `Map` for validation success/failure messages).
+- **Input:** `String crmAPIRequest` (JSON payload from CRM Validation Rule).
+- **Output:** `Map` (Containing `status` and `message` for the CRM UI).
 - **Primary Entities:** 
-    - `Accounts` (Distributors)
-    - `Sales_Sprints` (Custom Module)
+    - `Sales_Sprints` (Current record context)
+    - `Accounts` (Related Distributors)
+    - `Related_Distributor_Accounts` (Linking module/Related List)
 
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
 | Function / Service | Purpose | Criticality |
 | --- | --- | --- |
-| [[standalone.delugeSendErrorAlert]] | Dispatches error notifications if multiple active sprints are detected. | High |
-| `Zoho CRM COQL API` | Used to perform a filtered search for active sales sprints across the entire module. | High |
+| `Zoho CRM COQL API` | Retrieves all globally active Sales Sprints for comparison. | High |
 
 ## Logic Flow
 
 ```mermaid
 graph TD
-    Start(["Start: Validation Rule Trigger"]) --> Parse["Parse crmAPIRequest to Map"]
-    Parse --> Extract["Extract Record ID & Context"]
-    Extract --> Related["Get Related Sales Sprints for Account"]
-    Related --> COQL["COQL Query: Find all Active Sprints (Global)"]
-    COQL --> Intersect["Intersect Related IDs with Active IDs"]
-    Intersect --> Check{"Intersection Size > 1?"}
-    Check -- "Yes" --> Alert["Trigger [[standalone.delugeSendErrorAlert]]"]
-    Alert --> Error["Return Validation Error"]
-    Check -- "No" --> Success["Return Success/Empty"]
-    Success --> End(["End"])
+    Start(["Start: Validation Rule Trigger"]) --> Parse["Parse crmAPIRequest"]
+    Parse --> GetDistributors["Get Related Distributors for this Sprint"]
+    GetDistributors --> COQL["COQL Query: Find all Active Sprints (Global)"]
+    COQL --> LoopDistributors["Loop: For Each Related Distributor"]
+    LoopDistributors --> GetDistributorSprints["Get all Sprints for this Distributor"]
+    GetDistributorSprints --> Intersect["Intersect Distributor Sprints with Global Active Sprints"]
+    Intersect --> CheckConflict{"Conflict Found?"}
+    CheckConflict -- "Yes" --> BuildConflictList["Add Sprint Name to alreadyActiveList"]
+    CheckConflict -- "No" --> NextDistributor["Move to Next Distributor"]
+    BuildConflictList --> NextDistributor
+    NextDistributor --> FinalCheck{"Is alreadyActiveList empty?"}
+    FinalCheck -- "No" --> Error["Return 'error' status with Conflict Names"]
+    FinalCheck -- "Yes" --> Success["Return 'success' status"]
+    Error --> End(["End"])
+    Success --> End
 ```
 
 ## Core Logic Sections
 
-### 1. Context Extraction
-The script begins by converting the `crmAPIRequest` string into a map. It identifies the current record being edited or created to establish the context for the validation.
+### 1. Distributor Identification
+The script identifies all distributors linked to the current Sales Sprint record via the `Related_Distributor_Accounts` related list.
 
-### 2. Active Sprint Discovery (COQL)
-The script utilizes a COQL (Zoho CRM Object Query Language) query to find all records in the `Sales_Sprints` module where:
-- `Sales_Sprint_Active` is 'Yes'
-- `Send_to_Active_Campaign` is true
+### 2. Global State Comparison (COQL)
+It performs a COQL query to identify every Sales Sprint in the system that is currently marked as `Active` and enabled for `Active Campaign`. These IDs are stored in a master list for comparison.
 
-This provides a global list of "Active" sprints to compare against the specific record's relationships.
-
-### 3. Conflict Validation (Intersection)
-The core validation logic uses the `.intersect()` method:
-1. It collects IDs of sprints related to the Distributor.
-2. It collects IDs of all active sprints in the system.
-3. If the intersection of these two lists contains more than one record, it indicates a violation of the "one active sprint per distributor" rule.
+### 3. Nested Validation Loop
+For every distributor linked to the current record, the script:
+1. Retrieves all Sales Sprints associated with that specific distributor.
+2. Uses the `.intersect()` method to see if any of those associated sprints match the global list of "Active" sprints.
+3. Collects the names of conflicting sprints to provide a descriptive error message to the user.
 
 ## Developer Notes
 
-> [!WARNING]
-> **Code Status:** A significant portion of the logic in the provided snippet is currently commented out or structured as a template. Before deployment, ensure the COQL connection name `"zohocrmconnection"` exists in the environment.
+> [!CAUTION]
+> **Hardcoded ID Bug:** The current version of the script contains a hardcoded ID `recordId = 520877000208751093;`. This bypasses the dynamic `crmAPIRequest` and will cause the validation to fail or point to the wrong record in production. This must be changed to `recordId = recordMap.get("id");`.
 
-> [!IMPORTANT]
-> **COQL Limits:** The COQL API has a limit of 200 records per page. If the number of active Sales Sprints globally exceeds 200, pagination logic will need to be implemented.
+> [!CAUTION]
+> **Logic Scope Issue:** The variable `salesSprintIntersect` is calculated inside the distributor loop, but the logic to populate `alreadyActiveList` is currently placed *outside* the loop in the provided snippet. This means the script currently only validates conflicts for the *last* distributor in the list. The `alreadyActiveList` population logic should be moved inside the distributor loop.
 
-> [!NOTE]
-> The script uses the technical name `Sales_Campaigns_2` as the lookup field key within the related records loop; ensure this matches the actual API name of the lookup field on the Sales Sprint module.
+> [!TIP]
+> This script returns a specific Map format `{"status": "error", "message": "..."}` which is required for Zoho CRM Validation Rules to display custom error messages directly on the record UI.
 
 ## Change Log
-- **2026-03-20T12:22:15.384Z:** Initial creation of documentation via DeluluDocu. Logic identified as a validation rule for distributor-campaign constraints.
+- **2026-03-20T12:22:15.384Z:** Initial creation of documentation. Logic identified as a validation rule for distributor-campaign constraints.
+- **2026-03-20T13:48:48.743Z:** Updated script to handle multiple distributors per Sales Sprint. Switched from single-account validation to a nested loop checking all linked distributors. Refined error message to return names of conflicting sprints. Added warnings regarding hardcoded IDs and loop scoping.
