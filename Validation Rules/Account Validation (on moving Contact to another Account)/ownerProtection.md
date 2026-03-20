@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001373003"
-Name: ownerProtection
-Revision Timestamp: 2026-03-20T08:21:17.342Z
+Name: validation_rule.ownerProtection
+Revision Timestamp: 2026-03-20T08:22:11.614Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -56,7 +56,7 @@ graph TD
 ## Core Logic Sections
 
 ### 1. Request Parsing & Context Initialization
-The script extracts the record ID and the submitted field values from the `crmAPIRequest`. It now includes a safety check to see if the `contactId` is present.
+The script extracts the record ID and the submitted field values from the `crmAPIRequest`. It includes a safety check to see if the `contactId` is present to differentiate between a new record creation and an update.
 
 ### 2. Creation vs. Edit Handling
 If `contactId` is null, the script assumes the record is being created for the first time. Since there is no "previous" account to compare against in a move logic context, the validation immediately returns "success".
@@ -72,10 +72,10 @@ If a move is detected:
 ## Developer Notes
 
 > [!IMPORTANT]
-> This script performs up to two `getRecordById` calls. While efficient for single record edits, ensure that bulk updates (via API) do not hit secondary governor limits if multiple validation rules are running concurrently.
+> This script performs up to two `zoho.crm.getRecordById` calls. While efficient for single record edits, ensure that bulk updates (via API) do not hit secondary governor limits if multiple validation rules are running concurrently.
 
 > [!TIP]
-> The updated logic now includes a null check for the Contact ID. This ensures the script doesn't fail when a new Contact is being created (where the ID is not yet assigned), effectively bypassing the "move" validation during initial creation.
+> The logic includes a null check for the Contact ID. This ensures the script doesn't fail when a new Contact is being created (where the ID is not yet assigned), effectively bypassing the "move" validation during initial creation.
 
 > [!CAUTION]
 > If the `Account_Name` field is empty on the Contact (null), the `.get("id")` method on the map might throw an error. Current implementation assumes Contacts are always associated with an Account.
@@ -83,3 +83,4 @@ If a move is detected:
 ## Change Log
 - **2026-03-19T20:13:15.887Z:** Initial creation of documentation via DeluluDocu. Enforced Owner protection and Target Account Workspace ID validation.
 - **2026-03-20T08:21:17.342Z:** Added a null check for `contactId`. This prevents script errors during the creation of a new Contact, where the record ID does not yet exist in the `crmAPIRequest` payload.
+- **2026-03-20T08:22:11.614Z:** Cleaned up script by removing legacy commented-out test payload from the code body to improve readability. No changes to validation logic.
