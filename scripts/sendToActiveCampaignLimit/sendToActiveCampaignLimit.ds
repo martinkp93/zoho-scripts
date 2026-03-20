@@ -56,34 +56,30 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 		
 		salesSprintIntersect = activeSalesSprintIds.intersect(relatedSalesSprintIds);
 		intersectList.add(salesSprintIntersect.toText());
-		info salesSprintIntersect;
 	
 	}
-	info intersectList;
-	info intersectList.distinct().size();
-	conflictMessage = "Conflict: ";
-	for each id in intersectList.distinct()
+	
+	if(!intersectList.distinct().isEmpty())
 	{
-		// Type mismatch is fixed. "id" is in a stringified list but is fetched as a long/string.
-		for each rec in relatedDistributorAccounts
+		conflictMessage = "Conflict: ";
+		for each id in intersectList.distinct()
 		{
-			if(rec.get("Sales_Campaigns_2").get("id") == id)
+			for each rec in relatedDistributorAccounts
 			{
-				distName = rec.get("Related_Distributors_2").get("name");
-				conflict = distName + " (" + id + ")" + " | ";
-				conflictMessage = conflictMessage + conflict;
+				if(rec.get("Sales_Campaigns_2").get("id") == id)
+				{
+					distName = rec.get("Related_Distributors_2").get("name");
+					conflict = distName + " (" + id + ")" + " | ";
+					conflictMessage = conflictMessage + conflict;
 
-			}
-		}
+					}
+					}
+					}
+					response.put("status","error");
+					response.put("message","Conflict with Sales Sprints: " + conflictMessage);
+					return response;
 	}
-
 	
-	if(intersectList.distinct().size() > 0)
-		{
-			response.put("status","error");
-			response.put("message","Conflict with Sales Sprints: " + conflictMessage);
-			return response;
-		} 
 		response.put("status","success");
 		return response;
 
