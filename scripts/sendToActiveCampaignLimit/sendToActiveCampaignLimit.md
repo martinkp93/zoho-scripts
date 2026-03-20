@@ -1,8 +1,8 @@
 ---
 Function ID: "157805000001381060"
 Name: validation_rule.sendToActiveCampaignLimit
-Revision Timestamp: 2026-03-20T15:02:00.088Z
-Status: Functional (With Critical Logic Errors)
+Revision Timestamp: 2026-03-20T15:10:15.209Z
+Status: Functional (With Hardcoded ID)
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
 
@@ -37,11 +37,14 @@ graph TD
     COQL --> LoopDistributors["Loop: For Each Related Distributor"]
     LoopDistributors --> GetDistributorSprints["Get all Sprints for this Distributor"]
     GetDistributorSprints --> Intersect["Intersect Distributor Sprints with Global Active Sprints"]
-    Intersect --> Append["Append Intersect Result (.toText) to intersectList"]
+    Intersect --> HasConflict{"Conflict Size > 0?"}
+    HasConflict -- "Yes" --> Append["Add ID list to intersectList"]
+    HasConflict -- "No" --> NextDistributor
     Append --> NextDistributor["Move to Next Distributor"]
     NextDistributor -- "More Distributors?" --> LoopDistributors
-    NextDistributor -- "End of Loop" --> FinalCheck{"Is intersectList.distinct NOT empty?"}
-    FinalCheck -- "Yes" --> BuildMsg["Loop intersectList.distinct to build conflictMessage"]
+    NextDistributor -- "End of Loop" --> Clean["Remove empty strings and get distinct IDs"]
+    Clean --> FinalCheck{"Is uniqueConflicts NOT empty?"}
+    FinalCheck -- "Yes" --> BuildMsg["Loop uniqueConflicts to build conflictMessage (using .toString)"]
     BuildMsg --> Error["Return 'error' status (Blocking)"]
     FinalCheck -- "No" --> Success["Return 'success' status"]
     Error --> End(["End"])
@@ -60,24 +63,21 @@ It uses a COQL query to build a list of all `Sales_Sprints` IDs where `Sales_Spr
 For every distributor linked to the current sprint, the script:
 1. Retrieves all sprints linked to that specific distributor.
 2. Intersects that distributor's sprints with the global list of active sprints.
-3. Converts the resulting list of conflicting IDs to text (e.g., `"[]"` or `"[12345]"`) and adds it to `intersectList`.
+3. If the intersection size is greater than 0, the conflicting IDs are added to the `intersectList`.
 
 ### 4. Conflict Reporting
-If the `intersectList` is not empty, the script builds a human-readable string (`conflictMessage`) by iterating through the distinct results. It attempts to match record IDs back to names to provide context in the error message.
+If `uniqueConflicts` is not empty, the script builds a human-readable string (`conflictMessage`). It uses `.toString()` on IDs to ensure matching types during comparison between the conflict list and the source records.
 
 ## Developer Notes
 
 > [!CAUTION]
 > **Hardcoded ID Regression:** The dynamic `recordId` retrieval is still being overwritten by a hardcoded ID `520877000208751093` on line 9. This renders the validation rule non-functional for any record other than the specific test record.
 
-> [!CAUTION]
-> **Persistent False-Positive Bug:** The updated check `if(!intersectList.distinct().isEmpty())` does not solve the underlying logic error.
-> 1. When no conflict is found, `salesSprintIntersect.toText()` returns the string `"[]"`.
-> 2. This string is added to `intersectList`.
-> 3. Consequently, `intersectList` is never empty; it will contain at least one element (the string `"[]"`). This triggers an error message even when no actual ID conflicts exist.
+> [!TIP]
+> **Logic Bug Resolved:** The "False-Positive" bug has been resolved. By wrapping the `intersectList.addAll()` in a size check (`if(salesSprintIntersect.size() > 0)`), the script no longer adds empty list strings (`"[]"`) to the results, ensuring the validation only triggers on real conflicts.
 
-> [!CAUTION]
-> **Unresolved Type Mismatch:** The comparison `if(rec.get("Sales_Campaigns_2").get("id") == id)` still fails because `id` is a stringified list (e.g., `"[520877...]"`) and cannot be directly compared to a Long ID. Because of this, the `conflictMessage` will likely remain empty or incomplete while the error status is still returned to the user.
+> [!TIP]
+> **Type Mismatch Resolved:** The script now uses `.toString()` when comparing record IDs in the conflict message builder: `if(rec.get("Sales_Campaigns_2").get("id").toString() == id.toString())`. This ensures that BigInt/Long types correctly match String types in the loop.
 
 ## Change Log
 - **2026-03-20T12:22:15.384Z:** Initial creation of documentation. Logic identified as a validation rule for distributor-campaign constraints.
@@ -91,3 +91,4 @@ If the `intersectList` is not empty, the script builds a human-readable string (
 - **2026-03-20T14:53:54.840Z:** **Syntax Fix and Debugging:** Corrected the assignment operator (`=`) to an equality operator (`==`) in the conflict message builder loop. Re-added `info` statements for `intersectList` and its distinct size to facilitate debugging of the false-positive validation issue. The hardcoded ID and type mismatch logic bugs persist.
 - **2026-03-20T14:57:32.725Z:** **Commentary Update:** Added a code comment claiming the type mismatch between stringified lists and record IDs is resolved. However, no functional code changes were implemented to parse the stringified IDs or handle the empty list string ("[]"), so the false-positive validation error and message population failure persist.
 - **2026-03-20T15:02:00.088Z:** **Structural Refactoring:** Updated the conflict check condition from `.size() > 0` to `!isEmpty()`. Moved the conflict message construction logic inside the conditional block. These changes do not resolve the underlying logical issues regarding hardcoded IDs, stringified list comparisons, or false-positive triggers caused by empty intersection strings ("[]").
+- **2026-03-20T15:10:15.209Z:** **Logic and Type Fix:** Refined the collection logic to only add to `intersectList` if `size() > 0`, resolving the false-positive trigger caused by empty list strings. Implemented `.toString()` comparisons in the conflict builder loop to resolve type mismatch issues between IDs. The hardcoded `recordId` regression remains.
