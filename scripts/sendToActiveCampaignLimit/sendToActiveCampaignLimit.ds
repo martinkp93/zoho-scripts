@@ -59,8 +59,6 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 		info salesSprintIntersect;
 	
 	}
-	info intersectList;
-	info intersectList.distinct().size();
 	conflictMessage = "Conflict: ";
 	for each id in intersectList.distinct()
 	{
@@ -75,8 +73,6 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 			}
 		}
 	}
-
-	info conflictMessage;
 	
 	if(intersectList.distinct().size() > 0)
 		{
@@ -87,67 +83,4 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 		response.put("status","success");
 		return response;
 
-	
-		
-	
-
-
-	/*
-// 2. Get Related Distributor Accounts (related list)
-// 2. For each distributor in "Related Distributor Accounts", get distributorID
-// 3. For each distributorId, get Related Sales Sprints (Step 2 in Resolve RaQ Pricing script)
-// 4. Get Active Sales Sprints: Make COQL query (where Sales_Sprint_Active = 'Yes' and Send_to_Active_Campaign = true") (Step 3 in Resolve RaQ Pricing script)
-// 5. For each distributor, intersect (Related Sales Sprints IDs with Active Sales Sprints IDs). Result: If distributor has >= 1 intersect, return error for that distributor
-// See line 45 - 93 in Resolve RaQ Pricing script:
-
-// 2. Find Sales Sprints related to Distributor
-	relatedSalesSprints = zoho.crm.getRelatedRecords("Related_Sales_Sprints_2","Accounts",distributorId);
-	// 3. Find Active Sales Sprints
-	// activeSalesSprints = zoho.crm.searchRecords("Sales_Sprints","((Sales_Sprint_Active:equals:Yes) AND (Send_to_Active_Campaign:equals:true))");
-	queryMap = Map();
-	queryMap.put("select_query","select id, Name, Sales_Sprint_Active, Send_to_Active_Campaign from Sales_Sprints where Sales_Sprint_Active = 'Yes' and Send_to_Active_Campaign = true");
-	response = invokeurl
-	[
-		url :"https://www.zohoapis.eu/crm/v2/coql"
-		type :POST
-		parameters:queryMap.toString()
-		connection:"zohocrmconnection"
-	];
-	activeSalesSprints = response.get("data");
-	info activeSalesSprints;
-	// 4. Put the IDs for "relatedSalesSprints" and "activeSalesSprints" into separate list that can be parsed in step 3.1.
-	if(activeSalesSprints != null && relatedSalesSprints != null)
-	{
-		// 4.1. Related Sales Sprints to list
-		relatedSalesSprintIds = List();
-		for each  relatedSalesSprint in relatedSalesSprints
-		{
-			relatedSalesSprintIds.add(relatedSalesSprint.get("Sales_Campaigns_2").get("id"));
-		}
-		// 4.2. Active Sales Sprints to list
-		activeSalesSprintIds = List();
-		for each  rec in activeSalesSprints
-		{
-			activeSalesSprintIds.add(rec.get("id"));
-		}
-		// 4.3. Use "intersect" to find matching id in both lists 
-		salesSprintIntersect = activeSalesSprintIds.intersect(relatedSalesSprintIds);
-		info salesSprintIntersect;
-		// 4.4. Check if intersect returns more than one active Sales Sprint for the distributor; return error if more than one is found
-		if(salesSprintIntersect.size() > 1)
-		{
-			errorMsg = "Critical error in delugeResolveRaQPricing: More than one active Sales Sprint found for distributor. Cannot resolve pricing.";
-			info errorMsg;
-			standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMsg);
-			return {"success":false,"error_message":errorMsg};
-		}
-		else if(salesSprintIntersect.size() == 1)
-		{
-			salesSprintId = activeSalesSprintIds.intersect(relatedSalesSprintIds).get(0);
-			salesSprint = zoho.crm.getRecordById("Sales_Sprints",salesSprintId);
-		}
-	}
-	// 5. Get Sales Sprint prices for Products and put product ids into a map
-	if(salesSprint != null)
-	*/
 }
