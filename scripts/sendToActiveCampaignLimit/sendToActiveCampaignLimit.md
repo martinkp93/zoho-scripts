@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001381060"
 Name: validation_rule.sendToActiveCampaignLimit
-Revision Timestamp: 2026-03-20T13:50:45.491Z
+Revision Timestamp: 2026-03-20T13:51:16.768Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -67,7 +67,7 @@ For every distributor linked to the current record, the script:
 > **Logic Scope Issue:** The check `if(salesSprintIntersect.size() > 0)` is located *outside* the distributor loop. Because `salesSprintIntersect` is overwritten in every iteration of the loop, the validation rule only checks the **very last distributor** processed. Conflicts for previous distributors in the list are ignored.
 
 > [!IMPORTANT]
-> **User Experience Change:** The code that matched conflicting IDs back to Record Names (`alreadyActiveList`) has been commented out. The validation error message now displays raw Record IDs to the user (e.g., "Conflict with: [12345, 67890]"), which is significantly less user-friendly than the previous version.
+> **User Experience Change:** The code that matched conflicting IDs back to Record Names (`alreadyActiveList`) remains commented out. The validation error message returns raw Record IDs to the user.
 
 > [!TIP]
 > This script returns a specific Map format `{"status": "error", "message": "..."}` which is required for Zoho CRM Validation Rules to display custom error messages directly on the record UI.
@@ -76,3 +76,4 @@ For every distributor linked to the current record, the script:
 - **2026-03-20T12:22:15.384Z:** Initial creation of documentation. Logic identified as a validation rule for distributor-campaign constraints.
 - **2026-03-20T13:48:48.743Z:** Updated script to handle multiple distributors per Sales Sprint. Switched from single-account validation to a nested loop checking all linked distributors. Refined error message to return names of conflicting sprints. Added warnings regarding hardcoded IDs and loop scoping.
 - **2026-03-20T13:50:45.491Z:** Logic simplification update. The mapping of Sprint IDs to Sprint Names for the error message has been removed/commented out. The error message now returns raw IDs. The "Last Distributor Only" logic bug remains present.
+- **2026-03-20T13:51:16.768Z:** Minor text update to the error message string. The prefix was changed from "Conflict with: " to "Conflict with Sales Sprint (ID): ". No functional logic or bug fixes were applied in this revision; hardcoded IDs and scoping issues persist.
