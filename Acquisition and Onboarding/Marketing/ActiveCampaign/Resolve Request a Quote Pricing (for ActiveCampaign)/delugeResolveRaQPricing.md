@@ -1,9 +1,8 @@
 ---
-Function ID: "157805000001362019"
-Name: delugeResolveRaQPricing
-Revision Timestamp: 2026-03-20T11:57:02.240Z
-Status: Functional
----
+| Function ID | Name | Revision Timestamp | Status |
+| --- | --- | --- | --- |
+| 157805000001362019 | delugeResolveRaQPricing | 2026-03-20T11:59:42.480Z | Functional |
+
 **Postman Documentation:** [Link to API Collection Placeholder]
 
 ---
@@ -14,6 +13,7 @@ The `delugeResolveRaQPricing` function is a standalone utility designed to calcu
 ## Technical Contract
 - **Input:** `Int distributorId` (The unique ID of the Account/Distributor).
 - **Output:** A Map containing `success` (boolean) and `data` (Map of prices) or `error_message` (string).
+- **Data Structure:** The `data` map returns nested maps for `salesSprint`, `priceList`, and `savings`.
 - **Primary Entities:** `Accounts`, `Price_Lists`, `Sales_Sprints`, `Products`.
 
 ## Dependency Map
@@ -74,6 +74,9 @@ All numeric values are converted to strings prefixed with the `Currency` code re
 > The script strictly enforces a limit of **one** active Sales Sprint per distributor. If a distributor is associated with multiple active sprints simultaneously, the script will trigger an error alert and fail.
 
 > [!IMPORTANT]
+> **Breaking Change (2026-03-20):** The key for the savings map in the final JSON response has been renamed from `totalSavings` to `savings`. Ensure any front-end or calling script is updated to parse `data.savings.totalSavings`.
+
+> [!IMPORTANT]
 > Product identification relies on hardcoded string matching (e.g., `productName == "Cordulus Farm Station: Annual Subscription"`). Any change to product names in the CRM will break the pricing extraction logic.
 
 > [!TIP]
@@ -82,3 +85,4 @@ All numeric values are converted to strings prefixed with the `Currency` code re
 ## Change Log
 - **2026-03-19T20:12:07.388Z:** Initial creation of documentation via DeluluDocu.
 - **2026-03-20T11:57:02.240Z:** Logic confirmed/updated. Ensured correct handling of multi-year Accrual Periods (12 vs 24 months) and standardized currency prefixing for returned price maps. Added explicit COQL field selection to documentation.
+- **2026-03-20T11:59:42.480Z:** Updated the output map key for the savings data from `totalSavings` to `savings` to maintain naming convention consistency across API responses. No changes to core calculation logic.
