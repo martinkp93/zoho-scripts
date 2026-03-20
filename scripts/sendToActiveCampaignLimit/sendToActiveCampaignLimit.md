@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001381060"
 Name: validation_rule.sendToActiveCampaignLimit
-Revision Timestamp: 2026-03-20T14:57:32.725Z
+Revision Timestamp: 2026-03-20T15:02:00.088Z
 Status: Functional (With Critical Logic Errors)
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -40,10 +40,9 @@ graph TD
     Intersect --> Append["Append Intersect Result (.toText) to intersectList"]
     Append --> NextDistributor["Move to Next Distributor"]
     NextDistributor -- "More Distributors?" --> LoopDistributors
-    NextDistributor -- "End of Loop" --> Debug["Info: Debug intersectList and size"]
-    Debug --> BuildMsg["Loop intersectList.distinct to build conflictMessage"]
-    BuildMsg --> FinalCheck{"Is intersectList.distinct.size > 0?"}
-    FinalCheck -- "Yes" --> Error["Return 'error' status (Blocking)"]
+    NextDistributor -- "End of Loop" --> FinalCheck{"Is intersectList.distinct NOT empty?"}
+    FinalCheck -- "Yes" --> BuildMsg["Loop intersectList.distinct to build conflictMessage"]
+    BuildMsg --> Error["Return 'error' status (Blocking)"]
     FinalCheck -- "No" --> Success["Return 'success' status"]
     Error --> End(["End"])
     Success --> End
@@ -64,7 +63,7 @@ For every distributor linked to the current sprint, the script:
 3. Converts the resulting list of conflicting IDs to text (e.g., `"[]"` or `"[12345]"`) and adds it to `intersectList`.
 
 ### 4. Conflict Reporting
-The script builds a human-readable string (`conflictMessage`) by iterating through the distinct results in the `intersectList`. It attempts to match record IDs back to names to provide context in the error message.
+If the `intersectList` is not empty, the script builds a human-readable string (`conflictMessage`) by iterating through the distinct results. It attempts to match record IDs back to names to provide context in the error message.
 
 ## Developer Notes
 
@@ -72,16 +71,13 @@ The script builds a human-readable string (`conflictMessage`) by iterating throu
 > **Hardcoded ID Regression:** The dynamic `recordId` retrieval is still being overwritten by a hardcoded ID `520877000208751093` on line 9. This renders the validation rule non-functional for any record other than the specific test record.
 
 > [!CAUTION]
-> **Persistent False-Positive Bug:** The check `if(intersectList.distinct().size() > 0)` remains fundamentally flawed.
+> **Persistent False-Positive Bug:** The updated check `if(!intersectList.distinct().isEmpty())` does not solve the underlying logic error.
 > 1. When no conflict is found, `salesSprintIntersect.toText()` returns the string `"[]"`.
 > 2. This string is added to `intersectList`.
-> 3. Consequently, `intersectList.distinct().size()` will be at least 1, triggering an error message even when no actual ID conflicts exist.
+> 3. Consequently, `intersectList` is never empty; it will contain at least one element (the string `"[]"`). This triggers an error message even when no actual ID conflicts exist.
 
 > [!CAUTION]
-> **Unresolved Type Mismatch:** Although a comment was added claiming the type mismatch between stringified lists and IDs is fixed, the code remains identical to previous versions. The comparison `if(rec.get("Sales_Campaigns_2").get("id") == id)` will still fail because `id` is a stringified list (e.g., `"[520877...]"`) and cannot be directly compared to a Long ID.
-
-> [!TIP]
-> **Partial Syntax Fix:** The equality operator in the message builder loop was previously corrected from `=` (assignment) to `==` (comparison).
+> **Unresolved Type Mismatch:** The comparison `if(rec.get("Sales_Campaigns_2").get("id") == id)` still fails because `id` is a stringified list (e.g., `"[520877...]"`) and cannot be directly compared to a Long ID. Because of this, the `conflictMessage` will likely remain empty or incomplete while the error status is still returned to the user.
 
 ## Change Log
 - **2026-03-20T12:22:15.384Z:** Initial creation of documentation. Logic identified as a validation rule for distributor-campaign constraints.
@@ -94,3 +90,4 @@ The script builds a human-readable string (`conflictMessage`) by iterating throu
 - **2026-03-20T14:52:01.437Z:** **Code Cleanup:** Removed several `info` debugging statements that were outputting `intersectList` and its size. The core functional logic, including the hardcoded ID regression and the false-positive validation error caused by stringified empty lists, remains unchanged.
 - **2026-03-20T14:53:54.840Z:** **Syntax Fix and Debugging:** Corrected the assignment operator (`=`) to an equality operator (`==`) in the conflict message builder loop. Re-added `info` statements for `intersectList` and its distinct size to facilitate debugging of the false-positive validation issue. The hardcoded ID and type mismatch logic bugs persist.
 - **2026-03-20T14:57:32.725Z:** **Commentary Update:** Added a code comment claiming the type mismatch between stringified lists and record IDs is resolved. However, no functional code changes were implemented to parse the stringified IDs or handle the empty list string ("[]"), so the false-positive validation error and message population failure persist.
+- **2026-03-20T15:02:00.088Z:** **Structural Refactoring:** Updated the conflict check condition from `.size() > 0` to `!isEmpty()`. Moved the conflict message construction logic inside the conditional block. These changes do not resolve the underlying logical issues regarding hardcoded IDs, stringified list comparisons, or false-positive triggers caused by empty intersection strings ("[]").
