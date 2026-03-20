@@ -1,15 +1,15 @@
 ---
 Function ID: "157805000001381060"
 Name: validation_rule.sendToActiveCampaignLimit
-Revision Timestamp: 2026-03-20T14:25:18.159Z
-Status: Functional
+Revision Timestamp: 2026-03-20T14:47:13.537Z
+Status: Functional (With Critical Logic Errors)
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
 
 ---
 
 ## Overview
-The `validation_rule.sendToActiveCampaignLimit` function is a Zoho CRM Validation Rule script. Its purpose is to prevent a Sales Sprint from being activated (or sent to Active Campaign) if any of its associated Distributors (Accounts) are already participating in another active Sales Sprint. This prevents a single distributor from receiving conflicting campaign communications.
+The `validation_rule.sendToActiveCampaignLimit` function is a Zoho CRM Validation Rule script designed to enforce a "One Active Campaign per Distributor" policy. It checks if any Distributors (Accounts) linked to the current Sales Sprint are already associated with other Sales Sprints currently marked as active and enabled for Active Campaign.
 
 ## Technical Contract
 - **Input:** `String crmAPIRequest` (JSON payload from CRM Validation Rule).
@@ -32,16 +32,16 @@ This script orchestrates the following internal functions and external services:
 graph TD
     Start(["Start: Validation Rule Trigger"]) --> Parse["Parse crmAPIRequest"]
     Parse --> GetID["Extract recordId (Note: Hardcoded override present)"]
-    GetID --> GetDistributors["Get Related Distributors for this Sprint"]
+    GetID --> GetDistributors["Get Related Distributors for current Sprint"]
     GetDistributors --> COQL["COQL Query: Find all Active Sprints (Global)"]
-    COQL --> InitList["Initialize intersectList"]
-    InitList --> LoopDistributors["Loop: For Each Related Distributor"]
+    COQL --> LoopDistributors["Loop: For Each Related Distributor"]
     LoopDistributors --> GetDistributorSprints["Get all Sprints for this Distributor"]
     GetDistributorSprints --> Intersect["Intersect Distributor Sprints with Global Active Sprints"]
-    Intersect --> Append["Append Intersect Result to intersectList"]
+    Intersect --> Append["Append Intersect Result (.toText) to intersectList"]
     Append --> NextDistributor["Move to Next Distributor"]
     NextDistributor -- "More Distributors?" --> LoopDistributors
-    NextDistributor -- "End of Loop" --> FinalCheck{"Is intersectList.size > 0?"}
+    NextDistributor -- "End of Loop" --> BuildMsg["Loop intersectList.distinct to build conflictMessage"]
+    BuildMsg --> FinalCheck{"Is intersectList.distinct.size > 0?"}
     FinalCheck -- "Yes" --> Error["Return 'error' status (Blocking)"]
     FinalCheck -- "No" --> Success["Return 'success' status"]
     Error --> End(["End"])
@@ -50,28 +50,37 @@ graph TD
 
 ## Core Logic Sections
 
-### 1. Distributor Identification
-The script identifies all distributors linked to the current Sales Sprint record via the `Related_Distributor_Accounts` related list.
+### 1. Contextual Data Retrieval
+The script identifies the Sales Sprint record and fetches all distributors associated with it via the `Related_Distributor_Accounts` related list.
 
-### 2. Global State Comparison (COQL)
-It performs a COQL query to identify every Sales Sprint in the system that is currently marked as `Active` and enabled for `Active Campaign`. These IDs are stored in `activeSalesSprintIds` for comparison.
+### 2. Global Active State Check
+It uses a COQL query to build a list of all `Sales_Sprints` IDs where `Sales_Sprint_Active` is 'Yes' and `Send_to_Active_Campaign` is true.
 
-### 3. Validation Loop & Collection
-For every distributor linked to the current record, the script:
-1. Retrieves all Sales Sprints associated with that specific distributor via the `Related_Sales_Sprints_2` related list.
-2. Uses the `.intersect()` method to find matching IDs between the distributor's sprints and the global active sprints.
-3. **New Logic:** Appends the result of each intersection into a master `intersectList`.
+### 3. Conflict Detection Loop
+For every distributor linked to the current sprint, the script:
+1. Retrieves all sprints linked to that specific distributor.
+2. Intersects that distributor's sprints with the global list of active sprints.
+3. Converts the resulting list of conflicting IDs to text and adds it to `intersectList`.
+
+### 4. Conflict Reporting
+The script attempts to build a human-readable string (`conflictMessage`) by iterating through the distinct results in the `intersectList` and matching them back to distributor names.
 
 ## Developer Notes
 
 > [!CAUTION]
-> **Hardcoded ID Regression:** The previous fix for dynamic `recordId` retrieval has been overwritten. Line 9 now contains a hardcoded ID `520877000208751093`, which will cause the validation rule to always target a specific record regardless of where it is triggered.
+> **Hardcoded ID Regression:** The dynamic `recordId` retrieval is still being overwritten by a hardcoded ID `520877000208751093` on line 9. This renders the validation rule non-functional for any record other than the one specified.
 
 > [!CAUTION]
-> **Critical Logic Flaw (Collection):** The check `if(intersectList.size() > 0)` is logically flawed. The script adds the result of `.intersect()` to the list for *every* distributor checked. Even if the intersection is empty (no conflict), an empty list object is still added to `intersectList`. Consequently, if a Sales Sprint has even one related distributor, `intersectList.size()` will be greater than 0, causing the validation to trigger an error even when no actual conflict exists.
+> **Broken Validation Logic:** The check `if(intersectList.distinct().size() > 0)` is fundamentally flawed. 
+> 1. Even if no conflict is found, `salesSprintIntersect.toText()` returns an empty list string (e.g., `[]`).
+> 2. This empty string is added to `intersectList`.
+> 3. Therefore, `intersectList.distinct().size()` will be at least 1 if there is at least one distributor, triggering a false-positive conflict error every time.
 
-> [!TIP]
-> **Scoping Improved:** The script now correctly aggregates results to be checked outside of the distributor loop, addressing the previous "Last Distributor Only" bug, though the implementation of the collection check needs refinement.
+> [!CAUTION]
+> **Type Mismatch & Logic Error in Message Builder:** 
+> - The script attempts to build a message using `if(rec.get("Sales_Campaigns_2").get("id") = id)`. 
+> - The `id` variable here is a string representation of a list (e.g., `"[520877...]"`) produced by `.toText()`, while the record ID is a Long/String. These will never match.
+> - Furthermore, `=` is the assignment operator in Deluge; equality comparison requires `==`.
 
 ## Change Log
 - **2026-03-20T12:22:15.384Z:** Initial creation of documentation. Logic identified as a validation rule for distributor-campaign constraints.
@@ -80,3 +89,4 @@ For every distributor linked to the current record, the script:
 - **2026-03-20T13:51:16.768Z:** Minor text update to the error message string. The prefix was changed from "Conflict with: " to "Conflict with Sales Sprint (ID): ". No functional logic or bug fixes were applied in this revision; hardcoded IDs and scoping issues persist.
 - **2026-03-20T14:01:36.169Z:** **Critical Bug Fix:** Removed the hardcoded `recordId` and replaced it with dynamic retrieval from `crmAPIRequest`. Cleaned up redundant code inside the active sprint loop. The scoping bug (validating only the last distributor) remains unresolved and requires architectural correction in a future update.
 - **2026-03-20T14:25:18.159Z:** **Logic and Regression Update:** Re-introduced a hardcoded `recordId`. Modified the validation logic to use a collection list (`intersectList`) to attempt to solve the loop scoping issue. Introduced a new logical bug where the validation blocks any record with a distributor because it counts iterations rather than conflict counts.
+- **2026-03-20T14:47:13.537Z:** **Reporting Logic Update:** Modified the loop to use `.toText()` when adding to the intersect list. Added a new nested loop intended to resolve Distributor names for the conflict message. Introduced several critical syntax and logic errors, including an invalid equality operator (`=`) and a type mismatch between stringified lists and IDs that prevents the conflict message from populating correctly while still triggering a false-positive validation error.
