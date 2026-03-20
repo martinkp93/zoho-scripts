@@ -2,12 +2,9 @@ map validation_rule.ownerProtection(String crmAPIRequest)
 {
 // Initialise a map to hold the response (success or error)
 response = Map();
-// Get the record
-// crmAPIRequest = {"file_content":null,"headers":null,"auth_type":null,"method":null,"user_info":{"zgid":20087400242,"org_info":{"name":"Cordulus","id":20087400242,"time_zone":"Europe/Paris"},"country":null,"time_format":"hh:mm a","name":"Rihards Savickis","id":520877000338075001,"time_zone":"Europe/Berlin","email":"rs@cordulus.com","zuid":"20112315439"},"record":{"Owner":"{\"full_name\":\"Cordulus Admin\",\"name\":\"Cordulus Admin\",\"id\":\"520877000000180021\"}","Email":"eortega@aigues-asg.es","Description":"","Meta_Lead_ID":"","Reports_To":"","Number_Of_Chats":"","Visitor_Score":"","Other_Phone":"","Twitter":"","Average_Time_Spent_Minutes":"","User_Type":"Viewer","First_Name":"Enric","Asst_Phone":"","Record_Image":"","Department":"","Skype_ID":"","Assistant":"","Phone":"","Currency":"","Schlechtwetter_Recipient":"false","Marketing_Consent":"false","Account_Name":"{\"name\":\"Aigues del Segarra Garrigues SA\",\"id\":\"520877000184748063\"}","Email_Opt_Out":"false","Reporting_To":"","Kanisa_User_ID":"","Date_of_Birth":"","Price_list":"","First_Visited_URL":"","Days_Visited":"","Credentials_Active":"false","Title":"","Mobile":"","Home_Phone":"","Marketing_Email":"","First_Visited_Time":"","User_Status":"Active","API_Key_Active":"false","Last_Name":"Ortega","Referrer":"","Last_Visited_Time":"","Fax":"","Secondary_Email":""},"params":{},"body":null};
-
 entityMap = crmAPIRequest.toMap().get("record");
 
-
+// If contactId is null, the contact is in the process of being created
 contactId = entityMap.get("id");
 if(contactId != null)
 {
