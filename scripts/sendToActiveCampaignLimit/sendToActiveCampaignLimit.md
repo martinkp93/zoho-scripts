@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001381060"
 Name: validation_rule.sendToActiveCampaignLimit
-Revision Timestamp: 2026-03-20T13:51:16.768Z
+Revision Timestamp: 2026-03-20T14:01:36.169Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -31,7 +31,8 @@ This script orchestrates the following internal functions and external services:
 ```mermaid
 graph TD
     Start(["Start: Validation Rule Trigger"]) --> Parse["Parse crmAPIRequest"]
-    Parse --> GetDistributors["Get Related Distributors for this Sprint"]
+    Parse --> GetID["Extract dynamic recordId from Map"]
+    GetID --> GetDistributors["Get Related Distributors for this Sprint"]
     GetDistributors --> COQL["COQL Query: Find all Active Sprints (Global)"]
     COQL --> LoopDistributors["Loop: For Each Related Distributor"]
     LoopDistributors --> GetDistributorSprints["Get all Sprints for this Distributor"]
@@ -60,20 +61,18 @@ For every distributor linked to the current record, the script:
 
 ## Developer Notes
 
-> [!CAUTION]
-> **Hardcoded ID Bug:** The script still contains a hardcoded ID `recordId = 520877000208751093;`. This bypasses the dynamic `crmAPIRequest` and will cause the validation to fail or point to the wrong record in production. This must be changed to `recordId = recordMap.get("id");`.
-
-> [!CAUTION]
-> **Logic Scope Issue:** The check `if(salesSprintIntersect.size() > 0)` is located *outside* the distributor loop. Because `salesSprintIntersect` is overwritten in every iteration of the loop, the validation rule only checks the **very last distributor** processed. Conflicts for previous distributors in the list are ignored.
-
-> [!IMPORTANT]
-> **User Experience Change:** The code that matched conflicting IDs back to Record Names (`alreadyActiveList`) remains commented out. The validation error message returns raw Record IDs to the user.
-
 > [!TIP]
-> This script returns a specific Map format `{"status": "error", "message": "..."}` which is required for Zoho CRM Validation Rules to display custom error messages directly on the record UI.
+> **Dynamic ID Fixed:** The previously identified bug where the `recordId` was hardcoded has been resolved. The script now correctly extracts the `recordId` from the `crmAPIRequest` payload, making it safe for production use across different records.
+
+> [!CAUTION]
+> **Logic Scope Issue (Persistent):** The check `if(salesSprintIntersect.size() > 0)` remains located *outside* the distributor loop. Because `salesSprintIntersect` is overwritten in every iteration of the loop, the validation rule only evaluates the status of the **very last distributor** in the related list. If the first distributor has a conflict but the last one does not, the validation will incorrectly pass.
+
+> [!NOTE]
+> **Code Cleanup:** Redundant list and map initializations (specifically the `list` and `map` variables inside the global active sprint loop) have been removed to improve readability and performance.
 
 ## Change Log
 - **2026-03-20T12:22:15.384Z:** Initial creation of documentation. Logic identified as a validation rule for distributor-campaign constraints.
 - **2026-03-20T13:48:48.743Z:** Updated script to handle multiple distributors per Sales Sprint. Switched from single-account validation to a nested loop checking all linked distributors. Refined error message to return names of conflicting sprints. Added warnings regarding hardcoded IDs and loop scoping.
 - **2026-03-20T13:50:45.491Z:** Logic simplification update. The mapping of Sprint IDs to Sprint Names for the error message has been removed/commented out. The error message now returns raw IDs. The "Last Distributor Only" logic bug remains present.
 - **2026-03-20T13:51:16.768Z:** Minor text update to the error message string. The prefix was changed from "Conflict with: " to "Conflict with Sales Sprint (ID): ". No functional logic or bug fixes were applied in this revision; hardcoded IDs and scoping issues persist.
+- **2026-03-20T14:01:36.169Z:** **Critical Bug Fix:** Removed the hardcoded `recordId` and replaced it with dynamic retrieval from `crmAPIRequest`. Cleaned up redundant code inside the active sprint loop. The scoping bug (validating only the last distributor) remains unresolved and requires architectural correction in a future update.
