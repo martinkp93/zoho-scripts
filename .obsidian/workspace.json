@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Connectors/Populace/delugePopulaceConnector.md",
+                "file": "Colleague Setup Guide - DeluluDocu & GitHub Sync.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugePopulaceConnector"
+              "title": "Colleague Setup Guide - DeluluDocu & GitHub Sync"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Connectors/Populace/delugePopulaceConnector.md",
+                "file": "Colleague Setup Guide - DeluluDocu & GitHub Sync.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for delugePopulaceConnector"
+              "title": "Backlinks for Colleague Setup Guide - DeluluDocu & GitHub Sync"
             }
           },
           {
@@ -193,8 +193,10 @@
       "bases:Create new base": false
     }
   },
-  "active": "882f48ff16c62c62",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Connectors/Populace/delugePopulaceConnector.md",
+    "Colleague Setup Guide - DeluluDocu & GitHub Sync.md",
     "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Account)/delugeWAT02.md",
     "scripts/delugeWeatherStationQuantityUpdate/delugeWeatherStationQuantityUpdate.ds",
@@ -228,8 +230,6 @@
     "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker/delugeTieredDiscountsHandler.md",
     "Watchtower/Duplicate Zoho Desk Blueprint/delugeDuplicateBlueprint.md",
     "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
-    "Validation Rules/Account Validation (moving Contact to another Account)/ownerProtection.md",
-    "Validation Rules/Account Validation (on moving Contact to another Account)/accountvalidation.md",
-    "Revenue and Finance/Conversion Pricing/Sales Sprint Pricing Handler/delugeSalesSprintPricingHandler.md"
+    "Validation Rules/Account Validation (moving Contact to another Account)/ownerProtection.md"
   ]
 }
