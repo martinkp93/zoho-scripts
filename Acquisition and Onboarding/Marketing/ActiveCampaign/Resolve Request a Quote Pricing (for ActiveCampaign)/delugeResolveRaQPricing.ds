@@ -179,7 +179,7 @@ try
 		totalSavingsMap.put("totalSavings",priceListCurrency + " " + totalSavings);
 		prices.put("salesSprint",salesSprintMap);
 		prices.put("priceList",priceListMap);
-		prices.put("totalSavings",totalSavingsMap);
+		prices.put("savings",totalSavingsMap);
 	}
 	// info prices;
 	return {"success":true,"data":prices};
