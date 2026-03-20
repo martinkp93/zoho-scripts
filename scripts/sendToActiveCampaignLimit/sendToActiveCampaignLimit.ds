@@ -55,15 +55,33 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 		}
 		
 		salesSprintIntersect = activeSalesSprintIds.intersect(relatedSalesSprintIds);
-		intersectList.add(salesSprintIntersect);
+		intersectList.add(salesSprintIntersect.toText());
 		info salesSprintIntersect;
 	
 	}
 	info intersectList;
-	if(intersectList.size() > 0)
+	info intersectList.distinct().size();
+	conflictMessage = "Conflict: ";
+	for each id in intersectList.distinct()
+	{
+		for each rec in relatedDistributorAccounts
+		{
+			if(rec.get("Sales_Campaigns_2").get("id") = id)
+			{
+				distName = rec.get("Related_Distributors_2").get("name");
+				conflict = distName + " (" + id + ")" + " | ";
+				conflictMessage = conflictMessage + conflict;
+
+			}
+		}
+	}
+
+	info conflictMessage;
+	
+	if(intersectList.distinct().size() > 0)
 		{
 			response.put("status","error");
-			response.put("message","Conflict with Sales Sprint (ID): " + salesSprintIntersect);
+			response.put("message","Conflict with Sales Sprints: " + conflictMessage);
 			return response;
 		} 
 		response.put("status","success");
