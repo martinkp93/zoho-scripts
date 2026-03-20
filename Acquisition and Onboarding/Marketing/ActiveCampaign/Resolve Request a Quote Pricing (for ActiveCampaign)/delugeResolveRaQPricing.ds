@@ -17,6 +17,7 @@ try
 	prices = Map();
 	salesSprintMap = Map();
 	priceListMap = Map();
+	totalSavingsMap = Map();
 	productsMap = Map();
 	rows = Map();
 	// 1. Get Price List for Distributor
@@ -135,22 +136,50 @@ try
 			continue;
 		}
 	}
+	subPriceYear1 = ifnull(initialPrice,priceListPrice);
+	subPriceYear2 = ifnull(firstRenewalPrice,priceListPrice);
+	startupPrice = ifnull(startupPrice,priceListStartupPrice);
+	totalSavings = 0;
 	// 7. Put the prices together	
 	if(sprintType != null)
 	{
-		salesSprintMap.put("subPriceYear1",priceListCurrency + " " + ifnull(initialPrice,priceListPrice));
+		// Resolve Total Savings
+		periods = accrualPeriod.toLong() / 12;
+		if(periods == 1)
+		{
+			startupPriceSavings = priceListStartupPrice - startupPrice;
+			subscriptionPriceSavings = priceListPrice - subPriceYear1;
+			totalSavings = startupPriceSavings + subscriptionPriceSavings;
+		}
+		else if(periods == 2)
+		{
+			startupPriceSavings = priceListStartupPrice - startupPrice;
+			subscriptionPriceSavings = (periods * priceListPrice).toLong() - (subPriceYear1 + subPriceYear2).toLong();
+			totalSavings = startupPriceSavings + subscriptionPriceSavings;
+		}
+		else
+		{
+			errorMsg = "Critical error in delugeResolveRaQPricing: Sales Sprint has invalid Accrual Period. Cannot resolve pricing.";
+			info errorMsg;
+			standalone.delugeSendErrorAlert(functionName,payloadForCatch.toString(),errorMsg);
+			return {"success":false,"error_message":errorMsg};
+		}
+		// Put all prices into the salesSprint map
+		salesSprintMap.put("subPriceYear1",priceListCurrency + " " + subPriceYear1);
 		if(sprintType == "two for one")
 		{
-			salesSprintMap.put("subPriceYear2",priceListCurrency + " " + ifnull(firstRenewalPrice,priceListPrice));
+			salesSprintMap.put("subPriceYear2",priceListCurrency + " " + subPriceYear2);
 		}
-		salesSprintMap.put("startupPrice",priceListCurrency + " " + ifnull(startupPrice,priceListStartupPrice));
+		salesSprintMap.put("startupPrice",priceListCurrency + " " + startupPrice);
 	}
 	if(validPricing)
 	{
 		priceListMap.put("subPrice",priceListCurrency + " " + priceListPrice);
 		priceListMap.put("startupPrice",priceListCurrency + " " + priceListStartupPrice);
+		totalSavingsMap.put("totalSavings",priceListCurrency + " " + totalSavings);
 		prices.put("salesSprint",salesSprintMap);
 		prices.put("priceList",priceListMap);
+		prices.put("totalSavings",totalSavingsMap);
 	}
 	// info prices;
 	return {"success":true,"data":prices};
