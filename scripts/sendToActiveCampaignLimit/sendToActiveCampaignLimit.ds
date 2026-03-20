@@ -63,7 +63,14 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 		info salesSprintIntersect;
 	
 	}
-
+	
+	if(salesSprintIntersect.size() > 0)
+		{
+			response.put("status","error");
+			response.put("message","Conflict with: " + salesSprintIntersect);
+			return response;
+		} 
+/*
 	alreadyActiveList = List();
 		for each id in salesSprintIntersect
 		{
@@ -83,7 +90,7 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 			response.put("message","Conflict with: " + alreadyActiveList);
 			return response;
 		} 
-			
+			*/
 		response.put("status","success");
 		return response;
 
