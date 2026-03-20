@@ -4,21 +4,95 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 	// 1. Open entityMap and get "id" (the Sales Sprint's ID)
 	entityMap = crmAPIRequest.toMap();
 	recordMap = entityMap.get("record");
-	info entityMap;
-	/*
-	accountId = recordMap.get("id");
-	info "1. Current Account ID: " + accountId;
-	relatedSprints = zoho.crm.getRelatedRecords("Related_Sales_Sprints_2","Accounts",accountId);
-	// Loop through to confirm we can read the IDs
-	for each  sprint in relatedSprints
-	{
-		sprintId = sprint.get("id");
-		info "   -> Found Sprint ID: " + sprintId;
-	}
-	response = Map();
-	response.put("status","success");
-	return response;
+	// recordId = recordMap.get("id");
+	recordId = 520877000208751093;
+	relatedDistributorAccounts = zoho.crm.getRelatedRecords("Related_Distributor_Accounts", "Sales_Sprints", recordId);
+	info relatedDistributorAccounts;
+	
+	
+	// 3. Get All Distributors Active Sales Sprints
+	activeSalesSprints = zoho.crm.searchRecords("Sales_Sprints","((Sales_Sprint_Active:equals:Yes) AND (Send_to_Active_Campaign:equals:true))");
+	queryMap = Map();
+	queryMap.put("select_query","select id, Name, Sales_Sprint_Active, Send_to_Active_Campaign from Sales_Sprints where Sales_Sprint_Active = 'Yes' and Send_to_Active_Campaign = true");
+	response = invokeurl
+	[
+		url :"https://www.zohoapis.eu/crm/v2/coql"
+		type :POST
+		parameters:queryMap.toString()
+		connection:"zohocrmconnection"
+	];
+	activeSalesSprints = response.get("data");
+	info activeSalesSprints;
+	activeSalesSprintIds = List();
 
+	list = list();
+	for each activeSalesSprint in activeSalesSprints
+	{
+		activeSalesSprintId = activeSalesSprint.get("id");
+		activeSalesSprintName = activeSalesSprint.get("Name");
+		map = Map();
+		map.put(activeSalesSprintId,activeSalesSprintName);
+		list.add(map);
+		activeSalesSprintIds.add(activeSalesSprintId);
+	}
+	info list;
+	info activeSalesSprintIds;
+	
+	distributorList = List();
+	distributorMap = Map();
+	
+	for each relatedDistributor in relatedDistributorAccounts
+	{
+		relatedSalesSprintIds = List();
+		
+		distributorName = relatedDistributor.get("Related_Distributors_2").get("name");
+		distributorId = relatedDistributor.get("Related_Distributors_2").get("id");
+		distributorMap.put("name",distributorName);
+		distributorMap.put("id",distributorId);
+		
+		// 2. Get Distributor's Related Sales Sprints
+		relatedSalesSprints = zoho.crm.getRelatedRecords("Related_Sales_Sprints_2","Accounts",distributorId);
+		
+		for each relatedSalesSprint in relatedSalesSprints
+		{
+			relatedSalesSprintId = relatedSalesSprint.get("Sales_Campaigns_2").get("id");
+			relatedSalesSprintIds.add(relatedSalesSprintId);
+		}
+		
+		salesSprintIntersect = activeSalesSprintIds.intersect(relatedSalesSprintIds);
+		info salesSprintIntersect;
+	
+	}
+
+	alreadyActiveList = List();
+		for each id in salesSprintIntersect
+		{
+			alreadyActiveMap = Map();
+			for each active in activeSalesSprints
+			{
+				if(id == active.get("id"))
+				{
+					name = active.get("Name");
+					alreadyActiveList.add(name);
+				}
+			}
+		}
+		if(alreadyActiveList.size() > 0)
+		{
+			response.put("status","error");
+			response.put("message","Conflict with: " + alreadyActiveList);
+			return response;
+		} 
+			
+		response.put("status","success");
+		return response;
+
+
+		
+	
+
+
+	/*
 // 2. Get Related Distributor Accounts (related list)
 // 2. For each distributor in "Related Distributor Accounts", get distributorID
 // 3. For each distributorId, get Related Sales Sprints (Step 2 in Resolve RaQ Pricing script)
@@ -76,5 +150,4 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 	// 5. Get Sales Sprint prices for Products and put product ids into a map
 	if(salesSprint != null)
 	*/
-	return"";
 }
