@@ -64,6 +64,7 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 	conflictMessage = "Conflict: ";
 	for each id in intersectList.distinct()
 	{
+		// Type mismatch is fixed. "id" is in a stringified list but is fetched as a long/string.
 		for each rec in relatedDistributorAccounts
 		{
 			if(rec.get("Sales_Campaigns_2").get("id") == id)
