@@ -67,7 +67,7 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 	if(salesSprintIntersect.size() > 0)
 		{
 			response.put("status","error");
-			response.put("message","Conflict with: " + salesSprintIntersect);
+			response.put("message","Conflict with Sales Sprint (ID): " + salesSprintIntersect);
 			return response;
 		} 
 /*
