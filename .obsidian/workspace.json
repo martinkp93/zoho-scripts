@@ -195,6 +195,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
+    "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.ds",
+    "scripts/sendToActiveCampaignLimit",
     "Connectors/Populace/delugePopulaceConnector.md",
     "Colleague Setup Guide - DeluluDocu & GitHub Sync.md",
     "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
@@ -216,8 +219,6 @@
     "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)",
     "Support/Subscription Cancellation/Scheduled Cancellation Removed/delugeCancellationScheduledRemoved.md",
     "Support/Subscription Cancellation/Partial Cancellation/delugePartialCancellation.md",
-    "Support/Subscription Cancellation/Partial Cancellation/delugePartialCancellation.ds",
-    "Support/Subscription Cancellation/Partial Cancellation",
     "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md",
     "scripts/Deluge_ Partial Cancellation/Deluge_ Partial Cancellation.md",
     "Revenue and Finance/Conversion Pricing/Subscription Cycle Handler/delugeSubscriptionCycleHandler.md",
@@ -229,7 +230,6 @@
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
     "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker/delugeTieredDiscountsHandler.md",
     "Watchtower/Duplicate Zoho Desk Blueprint/delugeDuplicateBlueprint.md",
-    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md",
-    "Validation Rules/Account Validation (moving Contact to another Account)/ownerProtection.md"
+    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md"
   ]
 }
