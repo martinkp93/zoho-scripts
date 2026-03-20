@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001373003"
 Name: ownerProtection
-Revision Timestamp: 2026-03-19T20:13:15.887Z
+Revision Timestamp: 2026-03-20T08:21:17.342Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -30,10 +30,14 @@ This script orchestrates the following internal functions and external services:
 ```mermaid
 graph TD
     Start(["Start (Validation Trigger)"]) --> Parse["Parse crmAPIRequest"]
-    Parse --> FetchCurrent["Fetch Current Contact Record"]
+    Parse --> CheckID{"Is Contact ID Null?"}
+    
+    CheckID -- "Yes (Creation)" --> Success(["Return Success"])
+    CheckID -- "No (Edit)" --> FetchCurrent["Fetch Current Contact Record"]
+    
     FetchCurrent --> CompareAccounts{"Is Account Changing?"}
     
-    CompareAccounts -- "No" --> Success(["Success"])
+    CompareAccounts -- "No" --> Success
     
     CompareAccounts -- "Yes" --> FetchTarget["Fetch Target Account Details"]
     FetchTarget --> CheckWorkspace{"Has Workspace ID?"}
@@ -44,24 +48,26 @@ graph TD
     CheckOwner -- "Yes" --> ErrorOwner["Error: Cannot move Owner"]
     CheckOwner -- "No" --> Success
     
-    ErrorWS --> End(["Return Error"])
+    ErrorWS --> End(["Return Error Map"])
     ErrorOwner --> End
-    Success --> EndOK(["Return Success"])
+    Success --> EndOK(["Return Success Map"])
 ```
 
 ## Core Logic Sections
 
 ### 1. Request Parsing & Context Initialization
-The script extracts the record ID and the submitted field values (like `User_Type` and the new `Account_Name`) from the `crmAPIRequest`. It then performs a lookup on the existing Contact record to determine the original `existingAccountId` for comparison.
+The script extracts the record ID and the submitted field values from the `crmAPIRequest`. It now includes a safety check to see if the `contactId` is present.
 
-### 2. Account Change Detection
-The validation logic only executes if the `existingAccountId` (from the database) differs from the `targetAccountId` (the value being saved). If the Account remains the same, the script returns "success" immediately.
+### 2. Creation vs. Edit Handling
+If `contactId` is null, the script assumes the record is being created for the first time. Since there is no "previous" account to compare against in a move logic context, the validation immediately returns "success".
 
-### 3. Destination Validation
-If a move is detected, the script fetches the Target Account. It enforces a strict requirement that the destination Account must have a value in the `Kanisa_Farm_ID` field. This prevents Contacts from being moved into "unprovisioned" or orphaned accounts.
+### 3. Account Change Detection
+For existing records, the script fetches the current database state of the Contact. It compares the `existingAccountId` from the database with the `targetAccountId` provided in the update request. If the Account remains the same, the script exits with success.
 
-### 4. Role-Based Protection
-The script checks the `User_Type` of the Contact. If the user is flagged as an "Owner", the move is blocked. This is a security measure to ensure account ownership structures remain intact within the Kanisa Farm ecosystem.
+### 4. Destination & Role Validation
+If a move is detected:
+- **Workspace Validation:** The script fetches the Target Account and ensures it has a `Kanisa_Farm_ID`.
+- **Role Protection:** The script checks if the `User_Type` is "Owner". Owners are restricted from changing accounts to prevent data/ownership integrity issues.
 
 ## Developer Notes
 
@@ -69,10 +75,11 @@ The script checks the `User_Type` of the Contact. If the user is flagged as an "
 > This script performs up to two `getRecordById` calls. While efficient for single record edits, ensure that bulk updates (via API) do not hit secondary governor limits if multiple validation rules are running concurrently.
 
 > [!TIP]
-> This function specifically targets the "Populace" user logic. If a user needs to be moved despite being an "Owner", their `User_Type` must be downgraded before the Account change is attempted.
+> The updated logic now includes a null check for the Contact ID. This ensures the script doesn't fail when a new Contact is being created (where the ID is not yet assigned), effectively bypassing the "move" validation during initial creation.
 
 > [!CAUTION]
 > If the `Account_Name` field is empty on the Contact (null), the `.get("id")` method on the map might throw an error. Current implementation assumes Contacts are always associated with an Account.
 
 ## Change Log
 - **2026-03-19T20:13:15.887Z:** Initial creation of documentation via DeluluDocu. Enforced Owner protection and Target Account Workspace ID validation.
+- **2026-03-20T08:21:17.342Z:** Added a null check for `contactId`. This prevents script errors during the creation of a new Contact, where the record ID does not yet exist in the `crmAPIRequest` payload.
