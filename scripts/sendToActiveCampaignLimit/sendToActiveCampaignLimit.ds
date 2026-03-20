@@ -59,12 +59,14 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 		info salesSprintIntersect;
 	
 	}
+	info intersectList;
+	info intersectList.distinct().size();
 	conflictMessage = "Conflict: ";
 	for each id in intersectList.distinct()
 	{
 		for each rec in relatedDistributorAccounts
 		{
-			if(rec.get("Sales_Campaigns_2").get("id") = id)
+			if(rec.get("Sales_Campaigns_2").get("id") == id)
 			{
 				distName = rec.get("Related_Distributors_2").get("name");
 				conflict = distName + " (" + id + ")" + " | ";
@@ -73,6 +75,7 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 			}
 		}
 	}
+
 	
 	if(intersectList.distinct().size() > 0)
 		{
