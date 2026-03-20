@@ -4,8 +4,8 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 	// 1. Open entityMap and get "id" (the Sales Sprint's ID)
 	entityMap = crmAPIRequest.toMap();
 	recordMap = entityMap.get("record");
-	// recordId = recordMap.get("id");
-	recordId = 520877000208751093;
+	recordId = recordMap.get("id");
+	// recordId = 520877000208751093;
 	relatedDistributorAccounts = zoho.crm.getRelatedRecords("Related_Distributor_Accounts", "Sales_Sprints", recordId);
 	info relatedDistributorAccounts;
 	
@@ -25,17 +25,12 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 	info activeSalesSprints;
 	activeSalesSprintIds = List();
 
-	list = list();
 	for each activeSalesSprint in activeSalesSprints
 	{
 		activeSalesSprintId = activeSalesSprint.get("id");
 		activeSalesSprintName = activeSalesSprint.get("Name");
-		map = Map();
-		map.put(activeSalesSprintId,activeSalesSprintName);
-		list.add(map);
 		activeSalesSprintIds.add(activeSalesSprintId);
 	}
-	info list;
 	info activeSalesSprintIds;
 	
 	distributorList = List();
@@ -70,27 +65,6 @@ map validation_rule.sendToActiveCampaignLimit(String crmAPIRequest)
 			response.put("message","Conflict with Sales Sprint (ID): " + salesSprintIntersect);
 			return response;
 		} 
-/*
-	alreadyActiveList = List();
-		for each id in salesSprintIntersect
-		{
-			alreadyActiveMap = Map();
-			for each active in activeSalesSprints
-			{
-				if(id == active.get("id"))
-				{
-					name = active.get("Name");
-					alreadyActiveList.add(name);
-				}
-			}
-		}
-		if(alreadyActiveList.size() > 0)
-		{
-			response.put("status","error");
-			response.put("message","Conflict with: " + alreadyActiveList);
-			return response;
-		} 
-			*/
 		response.put("status","success");
 		return response;
 
