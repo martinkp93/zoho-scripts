@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001326061"
 Name: delugeLeadSheetHandler
-Revision Timestamp: 2026-03-20T09:42:22.181Z
+Revision Timestamp: 2026-03-24T10:26:48.000Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -102,5 +102,6 @@ Once the spreadsheet is updated, the script sends a notification. It parses a co
 > The "Region" logic is hardcoded for specific distributors (`Hankkija Oy`, `Danish Agro`, `Baltic Agro Estonia`). If new distributors require regional filtering based on UTM Ad Set names, they must be added to the `regionColumnDistributors` list.
 
 ## Change Log
+- **2026-03-24T10:26:48.000Z:** General code audit and documentation maintenance. Verified data preparation steps and cross-platform routing logic. No functional changes.
 - **2026-03-20T09:42:22.181Z:** Added explicit validation for empty spreadsheet URL to prevent runtime errors and improved logging of the push response.
 - **2026-03-19T15:58:37.329Z:** Initial creation of documentation via DeluluDocu.
