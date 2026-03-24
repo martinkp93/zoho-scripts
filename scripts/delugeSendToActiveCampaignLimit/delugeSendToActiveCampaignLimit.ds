@@ -3,7 +3,7 @@ string standalone.delugeSendToActiveCampaignLimit(String payload)
 	for each name in payload
 	{
 		response = zoho.crm.searchRecords("Accounts", "(Account_Name:equals:" + name +")");
-		distributorId = response.get("id");
+		distributorId = response.get(0).get("id");
 		
 		info distributorId;
 	}
