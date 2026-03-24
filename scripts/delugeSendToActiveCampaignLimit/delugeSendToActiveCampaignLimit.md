@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001393007"
 Name: delugeSendToActiveCampaignLimit
-Revision Timestamp: 2026-03-24T14:18:26.815Z
+Revision Timestamp: 2026-03-24T14:22:02.736Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -9,65 +9,78 @@ Status: Functional
 ---
 
 ## Overview
-The `delugeSendToActiveCampaignLimit` function is a validation utility that iterates through a payload to verify the existence of Account records in Zoho CRM. In its latest iteration, the script correctly handles the list response from CRM search queries to extract and log the specific CRM Record ID (`distributorId`) for each account found.
+The `delugeSendToActiveCampaignLimit` function is a complex validation utility designed to identify intersections between specific Accounts (distributors) and currently active Sales Sprints. It processes a payload of names, resolves them to CRM IDs, fetches globally active Sales Sprints via COQL, and determines which distributors are associated with those active sprints.
 
 ## Technical Contract
-- **Input:** `String payload` (Expected to be an iterable collection or a string that can be parsed as one).
+- **Input:** `String payload` (Expected to be an iterable collection of Account names).
 - **Output:** `String` (The original payload returned back to the caller).
 - **Primary Entities:** 
     - Zoho CRM (Accounts Module)
+    - Zoho CRM (Sales_Sprints Module)
+    - COQL (CRM Object Query Language)
     - ActiveCampaign (Contextual destination)
-    - Zoho Standalone Functions (Environment)
 
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
 | Function / Service | Purpose | Criticality |
 | --- | --- | --- |
-| Zoho CRM (Accounts) | Searches for account records based on the names provided in the payload. | High |
+| Zoho CRM (Accounts) | Searches for account records based on names. | High |
+| Zoho CRM (COQL) | Fetches active Sales Sprints via `https://www.zohoapis.eu/crm/v2/coql`. | High |
+| Connection: `zohocrmconnection` | OAuth2 connection for COQL API execution. | High |
+| Zoho CRM (Related Records) | Retrieves "Related_Sales_Sprints_2" for specific Accounts. | High |
 
 ## Logic Flow
-The function iterates through the input, performs a CRM lookup, accesses the first record in the returned list, extracts the unique Record ID, and logs it.
+The function resolves Account names to IDs, queries the CRM for globally active Sales Sprints, then iterates through each Account to find where their related sprints overlap with the global active list.
 
 ```mermaid
 graph TD
-    Start["Start: Receive Payload"] --> LoopStart{"For each name in payload"}
-    LoopStart -- "Iteration" --> SearchCRM["zoho.crm.searchRecords('Accounts', ...)"]
-    SearchCRM --> GetID["distributorId = response.get(0).get('id')"]
-    GetID --> LogID["info distributorId"]
-    LogID --> LoopStart
-    LoopStart -- "Finished" --> ReturnPayload["Return original payload"]
+    Start["Start: Receive Payload"] --> ResolveDistributors["Iterate Payload: Resolve Account Names to IDs"]
+    ResolveDistributors --> COQLQuery["Execute COQL: Get Global Active Sales Sprints"]
+    COQLQuery --> MapActiveIDs["Map Active Sprint IDs to List"]
+    MapActiveIDs --> DistLoopStart{"For each resolved Distributor ID"}
+    DistLoopStart -- "Process" --> GetRelated["zoho.crm.getRelatedRecords('Related_Sales_Sprints_2')"]
+    GetRelated --> Intersect["Calculate Intersection (Active vs Related)"]
+    Intersect --> CheckSize{"Intersection > 0?"}
+    CheckSize -- "Yes" --> AddToList["Add to intersectList"]
+    CheckSize -- "No" --> DistLoopStart
+    AddToList --> DistLoopStart
+    DistLoopStart -- "Finished" --> ReturnPayload["Return original payload"]
     ReturnPayload --> End["End"]
 ```
 
 ## Core Logic Sections
 The script consists of the following logical components:
 
-### 1. Iterable Payload Processing
-The function treats the `payload` parameter as a collection. It enters a `for each` loop to process individual items (names) within the payload.
+### 1. Distributor Resolution
+The script loops through the input `payload`, performing a `zoho.crm.searchRecords` for each name. It builds a list of CRM Record IDs (`distributors`) for further processing.
 
-### 2. CRM Account Verification
-For every name extracted from the payload, the script executes a `zoho.crm.searchRecords` call against the **Accounts** module. It uses a criteria search to find records where the `Account_Name` exactly matches the provided name.
+### 2. Global Active Sprint Discovery (COQL)
+Instead of standard search, the script utilizes a COQL query to target the `Sales_Sprints` module. It specifically filters for records where `Sales_Sprint_Active` is 'Yes' and `Send_to_Active_Campaign` is true. This bypasses standard API search limitations for complex criteria.
 
-### 3. ID Extraction (List Handling)
-The script handles the `zoho.crm.searchRecords` response as a list. By using `.get(0)`, it targets the first matching record found in the CRM and retrieves its unique `id`. This value is assigned to `distributorId` and logged.
+### 3. Relationship Intersection Logic
+For every resolved distributor, the script:
+1.  Fetches their specific related sprints via `getRelatedRecords`.
+2.  Extracts the IDs of those related sprints.
+3.  Uses the `.intersect()` method to find common IDs between the global "Active" list and the distributor's "Related" list.
 
 ## Developer Notes
 
-> [!CAUTION]
-> The `payload` parameter is defined as a `String`. If a primitive string is passed instead of a list/collection, the `for each` loop may only execute once or fail depending on the caller's implementation. Ensure the calling script passes a list variable.
-
 > [!IMPORTANT]
-> This script performs a CRM search inside a loop. If the `payload` contains a large number of items, this will consume significant API tasks and may hit Zoho's execution timeout or statement limits.
+> This script uses an `invokeurl` call for COQL using the `zohocrmconnection`. Ensure this connection exists in the Zoho environment with the `ZohoCRM.coql.READ` scope.
+
+> [!CAUTION]
+> **Performance Warning:** The script now performs a `getRelatedRecords` call *inside* a loop for every distributor in the payload. If the payload contains 50 names, this will execute 50 additional API calls. This may lead to "Internal Limit Exceeded" errors in high-volume environments.
+
+> [!NOTE]
+> The COQL query targets `https://www.zohoapis.eu/crm/v2/coql`. If this script is deployed in a non-EU data center (e.g., .com or .in), the URL must be updated to match the regional API endpoint.
 
 > [!TIP]
-> The latest update fixed a bug where the script attempted to call `.get("id")` directly on a list object. The addition of `.get(0)` ensures the script correctly navigates the search results to find the record map before requesting the ID.
-
-> [!CAUTION]
-> While the script now correctly indexes the response, it does not yet check if the search result is empty. If no record is found, `.get(0)` will return null and the subsequent `.get("id")` may trigger a script error. A null check (e.g., `if(response.size() > 0)`) is recommended for production resilience.
+> While the script calculates the `intersectList`, it currently does not perform an action with this list (like updating a record or sending an email) before returning the payload. This logic appears to be a foundation for a future "Send to ActiveCampaign" trigger.
 
 ## Change Log
 - **2026-03-24T13:44:57.179Z:** Initial creation of documentation via DeluluDocu.
-- **2026-03-24T14:16:16.993Z:** Updated script logic to include a `for each` loop and `zoho.crm.searchRecords` integration. The function now validates account names against the CRM database instead of simply logging the raw payload.
-- **2026-03-24T14:17:58.763Z:** Updated logic to extract the specific CRM Record ID (`distributorId`) from the search response and log it, rather than logging the entire search result object.
-- **2026-03-24T14:18:26.815Z:** Corrected index handling for CRM search results. The script now properly accesses the first element of the returned list (`.get(0)`) to extract the record ID, resolving a bug where IDs were not being captured from the response list.
+- **2026-03-24T14:16:16.993Z:** Updated script logic to include a `for each` loop and `zoho.crm.searchRecords` integration.
+- **2026-03-24T14:17:58.763Z:** Updated logic to extract the specific CRM Record ID (`distributorId`) from the search response.
+- **2026-03-24T14:18:26.815Z:** Corrected index handling for CRM search results using `.get(0)`.
+- **2026-03-24T14:22:02.736Z:** Major update: Integrated COQL query to fetch active Sales Sprints and implemented intersection logic to validate distributors against active sprints. Added `invokeurl` dependency and related record processing.
