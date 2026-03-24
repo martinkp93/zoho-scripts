@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001393007"
 Name: delugeSendToActiveCampaignLimit
-Revision Timestamp: 2026-03-24T14:22:02.736Z
+Revision Timestamp: 2026-03-24T14:23:01.022Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -13,7 +13,7 @@ The `delugeSendToActiveCampaignLimit` function is a complex validation utility d
 
 ## Technical Contract
 - **Input:** `String payload` (Expected to be an iterable collection of Account names).
-- **Output:** `String` (The original payload returned back to the caller).
+- **Output:** `String` (The `intersectList` of Sprint IDs, cast to a string).
 - **Primary Entities:** 
     - Zoho CRM (Accounts Module)
     - Zoho CRM (Sales_Sprints Module)
@@ -45,7 +45,7 @@ graph TD
     CheckSize -- "Yes" --> AddToList["Add to intersectList"]
     CheckSize -- "No" --> DistLoopStart
     AddToList --> DistLoopStart
-    DistLoopStart -- "Finished" --> ReturnPayload["Return original payload"]
+    DistLoopStart -- "Finished" --> ReturnPayload["Return intersectList"]
     ReturnPayload --> End["End"]
 ```
 
@@ -70,13 +70,13 @@ For every resolved distributor, the script:
 > This script uses an `invokeurl` call for COQL using the `zohocrmconnection`. Ensure this connection exists in the Zoho environment with the `ZohoCRM.coql.READ` scope.
 
 > [!CAUTION]
-> **Performance Warning:** The script now performs a `getRelatedRecords` call *inside* a loop for every distributor in the payload. If the payload contains 50 names, this will execute 50 additional API calls. This may lead to "Internal Limit Exceeded" errors in high-volume environments.
+> **Performance Warning:** The script performs a `getRelatedRecords` call *inside* a loop for every distributor in the payload. If the payload contains 50 names, this will execute 50 additional API calls. This may lead to "Internal Limit Exceeded" errors in high-volume environments.
 
 > [!NOTE]
 > The COQL query targets `https://www.zohoapis.eu/crm/v2/coql`. If this script is deployed in a non-EU data center (e.g., .com or .in), the URL must be updated to match the regional API endpoint.
 
 > [!TIP]
-> While the script calculates the `intersectList`, it currently does not perform an action with this list (like updating a record or sending an email) before returning the payload. This logic appears to be a foundation for a future "Send to ActiveCampaign" trigger.
+> Debugging `info` statements (e.g., `distributorId`, `activeSalesSprints`) have been commented out to minimize execution log clutter and overhead in production environments.
 
 ## Change Log
 - **2026-03-24T13:44:57.179Z:** Initial creation of documentation via DeluluDocu.
@@ -84,3 +84,4 @@ For every resolved distributor, the script:
 - **2026-03-24T14:17:58.763Z:** Updated logic to extract the specific CRM Record ID (`distributorId`) from the search response.
 - **2026-03-24T14:18:26.815Z:** Corrected index handling for CRM search results using `.get(0)`.
 - **2026-03-24T14:22:02.736Z:** Major update: Integrated COQL query to fetch active Sales Sprints and implemented intersection logic to validate distributors against active sprints. Added `invokeurl` dependency and related record processing.
+- **2026-03-24T14:23:01.022Z:** Maintenance: Commented out several `info` debug statements throughout the script to clean up execution output while preserving core logic.
