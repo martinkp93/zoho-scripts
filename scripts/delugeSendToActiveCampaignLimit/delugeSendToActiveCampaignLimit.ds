@@ -3,8 +3,8 @@ string standalone.delugeSendToActiveCampaignLimit(String payload)
 	distributors = List();
 	for each name in payload
 	{
-		search = zoho.crm.searchRecords("Accounts", "((Account_Name:equals:" + name +") AND (Distributor_Type:equals:Farm Distributor))");
-		distributorId = search.get(0).get("id");
+		searchDistributors = zoho.crm.searchRecords("Accounts", "((Account_Name:equals:" + name +") AND (Distributor_Type:equals:Farm Distributor))");
+		distributorId = searchDistributors.get(0).get("id");
 		distributors.add(distributorId);
 		// info distributorId;
 	}
@@ -76,7 +76,7 @@ if(!uniqueConflicts.isEmpty())
 	}
 	response = Map();
 	response.put("status","error");
-	response.put("message","Conflict with Sales Sprints: " + conflictMessage);
+	response.put("message","Conflict with Sales Sprints: " + distributors);
 	
 	}
 	return response;
