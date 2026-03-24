@@ -1,0 +1,5 @@
+string standalone.delugeSendToActiveCampaignLimit(String payload)
+{
+	info payload;
+return payload;
+}
