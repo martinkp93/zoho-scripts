@@ -1,15 +1,16 @@
 ---
 Function ID: "157805000001393007"
 Name: delugeSendToActiveCampaignLimit
-Revision Timestamp: 2026-03-24T14:27:12.400Z
+Revision Timestamp: 2026-03-24T14:28:35.469Z
 Status: Functional
 ---
+
 **Postman Documentation:** [Link to API Collection Placeholder]
 
 ---
 
 ## Overview
-The `delugeSendToActiveCampaignLimit` function is a validation utility designed to identify intersections between specific Accounts (distributors) and currently active Sales Sprints. It processes a payload of names, resolves them to CRM IDs, fetches globally active Sales Sprints via COQL, and determines which distributors are associated with those active sprints. The latest update adds a validation layer that returns a structured error message if conflicts are detected.
+The `delugeSendToActiveCampaignLimit` function is a validation utility designed to identify intersections between specific Accounts (distributors) and currently active Sales Sprints. It processes a payload of names, resolves them to CRM IDs, fetches globally active Sales Sprints via COQL, and determines which distributors are associated with those active sprints. The latest update improves variable scoping and ensures the response object is correctly initialized before returning error states.
 
 ## Technical Contract
 - **Input:** `String payload` (Expected to be an iterable collection of Account names).
@@ -47,8 +48,9 @@ graph TD
     AddToList --> DistLoopStart
     DistLoopStart -- "Finished" --> CleanList["Clean List (Distinct & Remove Nulls)"]
     CleanList --> ConflictCheck{"Conflicts Found?"}
-    ConflictCheck -- "Yes" --> BuildConflictMsg["Loop through Conflicts: Build Error Message"]
-    ConflictCheck -- "No" --> ReturnResponse["Return Response Map"]
+    ConflictCheck -- "Yes" --> InitErrorMap["Initialize response = Map()"]
+    InitErrorMap --> BuildConflictMsg["Loop through Conflicts: Build Error Message"]
+    ConflictCheck -- "No" --> ReturnResponse["Return Response (COQL Search Map)"]
     BuildConflictMsg --> ReturnResponse
     ReturnResponse --> End["End"]
 ```
@@ -57,10 +59,10 @@ graph TD
 The script consists of the following logical components:
 
 ### 1. Distributor Resolution
-The script loops through the input `payload`, performing a `zoho.crm.searchRecords` for each name. It builds a list of CRM Record IDs (`distributors`) for further processing.
+The script loops through the input `payload`, performing a `zoho.crm.searchRecords` for each name. The results are stored in a temporary `search` variable to avoid overwriting the final return object.
 
 ### 2. Global Active Sprint Discovery (COQL)
-Utilizes a COQL query to target the `Sales_Sprints` module, filtering for records where `Sales_Sprint_Active` is 'Yes' and `Send_to_Active_Campaign` is true.
+Utilizes a COQL query to target the `Sales_Sprints` module, filtering for records where `Sales_Sprint_Active` is 'Yes' and `Send_to_Active_Campaign` is true. The result of the COQL call is stored in `search` and eventually assigned to `activeSalesSprints`.
 
 ### 3. Relationship Intersection Logic
 For every resolved distributor, the script:
@@ -68,7 +70,10 @@ For every resolved distributor, the script:
 2.  Uses the `.intersect()` method to find common IDs between the global "Active" list and the distributor's "Related" list.
 
 ### 4. Validation and Conflict Reporting
-The script evaluates the `intersectList`. If not empty, it iterates through the unique conflict IDs to find the corresponding distributor names from the last retrieved `relatedSalesSprints` set and updates the `response` map with an "error" status and a detailed string listing the conflicting entities.
+The script evaluates the `intersectList`. If conflicts exist:
+1.  The `response` variable is explicitly initialized as a new `Map()`.
+2.  It iterates through the unique conflict IDs to build a detailed string listing the conflicting entities.
+3.  The map is populated with an "error" status and the message.
 
 ## Developer Notes
 
@@ -82,7 +87,7 @@ The script evaluates the `intersectList`. If not empty, it iterates through the 
 > **Performance Warning:** The script performs a `getRelatedRecords` call *inside* a loop for every distributor in the payload. If the payload contains many names, this will execute multiple additional API calls, potentially hitting CRM limits.
 
 > [!TIP]
-> The function signature returns a `String`, but the script returns the `response` variable (which is a Map). Zoho Deluge will automatically serialize this Map to a JSON string upon return.
+> **Variable Scoping Fix:** The latest update renamed intermediate API response variables to `search`. This prevents the script from accidentally returning partial API data or trying to `put` error keys into a non-map object if the COQL call failed or returned unexpected types.
 
 ## Change Log
 - **2026-03-24T13:44:57.179Z:** Initial creation of documentation via DeluluDocu.
@@ -92,3 +97,4 @@ The script evaluates the `intersectList`. If not empty, it iterates through the 
 - **2026-03-24T14:22:02.736Z:** Major update: Integrated COQL query to fetch active Sales Sprints and implemented intersection logic to validate distributors against active sprints. Added `invokeurl` dependency and related record processing.
 - **2026-03-24T14:23:01.022Z:** Maintenance: Commented out several `info` debug statements throughout the script to clean up execution output while preserving core logic.
 - **2026-03-24T14:27:12.400Z:** Added Part B: Validation Logic. The script now performs a distinct check on conflicts and returns a structured "error" status map with a descriptive `conflictMessage` containing Distributor names and IDs if intersections are found.
+- **2026-03-24T14:28:35.469Z:** Bug fix and Refactor: Renamed intermediate API result variables from `response` to `search` to prevent variable collision. Explicitly initialized `response = Map()` within the validation block to ensure a clean error object is returned when conflicts are detected.
