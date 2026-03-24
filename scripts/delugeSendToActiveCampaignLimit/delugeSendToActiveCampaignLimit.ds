@@ -53,7 +53,30 @@ string standalone.delugeSendToActiveCampaignLimit(String payload)
 					intersectList.addAll(salesSprintIntersect);
 					}
 					}
+	// --- PART B: The Validation Logic ---
+// Clean the list of any potential nulls or empty strings just in case
+uniqueConflicts = intersectList.distinct();
+uniqueConflicts.remove("");
+info uniqueConflicts;
+if(!uniqueConflicts.isEmpty())
+{
+	conflictMessage = "Conflict: ";
+	for each  id in uniqueConflicts
+	{
+		for each  rec in relatedSalesSprints
+		{
+			// Use toString() to ensure matching types (String vs BigInt)
+			if(rec.get("Sales_Campaigns_2").get("id").toString() == id.toString())
+			{
+				distName = rec.get("Related_Distributors_2").get("name");
+				conflict = distName + " (" + id + ") | ";
+				conflictMessage = conflictMessage + conflict;
+			}
+		}
+	}
+	response.put("status","error");
+	response.put("message","Conflict with Sales Sprints: " + conflictMessage);
 	
-	
-return intersectList;
+	}
+	return response;
 }
