@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000000154001"
 Name: getVisits1
-Revision Timestamp: 2026-03-19T18:59:02.750Z
+Revision Timestamp: 2026-03-24T12:47:59.317Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -9,7 +9,7 @@ Status: Functional
 ---
 
 ## Overview
-The `getVisits1` function is a marketing attribution and synchronization script within the Cordulus ecosystem. It is triggered by a "Visit" record  (via automation when a web session is logged). Its primary role is to analyze a user's navigation history (Actions Performed), identify if a "Success" page was reached, extract UTM parameters for attribution, and then back-fill that data into both Zoho CRM "Conversions" records and the external ActiveCampaign marketing platform.
+The `getVisits1` function is a marketing attribution and synchronization script within the Cordulus ecosystem. It is triggered by a "Visit" record (via automation when a web session is logged). Its primary role is to analyze a user's navigation history (Actions Performed), identify if a "Success" page was reached, extract UTM parameters for attribution, and then back-fill that data into both Zoho CRM "Conversions" records and the external ActiveCampaign marketing platform.
 
 ## Technical Contract
 - **Input:** `Int visit_id`
@@ -83,8 +83,12 @@ If the contact is linked to ActiveCampaign (`ActiveCampaign_Contact_ID` is prese
 > [!CAUTION]
 > The attribution logic assumes that the `Actions_Performed` records are returned in an order that allows identifying the page visited *immediately before* the success page within the loop.
 
+> [!CAUTION]
+> Syntax Observation: The logic `if(utm_source = "fb" || ...)` uses a single `=` for comparison. While Deluge often interprets this as a comparison in `if` statements, it is best practice to use `==` to avoid unexpected assignment behavior.
+
 - **Edge Case:** If a user visits multiple "success" pages in one visit, the `conversion_url` might be overwritten or incorrectly captured depending on the order of the related records.
-- **Normalization:** Note the logic `if(utm_source = "fb" || ...)` uses a single `=` for assignment/comparison in some Deluge environments, but standard Deluge comparison should be `==`.
+- **Cleanup:** The latest revision removed several redundant `info` statements and commented-out code blocks to improve execution speed and log readability.
 
 ## Change Log
+- **2026-03-24T12:47:59.317Z:** Refactored script to remove redundant `info` logging and legacy comments. Maintained core attribution logic and ActiveCampaign sync parameters.
 - **2026-03-19T18:59:02.750Z:** Initial creation of documentation via DeluluDocu.
