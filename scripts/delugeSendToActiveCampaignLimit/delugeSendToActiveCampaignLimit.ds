@@ -6,7 +6,7 @@ string standalone.delugeSendToActiveCampaignLimit(String payload)
 		response = zoho.crm.searchRecords("Accounts", "(Account_Name:equals:" + name +")");
 		distributorId = response.get(0).get("id");
 		distributors.add(distributorId);
-		info distributorId;
+		// info distributorId;
 	}
 	
 	
@@ -21,7 +21,7 @@ string standalone.delugeSendToActiveCampaignLimit(String payload)
 	connection:"zohocrmconnection"
 	];
 	activeSalesSprints = response.get("data");
-	info activeSalesSprints;
+	// info activeSalesSprints;
 	activeSalesSprintIds = List();
 	for each  activeSalesSprint in activeSalesSprints
 	{
@@ -29,7 +29,7 @@ string standalone.delugeSendToActiveCampaignLimit(String payload)
 		activeSalesSprintName = activeSalesSprint.get("Name");
 		activeSalesSprintIds.add(activeSalesSprintId);
 		}
-		info activeSalesSprintIds;
+		// info activeSalesSprintIds;
 		distributorList = List();
 		distributorMap = Map();
 		intersectList = List();
