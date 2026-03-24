@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
+                "file": "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeVisitsToActiveCampaign"
+              "title": "getVisits1"
             }
           }
         ]
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "getvi",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -74,7 +74,8 @@
               "title": "Bookmarks"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -94,7 +95,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
+                "file": "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +105,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for delugeVisitsToActiveCampaign"
+              "title": "Backlinks for getVisits1"
             }
           },
           {
@@ -195,6 +196,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
     "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
     "Colleague Setup Guide - DeluluDocu & GitHub Sync.md",
     "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.ds",
@@ -229,7 +231,6 @@
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Processor (Schedule)/delugeTriggerRenewalsAndNewSalesExportHandler.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
     "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker/delugeTieredDiscountsHandler.md",
-    "Watchtower/Duplicate Zoho Desk Blueprint/delugeDuplicateBlueprint.md",
-    "Revenue and Finance/Data Exports/KPIs/Mirror Exports Handler/delugeMirrorExportsHandler.md"
+    "Watchtower/Duplicate Zoho Desk Blueprint/delugeDuplicateBlueprint.md"
   ]
 }
