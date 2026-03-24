@@ -83,7 +83,7 @@ try
 			break;
 		}
 	}
-
+	
 	// 6. Data Preparation
 	rowData = List();
 	rowData.add(ifnull(conversionRecord.get("Created_Time"),zoho.currenttime).toString("YYYY-MM-dd"));
@@ -106,7 +106,6 @@ try
 	valuesList.add(rowData);
 	payload = {"values":valuesList};
 	// info payload;
-	
 	if(spreadsheetUrl.isEmpty())
 	{
 		info "Failed to find distributor spreadsheet.";
@@ -114,7 +113,6 @@ try
 		standalone.delugeSendErrorAlert(functionName,sheetsSubform,errorMessage);
 		return {"success":false,"status":"FailedToFindDistributorSpreadsheet","message":errorMessage};
 	}
-	
 	// 7. Integration Execution
 	if(spreadsheetUrl.contains("google"))
 	{
@@ -145,7 +143,6 @@ try
 		// info "Zapier Push: " + pushResponse;
 	}
 	info pushResponse;
-	
 	if(pushResponse.get("responseCode") != "200")
 	{
 		info "Failed to push lead to spreadsheet.";
