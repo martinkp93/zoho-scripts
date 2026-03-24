@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001393007"
 Name: delugeSendToActiveCampaignLimit
-Revision Timestamp: 2026-03-24T14:32:42.641Z
+Revision Timestamp: 2026-03-24T14:34:06.209Z
 Status: Functional
 ---
 
@@ -10,7 +10,7 @@ Status: Functional
 ---
 
 ## Overview
-The `delugeSendToActiveCampaignLimit` function is a validation utility designed to identify intersections between specific Accounts (distributors) and currently active Sales Sprints. It processes a payload of names, resolves them to CRM IDs, fetches globally active Sales Sprints via COQL, and determines which distributors are associated with those active sprints. The latest update introduces a specific filter for "Farm_Distributor" during the initial Account resolution phase.
+The `delugeSendToActiveCampaignLimit` function is a validation utility designed to identify intersections between specific Accounts (distributors) and currently active Sales Sprints. It processes a payload of names, resolves them to CRM IDs, fetches globally active Sales Sprints via COQL, and determines which distributors are associated with those active sprints. The latest update fixes a syntax error in the search criteria string used during the Account resolution phase.
 
 ## Technical Contract
 - **Input:** `String payload` (Expected to be an iterable collection of Account names).
@@ -58,8 +58,8 @@ graph TD
 ## Core Logic Sections
 The script consists of the following logical components:
 
-### 1. Distributor Resolution (Updated)
-The script loops through the input `payload`, performing a `zoho.crm.searchRecords` for each name. The search criteria now explicitly filters for `Distributor_Type:equals:Farm_Distributor`. Results are stored in a temporary `search` variable.
+### 1. Distributor Resolution (Syntax Fix)
+The script loops through the input `payload`, performing a `zoho.crm.searchRecords` for each name. The search criteria explicitly filters for `Distributor_Type:equals:Farm_Distributor`. The latest update encapsulates the search string in proper parentheses to ensure valid CRM query execution.
 
 ### 2. Global Active Sprint Discovery (COQL)
 Utilizes a COQL query to target the `Sales_Sprints` module, filtering for records where `Sales_Sprint_Active` is 'Yes' and `Send_to_Active_Campaign` is true.
@@ -77,8 +77,8 @@ The script evaluates the `intersectList`. If conflicts exist:
 
 ## Developer Notes
 
-> [!CAUTION]
-> **Syntax Warning:** In the latest update, the search criteria string `"(Account_Name:equals:" + name +") AND (Distributor_Type:equals:Farm_Distributor"` appears to be missing a closing parenthesis at the end of the criteria. This may cause the search to fail or throw an exception in some CRM environments.
+> [!TIP]
+> **Syntax Correction:** The latest revision corrected the `zoho.crm.searchRecords` criteria string. By wrapping the conditions in `((...))`, it resolves the "missing parenthesis" issue from the previous iteration.
 
 > [!IMPORTANT]
 > This script uses an `invokeurl` call for COQL using the `zohocrmconnection`. Ensure this connection exists in the Zoho environment with the `ZohoCRM.coql.READ` scope.
@@ -88,9 +88,6 @@ The script evaluates the `intersectList`. If conflicts exist:
 
 > [!CAUTION]
 > **Performance Warning:** The script performs a `getRelatedRecords` call *inside* a loop for every distributor in the payload. If the payload contains many names, this will execute multiple additional API calls, potentially hitting CRM limits.
-
-> [!TIP]
-> **Variable Scoping Fix:** The previous update renamed intermediate API response variables to `search`. This prevents the script from accidentally returning partial API data or trying to `put` error keys into a non-map object if the COQL call failed or returned unexpected types.
 
 ## Change Log
 - **2026-03-24T13:44:57.179Z:** Initial creation of documentation via DeluluDocu.
@@ -102,3 +99,4 @@ The script evaluates the `intersectList`. If conflicts exist:
 - **2026-03-24T14:27:12.400Z:** Added Part B: Validation Logic. The script now performs a distinct check on conflicts and returns a structured "error" status map with a descriptive `conflictMessage` containing Distributor names and IDs if intersections are found.
 - **2026-03-24T14:28:35.469Z:** Bug fix and Refactor: Renamed intermediate API result variables from `response` to `search` to prevent variable collision. Explicitly initialized `response = Map()` within the validation block to ensure a clean error object is returned when conflicts are detected.
 - **2026-03-24T14:32:42.641Z:** Search Filter Refinement: Updated the `zoho.crm.searchRecords` call for Accounts to include a mandatory check for `Distributor_Type:equals:Farm_Distributor`. Commented out remaining `info` debug statements.
+- **2026-03-24T14:34:06.209Z:** **Syntax Fix:** Corrected the CRM search criteria string by adding the missing closing parenthesis to the `Account_Name` and `Distributor_Type` logic. This ensures the search query is well-formed.
