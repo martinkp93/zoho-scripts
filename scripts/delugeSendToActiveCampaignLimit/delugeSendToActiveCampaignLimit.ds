@@ -3,7 +3,7 @@ string standalone.delugeSendToActiveCampaignLimit(String payload)
 	distributors = List();
 	for each name in payload
 	{
-		search = zoho.crm.searchRecords("Accounts", "(Account_Name:equals:" + name +")");
+		search = zoho.crm.searchRecords("Accounts", "(Account_Name:equals:" + name +") AND (Distributor_Type:equals:Farm_Distributor");
 		distributorId = search.get(0).get("id");
 		distributors.add(distributorId);
 		// info distributorId;
@@ -57,7 +57,7 @@ string standalone.delugeSendToActiveCampaignLimit(String payload)
 // Clean the list of any potential nulls or empty strings just in case
 uniqueConflicts = intersectList.distinct();
 uniqueConflicts.remove("");
-info uniqueConflicts;
+// info uniqueConflicts;
 if(!uniqueConflicts.isEmpty())
 {
 	conflictMessage = "Conflict: ";
