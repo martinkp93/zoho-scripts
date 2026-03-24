@@ -191,6 +191,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeSendToActiveCampaignLimit/delugeSendToActiveCampaignLimit.ds",
+    "scripts/delugeSendToActiveCampaignLimit/delugeSendToActiveCampaignLimit.md",
+    "scripts/delugeSendToActiveCampaignLimit",
     "scripts/script_1774359008075/script_1774359008075.md",
     "scripts/script_1774359008075/script_1774359008075.ds",
     "scripts/script_1774359008075",
@@ -211,7 +214,6 @@
     "scripts/delugeUpdatePurchaseConversionAndSoQty/delugeUpdatePurchaseConversionAndSoQty.ds",
     "scripts/delugeUpdatePurchaseConversionAndSoQty",
     "scripts/delugePostponeTo1JanOnNewOrders/delugePostponeTo1JanOnNewOrders.ds",
-    "scripts/delugePostponeTo1JanOnNewOrders",
     "Watchtower/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md",
     "Support/Subscription Cancellation/Scheduled Cancellation/delugeCancellationScheduled.md",
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
@@ -224,8 +226,6 @@
     "Environment Lifecycle/Update/Update Populace Workspace Distributor/delugeTriggerAddWorkspaceToDistributor.md",
     "Revenue and Finance/Data Exports/KPIs/Mirror Export Jobs Handler/delugeMirrorDataExportHandler.md",
     "standalone.delugePopulaceConnector.md",
-    "Environment Lifecycle/Delete/Delete Populace User/delugeTriggerDeletePopulaceUser.md",
-    "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Processor (Schedule)/delugeTriggerRenewalsAndNewSalesExportHandler.md",
-    "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md"
+    "Environment Lifecycle/Delete/Delete Populace User/delugeTriggerDeletePopulaceUser.md"
   ]
 }
