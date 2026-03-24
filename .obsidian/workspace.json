@@ -191,6 +191,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/script_1774364493009/script_1774364493009.md",
     "scripts/script_1774364493009/script_1774364493009.ds",
     "scripts/script_1774364493009",
     "scripts/script_1774364035530/script_1774364035530.md",
@@ -210,7 +211,6 @@
     "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
     "Colleague Setup Guide - DeluluDocu & GitHub Sync.md",
-    "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.ds",
     "Connectors/Populace/delugePopulaceConnector.md",
     "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Account)/delugeWAT02.md",
