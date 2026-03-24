@@ -3,7 +3,7 @@ string standalone.delugeSendToActiveCampaignLimit(String payload)
 	distributors = List();
 	for each name in payload
 	{
-		search = zoho.crm.searchRecords("Accounts", "((Account_Name:equals:" + name +") AND (Distributor_Type:equals:Farm_Distributor))");
+		search = zoho.crm.searchRecords("Accounts", "((Account_Name:equals:" + name +") AND (Distributor_Type:equals:Farm Distributor))");
 		distributorId = search.get(0).get("id");
 		distributors.add(distributorId);
 		// info distributorId;
