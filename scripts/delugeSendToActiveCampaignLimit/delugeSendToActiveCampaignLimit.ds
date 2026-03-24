@@ -1,5 +1,10 @@
 string standalone.delugeSendToActiveCampaignLimit(String payload)
 {
-	info payload;
+	for each name in payload
+	{
+		response = zoho.crm.searchRecords("Accounts", "(Account_Name:equals:" + name +")");
+		info response;
+	}
+	
 return payload;
 }
