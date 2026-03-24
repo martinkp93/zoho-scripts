@@ -3,15 +3,10 @@ void automation.getVisits1(Int visit_id)
 // Get the visit data
 visit = zoho.crm.getRecordById("Visits",visit_id);
 contact_id = visit.get("Visited_By").get("id");
-// info "Contact ID: " + contact_id;
 visit_created_time = visit.get("Created_Time");
 visit_created_date = visit_created_time.subString(0,10);
-// info "Visit Created Date : " + visit_created_date;
-// info "Visit Created Time: " + visit_created_time ;
-// info "Visit: " + visit;
 // Get the actions_performed data
 actions_performed = zoho.crm.getRelatedRecords("Actions_Performed","Visits",visit_id);
-// info "Actions Performed Data: " + actions_performed ;
 // Check if Visit Data includes a URL with "success" and if it's the only page visited
 // We don't want to continue if that is the case, as it indicates a session on a 
 // "Success" page that wasn't exited after sign up.
@@ -54,11 +49,9 @@ if(isOnlySuccessPage)
 {
 	info "The 'success' URL is the only page visited.";
 }
-//
 // Only continue script if URL contains 'success'
 if(containsSuccessURL && !isOnlySuccessPage)
 {
-	//
 	// Get the Accessed URL in the array of Actions Performed
 	containsUtmParams = false;
 	for each  ap in actions_performed
@@ -116,7 +109,7 @@ if(containsSuccessURL && !isOnlySuccessPage)
 				params_map.put("UTM_Traffic",utm_traffic);
 				params_map.put("Visit_ID",visit_id.toString());
 				info "URL contains UTM Params. Creating " + utm_source + " Params Map.";
-				// info "UTM Params Map: " + params_map;
+
 			}
 			else if(accessed_url.contains("fbclid") && containsUtmParams == false)
 			{
@@ -153,15 +146,10 @@ if(containsSuccessURL && !isOnlySuccessPage)
 	account_id = account.get("id");
 	//Get email related to the Contact
 	email = zoho.crm.getRecordById("Contacts",contact_id).get("Email");
-	activeCampaignContactId = zoho.crm.getRecordById("Contacts",contact_id).get("ActiveCampaign_Contact_ID");
 	// Get ActiveCampaign Contact ID related to the Contact
-	// info "Account: " + account;
-	// info "Account ID: " + account_id;
-	//
+	activeCampaignContactId = zoho.crm.getRecordById("Contacts",contact_id).get("ActiveCampaign_Contact_ID");
 	// Get the specific Conversion to update
 	conversions = zoho.crm.getRelatedRecords("Demo_Conversions","Accounts",account_id);
-	// info "Conversions: " + conversions;
-	//
 	// Loop through conversion to find conversion related to current visit
 	for each  conversion in conversions
 	{
@@ -172,8 +160,6 @@ if(containsSuccessURL && !isOnlySuccessPage)
 		conversion_created_date = conversion_created_time.subString(0,10);
 		if(conversion_created_date == visit_created_date && conversion_name != "Purchase Conversion")
 		{
-			// if(conversion_name == "Demo Conversion")
-			// if(conversion_name == "Demo Conversion")
 			info "Matched Conversion Created Time: " + conversion_created_time;
 			info "Matched Conversion: " + conversion_name + " ( " + conversion_id + ")";
 			update_conversion_response = zoho.crm.updateRecord("Conversions",conversion_id,params_map);
@@ -195,10 +181,8 @@ if(containsSuccessURL && !isOnlySuccessPage)
 				contactMap = Map();
 				contactMap.put("email",email);
 				contactMap.put("fieldValues",fieldValuesList);
-				// Correct payload structure (ActiveCampaign expects a "contact" key)
 				updateMap = Map();
 				updateMap.put("contact",contactMap);
-				//info updateMap;
 				// Make API call
 				response = invokeurl
 				[
