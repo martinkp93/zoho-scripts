@@ -191,6 +191,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/script_1774359008075/script_1774359008075.md",
+    "scripts/script_1774359008075/script_1774359008075.ds",
+    "scripts/script_1774359008075",
     "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md",
     "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
     "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
@@ -214,8 +217,6 @@
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
     "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
-    "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.ds",
-    "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)",
     "Support/Subscription Cancellation/Scheduled Cancellation Removed/delugeCancellationScheduledRemoved.md",
     "Support/Subscription Cancellation/Partial Cancellation/delugePartialCancellation.md",
     "scripts/Deluge_ Partial Cancellation/Deluge_ Partial Cancellation.md",
@@ -225,7 +226,6 @@
     "standalone.delugePopulaceConnector.md",
     "Environment Lifecycle/Delete/Delete Populace User/delugeTriggerDeletePopulaceUser.md",
     "Revenue and Finance/Data Exports/Invoicing/Invoicing Export Jobs Processor (Schedule)/delugeTriggerRenewalsAndNewSalesExportHandler.md",
-    "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
-    "Revenue and Finance/Conversion Pricing/Tiered Discounts Handker/delugeTieredDiscountsHandler.md"
+    "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md"
   ]
 }
