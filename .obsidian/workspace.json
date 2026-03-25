@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Welcome.md",
+                "file": "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Welcome"
+              "title": "Outline of sendToActiveCampaignLimit"
             }
           },
           {
@@ -194,7 +194,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "dd7d6ab330835f3c",
   "lastOpenFiles": [
     "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
     "scripts/script_1774365008976/script_1774365008976.md",
