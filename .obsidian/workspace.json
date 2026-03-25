@@ -196,6 +196,7 @@
   },
   "active": "dd7d6ab330835f3c",
   "lastOpenFiles": [
+    "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.md",
     "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.ds",
     "scripts/delugeManualUpdateAttributableConversionData",
     "scripts/delugeWeatherStationQuantityUpdate/delugeWeatherStationQuantityUpdate.md",
@@ -214,7 +215,6 @@
     "scripts/script_1774364493009/script_1774364493009.ds",
     "scripts/script_1774364493009",
     "scripts/script_1774364035530/script_1774364035530.md",
-    "scripts/script_1774364035530/script_1774364035530.ds",
     "scripts/script_1774363242002/script_1774363242002.md",
     "scripts/delugeSendToActiveCampaignLimit/delugeSendToActiveCampaignLimit.md",
     "scripts/script_1774359008075/script_1774359008075.md",
