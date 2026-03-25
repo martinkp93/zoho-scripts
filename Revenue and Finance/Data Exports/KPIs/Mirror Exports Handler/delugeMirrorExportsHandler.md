@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001324042"
 Name: delugeMirrorExportsHandler
-Revision Timestamp: 2026-03-19T19:39:48.731Z
+Revision Timestamp: 2026-03-25T14:48:17.958Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -79,5 +79,10 @@ To ensure a clean sync, the script uses the Google Sheets `batchUpdate` endpoint
 > [!TIP]
 > If a sync fails, check the "Description" field of the CRM Variable. Ensure it contains *only* the numeric GID of the specific tab in the Google Sheet, not the full URL.
 
+> [!TIP]
+> Fixed a critical JSON formatting bug where the `requests` parameter was being passed as a Map instead of a List/Array. Using `[]` instead of `{}` ensures compatibility with the Google Sheets `batchUpdate` endpoint.
+
+
 ## Change Log
 - **2026-03-19T19:39:48.731Z:** Initial creation of documentation via DeluluDocu.
+- **2026-03-25T14:48:17.958Z:** Fixed JSON payload structure for Google Sheets API. Changed `requests` from a map-like collection to a formal Deluge list/array using `[]` to prevent 400 Bad Request errors during batch updates.
