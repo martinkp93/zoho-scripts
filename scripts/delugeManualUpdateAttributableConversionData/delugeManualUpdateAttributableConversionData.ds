@@ -1,0 +1,66 @@
+string button.delugeManualUpdateAttributableConversionData(Int account_id,Int purchase_conversion_id,Date purchase_conversion_created_time)
+{
+//
+// Initialise Organisation ID
+org_id = "20087400261";
+info "Account ID: " + account_id;
+info "Purchase Conversion ID: " + purchase_conversion_id;
+info "Purchase Conversion Created Time: " + purchase_conversion_created_time;
+// Retrieve related records
+conversions = zoho.crm.getRelatedRecords("Demo_Conversions","Accounts",account_id);
+purchase_conversion_data = Map();
+number_of_conversions = conversions.size();
+info "Number of Conversions: " + number_of_conversions;
+if(number_of_conversions > 1)
+{
+	first_conversion = conversions.get(number_of_conversions - 1);
+	last_conversion = conversions.get(0);
+	second_last_conversion = conversions.get(1);
+	info "First Conversion: " + first_conversion.get("Name") + " " + first_conversion.get("id");
+	info "Second Last Conversion: " + second_last_conversion.get("Name") + " " + second_last_conversion.get("id");
+	info "Last Conversion: " + last_conversion.get("Name") + " " + last_conversion.get("id");
+	// Process first conversion if it's not a "Purchase Conversion"
+	if(first_conversion.get("Name") != "Purchase Conversion")
+	{
+		first_conversion_name = first_conversion.get("Name");
+		info "First Conversion Name: " + first_conversion_name;
+		purchase_conversion_data.put("Attributable_Conversion_First_Touch",first_conversion.get("id").toText());
+		purchase_conversion_data.put("Attributable_Conversion_Type_First_Touch",first_conversion_name.toText());
+		purchase_conversion_data.put("Attributable_Conversion_Date_First_Touch",first_conversion.get("Created_Time").left(10));
+		purchase_conversion_data.put("Time_from_First_Touch_to_Purchase_Days",first_conversion.get("Created_Time").daysBetween(purchase_conversion_created_time));
+	}
+	else
+	{
+		info "First Touch is a Purchase Conversion. Data map will not include this conversion when updating.";
+	}
+	// Process second last conversion if it's not a "Purchase Conversion"
+	if(second_last_conversion.get("Name") != "Purchase Conversion")
+	{
+		second_last_conversion_name = second_last_conversion.get("Name");
+		purchase_conversion_data.put("Attributable_Conversion_Last_Touch",second_last_conversion.get("id").toText());
+		purchase_conversion_data.put("Attributable_Conversion_Type_Last_Touch",second_last_conversion_name.toText());
+		purchase_conversion_data.put("Attributable_Conversion_Date_Last_Touch",second_last_conversion.get("Created_Time").left(10));
+		purchase_conversion_data.put("Time_from_Last_Touch_to_Purchase_Days",second_last_conversion.get("Created_Time").daysBetween(purchase_conversion_created_time));
+	}
+	else
+	{
+		info "Last Touch is a Purchase Conversion. Data map will not include this conversion when updating.";
+	}
+	info "Data Map: " + purchase_conversion_data;
+	// Update Account's Purchase Conversion with Attributable data if the map is not empty
+	if(purchase_conversion_data.size() > 0)
+	{
+		update_purchase_conversion = zoho.crm.updateRecord("Conversions",purchase_conversion_id,purchase_conversion_data);
+		info "Update Response: " + update_purchase_conversion;
+	}
+	else
+	{
+		info "No eligible data for making an update.";
+	}
+}
+else
+{
+	info "Not enough conversions to process.";
+}
+return "";
+}
