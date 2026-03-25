@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001182017"
 Name: delugeTriggerDeletePopulaceWorkspace
-Revision Timestamp: 2026-03-25T13:59:56.689Z
+Revision Timestamp: 2026-03-25T14:00:36.405Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -60,8 +60,9 @@ The script invokes the `standalone.delugePopulaceConnector` function using the `
 > This script is designed to be idempotent; if it is called multiple times for the same `workspaceId`, the downstream connector/API should ideally handle the "Already Deleted" state gracefully.
 
 > [!TIP]
-> The code was recently cleaned up to remove redundant comments in the payload preparation section, improving readability without altering the execution logic.
+> The code was recently cleaned up to remove redundant comments and whitespace in the payload preparation section, improving readability without altering the execution logic.
 
 ## Change Log
 - **2026-03-19T18:52:15.141Z:** Initial creation of documentation via DeluluDocu.
 - **2026-03-25T13:59:56.689Z:** Performed code cleanup to remove redundant comment lines in the Logic Section 2. Logic remains unchanged.
+- **2026-03-25T14:00:36.405Z:** Further refined comment spacing in the payload preparation block. No functional changes were made to the script logic.
