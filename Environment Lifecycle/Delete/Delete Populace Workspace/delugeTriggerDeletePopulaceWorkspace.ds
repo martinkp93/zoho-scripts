@@ -4,7 +4,6 @@ void automation.delugeTriggerDeletePopulaceWorkspace(Int accountId,String worksp
 if(workspaceId != null && workspaceId != "")
 {
 	// 2. Build the payload for the connector
-
 	// The payload only needs the workspaceId for the connector to build the URL
 	payload = Map();
 	payload.put("workspaceId",workspaceId);
