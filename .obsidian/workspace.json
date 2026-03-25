@@ -14,7 +14,7 @@
               "type": "markdown",
               "state": {
                 "file": "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
-                "mode": "preview",
+                "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
@@ -194,7 +194,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "dd7d6ab330835f3c",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
     "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
     "scripts/script_1774365008976/script_1774365008976.md",
