@@ -9,7 +9,7 @@ Status: Functional (With Hardcoded ID)
 ---
 
 ## Overview
-The `validation_rule.sendToActiveCampaignLimit` function is a Zoho CRM Validation Rule script designed to enforce a "One Active Campaign per Distributor" policy. It checks if any Distributors (Accounts) linked to the current Sales Sprint are already associated with other Sales Sprints currently marked as active and enabled for Active Campaign.
+The `validation_rule.sendToActiveCampaignLimit` function is a Zoho CRM Validation Rule script designed to enforce a "One Active Campaign per Distributor" policy. It checks if any Distributors (Accounts) linked to the current Sales Sprint are already associated with other Sales Sprints currently marked as active and enabled for Active Campaign. HEY
 
 
 ## Technical Contract
