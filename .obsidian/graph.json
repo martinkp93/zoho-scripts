@@ -1,6 +1,6 @@
 {
   "collapse-filter": false,
-  "search": "",
+  "search": "activecampaign",
   "showTags": false,
   "showAttachments": false,
   "hideUnresolved": false,
@@ -46,6 +46,6 @@
   "repelStrength": 15.0868055555556,
   "linkStrength": 0.738671875,
   "linkDistance": 500,
-  "scale": 0.23445824716830277,
-  "close": true
+  "scale": 1.2463487297940372,
+  "close": false
 }
