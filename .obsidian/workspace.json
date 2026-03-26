@@ -11,14 +11,10 @@
             "id": "be42622720ea9833",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "delugeSyncActiveCampaignContact"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
         ]
@@ -94,7 +90,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +99,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for delugeSyncActiveCampaignContact"
+              "title": "Backlinks"
             }
           },
           {
@@ -156,13 +151,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of delugeSyncActiveCampaignContact"
+              "title": "Outline"
             }
           },
           {
@@ -197,6 +191,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
     "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.md",
     "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.ds",
     "scripts/delugeActiveCampaignHandlerTest",
@@ -231,7 +226,6 @@
     "scripts/delugeUpdatePurchaseConversionAndSoQty/delugeUpdatePurchaseConversionAndSoQty.md",
     "Watchtower/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md",
     "Support/Subscription Cancellation/Scheduled Cancellation/delugeCancellationScheduled.md",
-    "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
-    "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md"
+    "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md"
   ]
 }
