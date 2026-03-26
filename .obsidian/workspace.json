@@ -191,6 +191,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.md",
+    "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.ds",
+    "scripts/delugeActiveCampaignHandlerTest",
     "Environment Lifecycle/Delete/Delete Populace Workspace/delugeTriggerDeletePopulaceWorkspace.md",
     "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
     "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.md",
@@ -208,8 +211,6 @@
     "scripts/script_1774364968033/script_1774364968033.ds",
     "scripts/script_1774364968033",
     "scripts/script_1774364493009/script_1774364493009.md",
-    "scripts/script_1774364493009/script_1774364493009.ds",
-    "scripts/script_1774364493009",
     "scripts/script_1774364035530/script_1774364035530.md",
     "scripts/script_1774363242002/script_1774363242002.md",
     "scripts/delugeSendToActiveCampaignLimit/delugeSendToActiveCampaignLimit.md",
@@ -225,7 +226,6 @@
     "Watchtower/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md",
     "Support/Subscription Cancellation/Scheduled Cancellation/delugeCancellationScheduled.md",
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
-    "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
-    "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md"
+    "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md"
   ]
 }
