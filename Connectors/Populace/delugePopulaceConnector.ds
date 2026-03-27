@@ -10,7 +10,7 @@ try
 	config.put("updateUser",{"m":"PUT","p":"/users/{userId}"});
 	config.put("deleteUser",{"m":"DELETE","p":"/users/{userId}?contactId={contactId}"});
 	// Workspaces
-	config.put("createWorkspace",{"m":"POST","p":"/workspaces"});
+	config.put("createWorkspaces",{"m":"POST","p":"/workspaces"});
 	config.put("updateWorkspace",{"m":"PUT","p":"/workspaces/{workspaceId}"});
 	config.put("deleteWorkspace",{"m":"DELETE","p":"/workspaces/{workspaceId}?accountId={accountId}"});
 	// Distributors
