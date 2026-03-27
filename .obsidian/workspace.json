@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "senderroralert",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -74,8 +74,7 @@
               "title": "Bookmarks"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -195,7 +194,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "794498d1f4077c72",
+  "active": "a475bd43d4c255ad",
   "lastOpenFiles": [
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
     "scripts/delugeLeadHandlerTest/delugeLeadHandlerTest.md",
