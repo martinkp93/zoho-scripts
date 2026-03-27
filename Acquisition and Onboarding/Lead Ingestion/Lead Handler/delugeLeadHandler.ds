@@ -2,9 +2,10 @@ string standalone.delugeLeadHandler(String crmAPIRequest)
 {
 try 
 {
+	// crmAPIRequest = {"body":{"vertical":"Farm","fullName":"Test Testersen","email":"mp+test+new+ac+setup+90@cordulus.com","phone":"12345678","utmSource":"Website","utmTraffic":"Organic","utmMedium":"Website","country":"United Kingdom","conversionType":"Request a Quote Conversion","distributor":"Mole Valley Farmers Ltd."}};
 	info "CRM API Request:" + crmAPIRequest;
 	// =============================================================================
-	// 1. PARSE INPUT DATA 
+	// 1. PARSE INPUT DATA
 	// =============================================================================
 	body = Map();
 	if(crmAPIRequest != null && crmAPIRequest != "")
@@ -18,7 +19,7 @@ try
 	}
 	if(body.isEmpty())
 	{
-		return "Error: No data received in body";
+		return "Error: No data received in body.";
 	}
 	// =============================================================================
 	// 2. PREPARE VARIABLES
@@ -50,12 +51,13 @@ try
 	{
 		// Search for the distributor account
 		distributorSearch = zoho.crm.searchRecords("Accounts","(Account_Name:equals:" + distributorName + ")");
+		info distributorSearch;
 		if(distributorSearch != null)
 		{
 			if(distributorSearch.size() > 0)
 			{
-				// Optional: Filter for specific type if needed, or just take the first match
 				distributorId = distributorSearch.get(0).get("id");
+				distributorPrimaryContact = distributorSearch.get(0).get("Primary_Contact");
 			}
 		}
 	}
@@ -64,21 +66,26 @@ try
 		if(country != null || country != "")
 		{
 			distributorSearch = zoho.crm.searchRecords("Accounts","(Billing_Country:equals:" + country + ") and (Default_Distributor_for_Country:equals:true)");
+			info distributorSearch;
 			if(distributorSearch != null)
 			{
 				if(distributorSearch.size() > 0)
 				{
-					info "Distributor Search:" + distributorSearch;
+					// info "Distributor Search:" + distributorSearch;
 					distributorId = distributorSearch.get(0).get("id");
+					distributorPrimaryContact = distributorSearch.get(0).get("Primary_Contact");
 				}
 			}
 		}
-		else
-		{
-			distributorId = 520877000145481486;
-			// default to Cordulus A/S
-		}
 	}
+	if(distributorId == null)
+	{
+		defaultDistributorId = 520877000145481486;
+		// Default Distributor: Cordulus A/S
+		distributorId = defaultDistributorId;
+		info "Defaulted to 'Cordulus A/S' as Distributor";
+	}
+	info distributorId;
 	// =============================================================================
 	// 4. FIND OR CREATE CONTACT & ACCOUNT
 	// =============================================================================
@@ -97,6 +104,7 @@ try
 		if(accountLookup != null)
 		{
 			accountId = accountLookup.get("id");
+			info "Found existing Account: " + accountId;
 		}
 		// Get the existing ActiveCampaign ID to pass to the handler
 		existingAcId = existingContact.get("ActiveCampaign_Contact_ID");
@@ -109,10 +117,7 @@ try
 		// A. Create Account
 		createAccountMap = Map();
 		createAccountMap.put("Account_Name",fullName);
-		// Or company name if available
 		createAccountMap.put("Billing_Country",country);
-		// createAccountMap.put("Billing_Country_Code","DK");
-		// Adjust logic if dynamic
 		if(distributorId != null)
 		{
 			createAccountMap.put("Distributor_Lookup",distributorId);
@@ -198,6 +203,21 @@ try
 		}
 	}
 	// =============================================================================
+	// 6. RESOLVE PRICING
+	// =============================================================================
+	pricing = null;
+	if(conversionName.contains("Request a Quote") && utmSource == "Website")
+	{
+		pricingResponse = standalone.delugeResolveRaQPricing(distributorId);
+		if(pricingResponse.get("success") == false)
+		{
+			return "";
+		}
+		info pricingResponse;
+		pricing = if(pricingResponse.get("data").isEmpty() == false,pricingResponse.get("data"),null);
+		info "Pricing: " + pricing;
+	}
+	// =============================================================================
 	// 6. CALL ACTIVECAMPAIGN HANDLER
 	// =============================================================================
 	if(contactId != null)
@@ -224,7 +244,27 @@ try
 		// Call the standalone handler. 
 		// It handles creating the AC contact, adding tags, and return the ActiveCampaign Contact ID
 		info "Called ActiveCampaign Handler";
-		syncAcContactResp = standalone.delugeActiveCampaignHandler(contactId.toLong(),accountId.toLong(),firstName,lastName,email,country,existingAcId,finalTags,conversionName,conversionId,distributorName,utmSource,utmMedium,utmCampaign,phone,targetListId);
+		payload = Map();
+		payload.put("contactId",contactId.toLong());
+		payload.put("accountId",accountId.toLong());
+		payload.put("firstName",firstName);
+		payload.put("lastName",lastName);
+		payload.put("email",email);
+		payload.put("phone",phone);
+		payload.put("country",country);
+		payload.put("distributorName",distributorName);
+		payload.put("distributorPrimaryContact",distributorPrimaryContact);
+		payload.put("existingAcId",existingAcId);
+		payload.put("conversionName",conversionName);
+		payload.put("conversionId",conversionId);
+		payload.put("utmSource",utmSource);
+		payload.put("utmMedium",utmMedium);
+		payload.put("utmCampaign",utmCampaign);
+		payload.put("targetListId",targetListId);
+		payload.put("tags",finalTags);
+		payload.put("pricing",pricing);
+		info payload;
+		syncAcContactResp = standalone.delugeActiveCampaignHandler(payload);
 		info "ActiveCampaign Handler response: " + syncAcContactResp;
 	}
 	if(syncAcContactResp.get("acContactId") != null && existingAcId == null)
@@ -238,13 +278,13 @@ try
 	// =============================================================================
 	// Call the standalone handler
 	// It handles fetching distributor lead sheet details, pushing leads to sheets, and sending notification emails
-	if(conversionName.contains("Request a Quote"))
+	if(conversionName.contains("Request a Quote") && utmSource != "Website")
 	{
 		info "Called Lead Sheet Handler";
 		leadSheetHandlerResp = standalone.delugeLeadSheetHandler(conversionId);
 		info "Lead Sheet Handler response: " + leadSheetHandlerResp;
-		info "Function executed successfully";
 	}
+	info "Function executed successfully";
 }
 catch (e)
 {
