@@ -32,7 +32,7 @@ This script orchestrates the following internal functions and external services:
 | [[delugeActiveCampaignHandler]]              | Adds contacts to specific marketing and onboarding lists.                                      | Low         |
 | [[delugeMailersendConnector]]                | Sends transactional emails using templates matched by language and event type.                 | Medium      |
 | [[delugeSendErrorAlert]]                     | Dispatches error notifications to Slack/System Admins.                                         | High        |
-| [[triggerWorkspaceAndPermissionsHandlerCrm]] | Trigger relay script in Zoho Billing that sends                                                |             |
+| [[triggerWorkspaceAndPermissionsHandlerCrm]] | Trigger relay script in Zoho Billing that sends a payload to the current script.               | High        |
 
 ## Logic Flow
 

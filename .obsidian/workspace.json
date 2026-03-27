@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
+                "file": "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeWorkspaceAndPermissionsHandler"
+              "title": "triggerWorkspaceAndPermissionsHandlerCrm"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
+                "file": "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for delugeWorkspaceAndPermissionsHandler"
+              "title": "Backlinks for triggerWorkspaceAndPermissionsHandlerCrm"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
+                "file": "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of delugeWorkspaceAndPermissionsHandler"
+              "title": "Outline of triggerWorkspaceAndPermissionsHandlerCrm"
             }
           },
           {
@@ -196,12 +196,12 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
     "scripts/delugeLeadHandlerTest/delugeLeadHandlerTest.md",
     "scripts/delugeLeadHandlerTest/delugeLeadHandlerTest.ds",
     "scripts/delugeLeadHandlerTest",
     "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
-    "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Support/Chat/SalseIQ Missed Chat Notification/delugeSalesIQMissedChat.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
     "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.md",
