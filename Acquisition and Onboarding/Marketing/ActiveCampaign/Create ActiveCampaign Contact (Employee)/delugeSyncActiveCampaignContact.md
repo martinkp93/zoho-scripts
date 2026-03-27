@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001112005"
 Name: delugeSyncActiveCampaignContact
-Revision Timestamp: 2026-03-19T19:33:50.220Z
+Revision Timestamp: 2026-03-27T13:29:08.120Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -40,7 +40,8 @@ graph TD
     Start(["Start"]) --> CheckID{"Is AC Contact ID Empty?"}
     CheckID -- "No" --> End(["End"])
     CheckID -- "Yes" --> SetTags["Set Default Tags: Customer, Employee"]
-    SetTags --> CallHandler["Call [[delugeActiveCampaignHandler]]"]
+    SetTags --> BuildMap["Build Payload Map"]
+    BuildMap --> CallHandler["Call [[delugeActiveCampaignHandler]]"]
     CallHandler --> CheckResp{"Did Handler Return ID?"}
     CheckResp -- "No" --> End
     CheckResp -- "Yes" --> UpdateCRM["Update CRM Contact: ActiveCampaign_Contact_Id"]
@@ -53,10 +54,10 @@ graph TD
 The script first evaluates the `activeCampaignContactId` parameter. It only proceeds with the sync logic if this value is empty, preventing redundant API calls for contacts already mapped to ActiveCampaign.
 
 ### 2. Standalone Handler Invocation
-The script passes all contact details to the `[[delugeActiveCampaignHandler]]`. 
+The script packages contact details and the static tags (`{"Customer", "Employee"}`) into a Map called `payload`. It then passes this single Map to `[[delugeActiveCampaignHandler]]`. This refactor moves away from positional arguments to a more robust key-value structure.
 
 > [!TIP]
-> This script currently assigns a static list of tags (`{"Customer", "Employee"}`) to all synced contacts by default.
+> Using a Map for the handler payload allows for easier future expansion (e.g., adding more contact fields) without breaking the function signature of the handler.
 
 ### 3. Record Persistence
 Upon a successful response from the handler, the script extracts the `acContactId`. It then performs a `zoho.crm.updateRecord` call to write this ID back to the `ActiveCampaign_Contact_Id` field on the Zoho CRM Contact record.
@@ -64,10 +65,14 @@ Upon a successful response from the handler, the script extracts the `acContactI
 ## Developer Notes
 
 > [!WARNING]
-> **Data Casting:** The script explicitly converts `contactId` and `accountId` to Long using `.toLong()` when calling the handler. Ensure the input `Int` does not exceed standard integer limits if the CRM ID grows in length, though Zoho Deluge usually handles `Int` as `Long` internally.
+> **Data Casting:** The script explicitly converts `contactId` and `accountId` to Long using `.toLong()` when building the payload map. Ensure the input `Int` does not exceed standard integer limits.
 
 > [!IMPORTANT]
 > **Response Handling:** The script checks if `syncAcContactResp.get("acContactId") != null`. If the handler returns an error map without this key, the CRM update will be skipped silently. Monitoring the `info` logs is required for debugging failed syncs.
 
+> [!CAUTION]
+> **Variable Scope:** The variable `syncAcContactResp` is initialized inside the first `if` block. If `activeCampaignContactId` is NOT empty, the second `if` statement attempts to call `.get()` on a potentially uninitialized variable. While Deluge sometimes defaults null/empty in these cases, it is best practice to initialize the map at the top of the script.
+
 ## Change Log
 - **2026-03-19T19:33:50.220Z:** Initial creation of documentation via DeluluDocu.
+- **2026-03-27T13:29:08.120Z:** Refactored the integration logic to use a Map-based payload when calling `[[delugeActiveCampaignHandler]]` instead of multiple positional arguments. This improves code readability and reduces errors related to argument ordering.
