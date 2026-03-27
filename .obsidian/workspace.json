@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
+                "file": "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeWorkspaceAndPermissionsHandler"
+              "title": "delugeFeatureAggregator"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
+                "file": "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for delugeWorkspaceAndPermissionsHandler"
+              "title": "Backlinks for delugeFeatureAggregator"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
+                "file": "Environment Lifecycle/Read/Feature Aggregator/delugeFeatureAggregator.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of delugeWorkspaceAndPermissionsHandler"
+              "title": "Outline of delugeFeatureAggregator"
             }
           },
           {
@@ -196,6 +196,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
     "Support/Chat/SalseIQ Missed Chat Notification/delugeSalesIQMissedChat.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
@@ -228,7 +229,6 @@
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
     "Colleague Setup Guide - DeluluDocu & GitHub Sync.md",
     "Connectors/Populace/delugePopulaceConnector.md",
-    "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Account)/delugeWAT02.md",
     "scripts/delugeUpdatePurchaseConversionAndSoQty/delugeUpdatePurchaseConversionAndSoQty.md",
     "Watchtower/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md"
