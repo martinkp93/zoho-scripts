@@ -30,7 +30,6 @@ try
 	distributorName = body.get("distributorName");
 	priceListId = body.get("priceListId");
 	customerAccountId = body.get("customerId").toLong();
-	info customerAccountId;
 	customerEmail = body.get("customerEmail");
 	phone = body.get("phone");
 	companyName = body.get("companyName");
@@ -90,7 +89,7 @@ try
 			return errorMessage;
 		}
 		findBillingCustomer = findBillingCustomerResp.get("responseText");
-		customerId = findBillingCustomer.get("customers").get(0).get("customer_id");
+		customerId = findBillingCustomer.get("customer").get("customer_id");
 		info "[LOG] Found existing customer.";
 	}
 	else
