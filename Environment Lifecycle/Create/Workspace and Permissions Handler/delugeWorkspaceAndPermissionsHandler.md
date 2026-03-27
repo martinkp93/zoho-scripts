@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001175050"
 Name: delugeWorkspaceAndPermissionsHandler
-Revision Timestamp: 2026-03-19T21:17:50.789Z
+Revision Timestamp: 2026-03-27T13:30:33.724Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -102,7 +102,7 @@ The script looks up `Service Plan` records in the CRM to find template mappings.
 > The script uses `trigger: {workflow}` when updating the CRM Account. This is intentional to ensure that any downstream automation (like reporting or further syncs) is triggered after the workspace creation.
 
 > [!TIP]
-> Redundant comments in Section 8 regarding the update of `Credentials_Active` and `API_Key_Active` status were removed. These fields are updated immediately in Section 5 upon successful generation of credentials to ensure the CRM reflects the current state even if subsequent steps fail.
+> Section 7 (ActiveCampaign) has been updated to use a unified `Map` payload when calling `[[delugeActiveCampaignHandler]]`. This prevents issues associated with positional arguments and allows for easier future expansion of the contact metadata being synced.
 
 > [!NOTE]
 > All external connector calls (`Populace`, `Daggers`, `Tickets`, `Schlechtwetter`) are expected to handle their own internal logging and Slack alerts. This script focuses on high-level flow control and halting execution if a critical step fails.
@@ -110,3 +110,4 @@ The script looks up `Service Plan` records in the CRM to find template mappings.
 ## Change Log
 - **2026-03-19T15:30:49.368Z:** Initial creation of documentation via DeluluDocu.
 - **2026-03-19T21:17:50.789Z:** Cleaned up redundant/misleading comments in Section 8 (CRM Updates) and Section 9 (Email Automation). No logic changes made. Updated Mermaid diagram to include Section 7 (ActiveCampaign).
+- **2026-03-27T13:30:33.724Z:** Refactored Section 7 to pass a single `Map` payload to `[[delugeActiveCampaignHandler]]` instead of multiple positional arguments. This improves the robustness of the integration and aligns with the interface used by other connectors.
