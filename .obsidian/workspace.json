@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
+                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeSubscriptionHandler"
+              "title": "delugeWorkspaceAndPermissionsHandler"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
+                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for delugeSubscriptionHandler"
+              "title": "Backlinks for delugeWorkspaceAndPermissionsHandler"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
+                "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of delugeSubscriptionHandler"
+              "title": "Outline of delugeWorkspaceAndPermissionsHandler"
             }
           },
           {
@@ -196,6 +196,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
     "Support/Chat/SalseIQ Missed Chat Notification/delugeSalesIQMissedChat.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
     "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.md",
@@ -230,7 +231,6 @@
     "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Watchtower/Associate or Dissociate Distributor (Contacts) to Customer (Account)/delugeWAT02.md",
     "scripts/delugeUpdatePurchaseConversionAndSoQty/delugeUpdatePurchaseConversionAndSoQty.md",
-    "Watchtower/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md",
-    "Support/Subscription Cancellation/Scheduled Cancellation/delugeCancellationScheduled.md"
+    "Watchtower/Associate or Dissociate Distributor (Contact) to Customer (Accounts)/delugeWAT03.md"
   ]
 }
