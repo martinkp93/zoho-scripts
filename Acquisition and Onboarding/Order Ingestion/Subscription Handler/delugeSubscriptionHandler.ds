@@ -68,26 +68,30 @@ try
 	// --- Step 1 & 2: Find or Create Customer in Zoho Billing ---
 	//
 	info "[LOG] Step 2 & 3: Finding or creating customer for email: " + customerEmail;
-	params = Map();
-	params.put("email",customerEmail);
-	findBillingCustomerResp = invokeurl
-	[
-		url :"https://www.zohoapis.eu/billing/v1/customers"
-		type :GET
-		parameters:params
-		detailed:true
-		connection:"zohobillingconnection"
-	];
-	if(findBillingCustomerResp.get("responseCode") != 200)
+	if(customerAccountId != null)
 	{
-		errorMessage = "API ERROR: Failed to search for customers in Zoho Billing. Response: " + findBillingCustomerResp;
-		info "❌ " + errorMessage;
-		standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",body.toString(),errorMessage);
-		return errorMessage;
+		params = Map();
+		params.put("reference_id_type","zcrm_account_id");
+		findBillingCustomerResp = invokeurl
+		[
+			url :"https://www.zohoapis.eu/billing/v1/customers/reference/" + customerAccountId
+			type :GET
+			parameters:params
+			detailed:true
+			connection:"zohobillingconnection"
+		];
+		if(findBillingCustomerResp.get("responseCode") != 200)
+		{
+			errorMessage = "API ERROR: Failed to search for customers in Zoho Billing. Response: " + findBillingCustomerResp;
+			info "❌ " + errorMessage;
+			standalone.delugeSendErrorAlert("delugeNewSubscriptionHandler",body.toString(),errorMessage);
+			return errorMessage;
+		}
+		findBillingCustomer = findBillingCustomerResp.get("responseText");
+		customerId = findBillingCustomer.get("customers").get(0).get("customer_id");
+		info "[LOG] Found existing customer.";
 	}
-	findBillingCustomer = findBillingCustomerResp.get("responseText");
-	customerId = null;
-	if(findBillingCustomer.get("customers").isEmpty())
+	else
 	{
 		info "[LOG] No existing customer found. Creating a new one.";
 		newCustomerMap = {"display_name":companyName,"company_name":companyName,"first_name":firstName,"last_name":lastName,"email":customerEmail,"phone":phone,"billing_address":{"country":country}};
@@ -111,11 +115,6 @@ try
 		customerInfo = createCustomerResp.get("responseText").get("customer");
 		customerId = customerInfo.get("customer_id");
 		info "[LOG] Successfully created new customer with ID: " + customerId;
-	}
-	else
-	{
-		info "[LOG] Found existing customer.";
-		customerId = findBillingCustomer.get("customers").get(0).get("customer_id");
 	}
 	info "[LOG] Using Customer ID: " + customerId;
 	//
