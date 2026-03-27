@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "trial handler",
+                "query": "triggerworkspace",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -74,7 +74,8 @@
               "title": "Bookmarks"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -194,7 +195,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "be42622720ea9833",
+  "active": "794498d1f4077c72",
   "lastOpenFiles": [
     "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
