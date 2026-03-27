@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001245001"
 Name: delugeSubscriptionHandler
-Revision Timestamp: 2026-03-27T11:45:49.287Z
+Revision Timestamp: 2026-03-27T11:51:56.607Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -103,6 +103,9 @@ The script begins by extracting the `body` from the `crmAPIRequest`. It performs
 > [!TIP]
 > **Diagnostic Logging:** Added `info` statement for the Billing Customer response (`findBillingCustomerResp`) to help debug data mapping issues when the reference lookup returns unexpected results.
 
+> [!TIP]
+> **API Path Correction:** Fixed the JSON path for retrieving the Customer ID after a reference lookup. The `/billing/v1/customers/reference/` endpoint returns a single `customer` object map, not a list. The code was updated to use `.get("customer").get("customer_id")` instead of attempting to access a list via index `0`.
+
 > [!WARNING]
 > **Hardcoded Credentials:** The Sales Order generation section uses a hardcoded `zapikey` in the `invokeurl`. This should be migrated to a Connection or an Encrypted Variable for security.
 
@@ -117,3 +120,4 @@ The script begins by extracting the `body` from the `crmAPIRequest`. It performs
 - **2026-03-27T11:41:12.956Z:** Refactored Zoho Billing customer lookup logic. Switched from email-based search to `zcrm_account_id` reference lookup via the Billing `/customers/reference/` endpoint to improve matching accuracy for existing CRM accounts. Removed redundant email search logic when `customerAccountId` is present.
 - **2026-03-27T11:45:14.160Z:** Added diagnostic logging for the Zoho Billing customer reference lookup response to assist in troubleshooting intermittent API connectivity issues during the subscription flow.
 - **2026-03-27T11:45:49.287Z:** Fixed a potential data type mismatch by explicitly casting the `customerAccountId` from the request body to a `Long` type using `.toLong()`. This ensures compatibility with Zoho CRM and Billing lookups.
+- **2026-03-27T11:51:56.607Z:** Corrected a logic error in the Zoho Billing customer lookup. The API response for the reference endpoint returns a single `customer` map; updated the script to extract `customer_id` from the correct JSON path, resolving a null value error when looking up existing billing profiles.
