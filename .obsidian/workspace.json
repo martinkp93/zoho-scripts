@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
+                "file": "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "delugeTrialHandler"
+              "title": "triggerWorkspaceAndPermissionsHandlerCrm"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
+                "file": "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for delugeTrialHandler"
+              "title": "Backlinks for triggerWorkspaceAndPermissionsHandlerCrm"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
+                "file": "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of delugeTrialHandler"
+              "title": "Outline of triggerWorkspaceAndPermissionsHandlerCrm"
             }
           },
           {
@@ -196,6 +196,7 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
     "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
     "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
@@ -230,7 +231,6 @@
     "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md",
     "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
-    "Colleague Setup Guide - DeluluDocu & GitHub Sync.md",
-    "Connectors/Populace/delugePopulaceConnector.md"
+    "Colleague Setup Guide - DeluluDocu & GitHub Sync.md"
   ]
 }
