@@ -80,6 +80,7 @@ try
 			detailed:true
 			connection:"zohobillingconnection"
 		];
+		info findBillingCustomerResp;
 		if(findBillingCustomerResp.get("responseCode") != 200)
 		{
 			errorMessage = "API ERROR: Failed to search for customers in Zoho Billing. Response: " + findBillingCustomerResp;
