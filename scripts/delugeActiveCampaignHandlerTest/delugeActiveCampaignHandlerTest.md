@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001367001"
 Name: delugeActiveCampaignHandlerTest
-Revision Timestamp: 2026-03-26T11:30:08.862Z
+Revision Timestamp: 2026-03-27T13:04:03.376Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -26,8 +26,8 @@ This script orchestrates the following internal functions and external services:
 | Function / Service | Purpose | Criticality |
 | --- | --- | --- |
 | [[delugeSendErrorAlert]] | Handles error logging and notifications for API failures. | High |
-| ActiveCampaign API | External service for contact and marketing automation management. | Critical |
-| Zoho CRM API | Used to update the `ActiveCampaign_Contact_ID` field on Contact records. | Medium |
+| "ActiveCampaign API" | External service for contact and marketing automation management. | Critical |
+| "Zoho CRM API" | Used to update the `ActiveCampaign_Contact_ID` field on Contact records. | Medium |
 
 ## Logic Flow
 
@@ -56,10 +56,12 @@ graph TD
 
 ### 1. Payload Parsing & Pricing Extraction
 The script extracts standard contact info (email, names, IDs) and handles a nested `pricing` map. It calculates differences between "Startup Prices" and "Subscription Prices" across sales sprints and pricelists, preparing these as custom field values for ActiveCampaign.
+- **NEW:** The script now also extracts `distributorPrimaryContact` from the payload for mapping.
 
 ### 2. Contact Syncing & Zoho CRM Feedback
 Using the ActiveCampaign `/contact/sync` endpoint, the script performs an upsert. 
 - It maps data to specific AC Custom Field IDs (e.g., ID `64` for `offerStartup`).
+- **Mapping Update:** Added mapping for `distributorPrimaryContact` to ActiveCampaign custom field ID `68`.
 - Upon a successful HTTP 200/201 response, it immediately writes the `finalAcContactId` back to the Zoho CRM Contact record to maintain a persistent link between the two systems.
 
 ### 3. Subscription Management
@@ -82,5 +84,9 @@ The script processes a list of tags. For each tag:
 > [!TIP]
 > The `contact/sync` endpoint is used instead of a standard POST to `/contacts`. This is preferred as it handles deduplication based on email automatically, reducing the need for manual "search-then-update" logic.
 
+> [!TIP]
+> **New Field Added:** Custom Field ID `68` has been mapped to `distributorPrimaryContact`. Ensure this field exists in ActiveCampaign with the correct permissions.
+
 ## Change Log
 - **2026-03-26T11:30:08.862Z:** Initial creation of documentation via DeluluDocu. Added logic for pricing field mapping and dynamic tag creation.
+- **2026-03-27T13:04:03.376Z:** Updated script to handle `distributorPrimaryContact` extraction from payload and mapping to ActiveCampaign custom field ID `68`. Adjusted documentation to reflect new data mapping.
