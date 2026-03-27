@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001245001"
 Name: delugeSubscriptionHandler
-Revision Timestamp: 2026-03-27T13:07:29.815Z
+Revision Timestamp: 2026-03-27T13:08:44.330Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -109,6 +109,9 @@ The script begins by extracting the `body` from the `crmAPIRequest`. It performs
 > [!TIP]
 > **API Path Correction:** Fixed the JSON path for retrieving the Customer ID after a reference lookup. The `/billing/v1/customers/reference/` endpoint returns a single `customer` object map, not a list. The code was updated to use `.get("customer").get("customer_id")` instead of attempting to access a list via index `0`.
 
+> [!TIP]
+> **Empty String Validation:** The check for `customerAccountId` was updated to `!= ""` to better handle cases where the upstream system sends an empty string instead of a null value. This prevents the script from attempting to execute a Billing lookup with an invalid ID string.
+
 > [!WARNING]
 > **Hardcoded Credentials:** The Sales Order generation section uses a hardcoded `zapikey` in the `invokeurl`. This should be migrated to a Connection or an Encrypted Variable for security.
 
@@ -125,3 +128,4 @@ The script begins by extracting the `body` from the `crmAPIRequest`. It performs
 - **2026-03-27T11:45:49.287Z:** Fixed a potential data type mismatch by explicitly casting the `customerAccountId` from the request body to a `Long` type using `.toLong()`. This ensures compatibility with Zoho CRM and Billing lookups.
 - **2026-03-27T11:51:56.607Z:** Corrected a logic error in the Zoho Billing customer lookup. The API response for the reference endpoint returns a single `customer` map; updated the script to extract `customer_id` from the correct JSON path, resolving a null value error when looking up existing billing profiles.
 - **2026-03-27T13:07:29.815Z:** Refined the `.toLong()` casting logic for `customerAccountId`. The cast was moved from the global variable initialization to the local block where the customer ID is confirmed to be non-null, preventing script termination errors when processing requests without an existing CRM Account ID.
+- **2026-03-27T13:08:44.330Z:** Adjusted the conditional check for `customerAccountId` from a null check to an empty string check (`!= ""`). This modification ensures that empty strings provided by the webhook body (which are common in JSON payloads where a key is present but empty) are correctly identified, preventing invalid API calls to the Zoho Billing reference endpoint.
