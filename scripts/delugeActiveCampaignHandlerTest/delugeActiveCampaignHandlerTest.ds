@@ -19,6 +19,7 @@ try
 	contactId = payload.get("contactId");
 	country = payload.get("country");
 	distributorName = payload.get("distributorName");
+	distributorPrimaryContact = payload.get("distributorPrimaryContact");
 	conversionName = payload.get("conversionName");
 	conversionId = payload.get("conversionId");
 	utmSource = payload.get("utmSource");
@@ -59,6 +60,7 @@ try
 	customFields.put("3",contactId);
 	customFields.put("4",country);
 	customFields.put("11",distributorName);
+	customFields.put("68",distributorPrimaryContact);
 	customFields.put("5",conversionName);
 	customFields.put("2",conversionId);
 	customFields.put("47",utmSource);
