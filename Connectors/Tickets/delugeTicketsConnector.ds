@@ -9,7 +9,7 @@ try
 	config.put("createCredentials",{"m":"POST","p":"/users/{userId}/credentials"});
 	config.put("deleteCredentials",{"m":"DELETE","p":"/users/{userId}/credentials"});
 	// API Keys
-	config.put("createApiKe",{"m":"POST","p":"/users/{userId}/workspaces/{workspaceId}/api-keys"});
+	config.put("createApiKey",{"m":"POST","p":"/users/{userId}/workspaces/{workspaceId}/api-keys"});
 	config.put("deleteApiKey",{"m":"DELETE","p":"/users/{userId}/workspaces/{workspaceId}/api-keys"});
 	// Password Management (uses another url)
 	config.put("initiatePasswordReset",{"m":"POST","p":"https://tickets.cordulus.com/api/v1/initiate-password-reset"});
