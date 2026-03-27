@@ -23,6 +23,8 @@ try
 		standalone.delugeSendErrorAlert(functionName,crmAPIRequest,errorMessage);
 		return "{\"crmAPIResponse\":{\"status_code\":400,\"body\":{\"code\":\"failure\",\"message\":\"" + errorMessage + "\"}}}";
 	}
+
+	
 	orgId = body.get("orgId");
 	customerId = body.get("customerId");
 	zcrmAccId = body.get("zcrmAccId");
@@ -317,9 +319,22 @@ try
 	targetListId = if(activatedPlanCode.contains(1200),38,if(activatedPlanCode.contains(1500),39,null));
 	if(targetListId != null && activatedPlanStatus == "live" && newActivation == TRUE)
 	{
-		info "Syncing Contact to ActiveCampaign List: " + targetListId + " with Tag: Onboarding";
+		// Prepare payload for ActiveCampaign Handler
 		tags = {"Onboarding"};
-		syncAcContactResp = standalone.delugeActiveCampaignHandler(zcrmContactId.toLong(),zcrmAccId.toLong(),firstName,lastName,email,country,activeCampaignContactId,tags,null,null,null,null,null,null,null,targetListId);
+		payload = Map();
+		payload.put("contactId",zcrmContactId.toLong());
+		payload.put("accountId",zcrmAccId.toLong());
+		payload.put("firstName",firstName);
+		payload.put("lastName",lastName);
+		payload.put("email",email);
+		payload.put("country",country);
+		payload.put("existingAcId",activeCampaignContactId);
+		payload.put("targetListId",targetListId);
+		payload.put("tags",tags);
+		
+		info "Syncing Contact to ActiveCampaign List: " + targetListId + " with Tag: Onboarding";
+		syncAcContactResp = standalone.delugeActiveCampaignHandler(payload);
+		
 		activeCampaignContactId = syncAcContactResp.get("acContactId");
 		info "Synced Contact with ActiveCampaign Contact ID: " + activeCampaignContactId;
 	}
