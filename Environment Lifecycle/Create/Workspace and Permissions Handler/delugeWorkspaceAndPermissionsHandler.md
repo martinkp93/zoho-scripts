@@ -21,17 +21,18 @@ The `delugeWorkspaceAndPermissionsHandler` is a central orchestration script wit
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
 
-| Function / Service | Purpose | Criticality |
-| --- | --- | --- |
-| [[delugeFeatureAggregator]] | Determines the total set of features/entitlements based on all active subscriptions. | High |
-| [[delugePopulaceConnector]] | Handles creation and updates of Users, Workspaces, and feature permissions in the Populace DB. | High |
-| [[delugeCroplineMembershipHandler]] | Retrieves the specific Distributor admin user ID for membership assignment. | Medium |
-| [[delugeDaggersConnector]] | Synchronizes detailed subscription metadata to the Daggers platform. | High |
-| [[delugeTicketsConnector]] | Generates user passwords and API keys. | Medium |
-| [[delugeSchlechtwetterConnector]] | Manages access to the Schlechtwetter API for specific plan codes. | Low |
-| [[delugeActiveCampaignHandler]] | Adds contacts to specific marketing and onboarding lists. | Low |
-| [[delugeMailersendConnector]] | Sends transactional emails using templates matched by language and event type. | Medium |
-| [[delugeSendErrorAlert]] | Dispatches error notifications to Slack/System Admins. | High |
+| Function / Service                           | Purpose                                                                                        | Criticality |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------- |
+| [[delugeFeatureAggregator]]                  | Determines the total set of features/entitlements based on all active subscriptions.           | High        |
+| [[delugePopulaceConnector]]                  | Handles creation and updates of Users, Workspaces, and feature permissions in the Populace DB. | High        |
+| [[delugeCroplineMembershipHandler]]          | Retrieves the specific Distributor admin user ID for membership assignment.                    | Medium      |
+| [[delugeDaggersConnector]]                   | Synchronizes detailed subscription metadata to the Daggers platform.                           | High        |
+| [[delugeTicketsConnector]]                   | Generates user passwords and API keys.                                                         | Medium      |
+| [[delugeSchlechtwetterConnector]]            | Manages access to the Schlechtwetter API for specific plan codes.                              | Low         |
+| [[delugeActiveCampaignHandler]]              | Adds contacts to specific marketing and onboarding lists.                                      | Low         |
+| [[delugeMailersendConnector]]                | Sends transactional emails using templates matched by language and event type.                 | Medium      |
+| [[delugeSendErrorAlert]]                     | Dispatches error notifications to Slack/System Admins.                                         | High        |
+| [[triggerWorkspaceAndPermissionsHandlerCrm]] | Trigger relay script in Zoho Billing that sends                                                |             |
 
 ## Logic Flow
 

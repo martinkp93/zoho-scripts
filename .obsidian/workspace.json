@@ -14,7 +14,7 @@
               "type": "markdown",
               "state": {
                 "file": "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
-                "mode": "preview",
+                "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
@@ -194,7 +194,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "a475bd43d4c255ad",
+  "active": "be42622720ea9833",
   "lastOpenFiles": [
     "Acquisition and Onboarding/Order Ingestion/Subscription Handler/delugeSubscriptionHandler.md",
     "scripts/delugeLeadHandlerTest/delugeLeadHandlerTest.md",
