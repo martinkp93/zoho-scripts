@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001245001"
 Name: delugeSubscriptionHandler
-Revision Timestamp: 2026-03-27T11:51:56.607Z
+Revision Timestamp: 2026-03-27T13:07:29.815Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -95,7 +95,10 @@ The script begins by extracting the `body` from the `crmAPIRequest`. It performs
 ## Developer Notes
 
 > [!TIP]
-> **Data Type Casting:** The update on 2026-03-27 added `.toLong()` to the `customerAccountId` variable extraction. This ensures that the ID received from the JSON payload (which may arrive as a string) is explicitly cast to a numerical Long, preventing type-mismatch errors during API URL construction or subsequent CRM updates.
+> **Improved Null Safety for ID Casting:** The `.toLong()` cast for `customerAccountId` was moved inside the specific conditional block where the ID is verified to be non-null. In previous versions, performing `.toLong()` during initial variable extraction would cause a script crash if the ID was missing from the JSON payload.
+
+> [!TIP]
+> **Data Type Casting:** The update on 2026-03-27 ensured that the ID received from the JSON payload is explicitly cast to a numerical Long during API URL construction, preventing type-mismatch errors.
 
 > [!TIP]
 > **Improved Customer Matching:** The update implemented on 2026-03-27 switched from searching by email to searching by `zcrm_account_id`. This prevents duplicate customer creation when a CRM account already has a billing profile linked via a different email address.
@@ -121,3 +124,4 @@ The script begins by extracting the `body` from the `crmAPIRequest`. It performs
 - **2026-03-27T11:45:14.160Z:** Added diagnostic logging for the Zoho Billing customer reference lookup response to assist in troubleshooting intermittent API connectivity issues during the subscription flow.
 - **2026-03-27T11:45:49.287Z:** Fixed a potential data type mismatch by explicitly casting the `customerAccountId` from the request body to a `Long` type using `.toLong()`. This ensures compatibility with Zoho CRM and Billing lookups.
 - **2026-03-27T11:51:56.607Z:** Corrected a logic error in the Zoho Billing customer lookup. The API response for the reference endpoint returns a single `customer` map; updated the script to extract `customer_id` from the correct JSON path, resolving a null value error when looking up existing billing profiles.
+- **2026-03-27T13:07:29.815Z:** Refined the `.toLong()` casting logic for `customerAccountId`. The cast was moved from the global variable initialization to the local block where the customer ID is confirmed to be non-null, preventing script termination errors when processing requests without an existing CRM Account ID.
