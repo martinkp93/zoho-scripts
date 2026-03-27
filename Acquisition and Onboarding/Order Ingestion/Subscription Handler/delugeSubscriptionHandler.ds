@@ -68,7 +68,7 @@ try
 	// --- Step 1 & 2: Find or Create Customer in Zoho Billing ---
 	//
 	info "[LOG] Step 2 & 3: Finding or creating customer for email: " + customerEmail;
-	if(customerAccountId != null)
+	if(customerAccountId != "")
 	{
 		params = Map();
 		params.put("reference_id_type","zcrm_account_id");
