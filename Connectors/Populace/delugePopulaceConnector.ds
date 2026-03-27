@@ -7,7 +7,7 @@ try
 	config = Map();
 	// Users
 	config.put("createUser",{"m":"POST","p":"/users"});
-	config.put("updateUser",{"m":"PUT","p":"/users/{userId}"});
+	config.put("updateUsers",{"m":"PUT","p":"/users/{userId}"});
 	config.put("deleteUser",{"m":"DELETE","p":"/users/{userId}?contactId={contactId}"});
 	// Workspaces
 	config.put("createWorkspaces",{"m":"POST","p":"/workspaces"});
