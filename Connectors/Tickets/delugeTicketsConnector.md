@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001178035"
 Name: delugeTicketsConnector
-Revision Timestamp: 2026-03-19T15:32:30.152Z
+Revision Timestamp: 2026-03-27T21:36:51.062Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -13,7 +13,7 @@ The `delugeTicketsConnector` is a centralized utility function designed to inter
 
 ## Technical Contract
 - **Input:** 
-    - `action` (String): The identifier for the operation to perform (e.g., `createApiKey`, `initiatePasswordReset`).
+    - `action` (String): The identifier for the operation to perform (e.g., `createApiKe`, `initiatePasswordReset`).
     - `payload` (Map): A map containing both the dynamic path parameters (like `userId`) and the data to be sent in the request body.
 - **Output:** A Map containing `success` (Boolean) and either `data` (String response) or `error_message` (String).
 - **Primary Entities:** 
@@ -74,5 +74,9 @@ The script supports `POST` and `DELETE` methods via Zoho's `invokeurl`. It utili
 > [!CAUTION]
 > Because path parameters are removed from the `payload` map during the URL building phase, any script calling this connector should be aware that the original payload map passed by reference may be modified.
 
+> [!CAUTION]
+> **Regression Warning:** In the latest update, a typo was introduced in the `config` map. The key `createApiKey` was changed to `createApiKe`. Any external scripts calling this function using the original `createApiKey` string will now result in an "Invalid action specified" error.
+
 ## Change Log
 - **2026-03-19T15:32:30.152Z:** Initial creation of documentation via DeluluDocu.
+- **2026-03-27T21:36:51.062Z:** Updated configuration map. Note: A typo was introduced in the API Key creation action string (`createApiKey` -> `createApiKe`).
