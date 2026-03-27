@@ -2,6 +2,7 @@ string standalone.delugeSalesIQMissedChat(String crmAPIRequest)
 {
 // 1. Parse the incoming body from SalesIQ
 requestBody = crmAPIRequest.get("body").toMap();
+
 // 2. Extract the specific variables
 vMessage = requestBody.get("message");
 vEmail = requestBody.get("visitor_email");
