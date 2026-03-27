@@ -29,7 +29,7 @@ try
 	invoicedById = body.get("invoicedById");
 	distributorName = body.get("distributorName");
 	priceListId = body.get("priceListId");
-	customerAccountId = body.get("customerId").toLong();
+	customerAccountId = body.get("customerId");
 	customerEmail = body.get("customerEmail");
 	phone = body.get("phone");
 	companyName = body.get("companyName");
@@ -74,7 +74,7 @@ try
 		params.put("reference_id_type","zcrm_account_id");
 		findBillingCustomerResp = invokeurl
 		[
-			url :"https://www.zohoapis.eu/billing/v1/customers/reference/" + customerAccountId
+			url :"https://www.zohoapis.eu/billing/v1/customers/reference/" + customerAccountId.toLong()
 			type :GET
 			parameters:params
 			detailed:true
