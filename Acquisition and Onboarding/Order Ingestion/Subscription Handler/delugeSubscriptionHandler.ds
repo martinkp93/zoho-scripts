@@ -29,7 +29,7 @@ try
 	invoicedById = body.get("invoicedById");
 	distributorName = body.get("distributorName");
 	priceListId = body.get("priceListId");
-	customerAccountId = body.get("customerId");
+	customerAccountId = body.get("customerId").toLong();
 	customerEmail = body.get("customerEmail");
 	phone = body.get("phone");
 	companyName = body.get("companyName");
