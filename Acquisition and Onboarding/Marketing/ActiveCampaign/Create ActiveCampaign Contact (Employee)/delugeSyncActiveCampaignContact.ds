@@ -1,10 +1,20 @@
-void automation.delugeSyncActiveCampaignContact(Int contactId, Int accountId, String firstName, String lastName, String email, String country, String activeCampaignContactId)
+void automation.delugeSyncActiveCampaignContact(Int contactId,Int accountId,String firstName,String lastName,String email,String country,String activeCampaignContactId)
 {
 if(activeCampaignContactId == "")
 {
 	tags = {"Customer","Employee"};
 	info "Calling ActiveCampaign Handler";
-	syncAcContactResp = standalone.delugeActiveCampaignHandler(contactId.toLong(),accountId.toLong(),firstName,lastName,email,country,null,tags,null,null,null,null,null,null,null,null);
+	
+	payload = Map();
+	payload.put("contactId",contactId.toLong());
+	payload.put("accountId",accountId.toLong());
+	payload.put("firstName",firstName);
+	payload.put("lastName",lastName);
+	payload.put("email",email);
+	payload.put("country",country);
+	payload.put("tags",tags);
+	syncAcContactResp = standalone.delugeActiveCampaignHandler(payload);
+	
 	info "ActiveCampaign Handler response: " + syncAcContactResp;
 }
 if(syncAcContactResp.get("acContactId") != null)
