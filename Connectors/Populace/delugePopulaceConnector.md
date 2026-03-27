@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001170034"
 Name: delugePopulaceConnector
-Revision Timestamp: 2026-03-27T21:03:10.201Z
+Revision Timestamp: 2026-03-27T21:27:34.353Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -56,7 +56,7 @@ graph TD
 ### 1. Action Configuration Map
 The script maintains an internal registry of supported actions. Each entry defines the HTTP verb and the URL path template. Path templates use curly braces (e.g., `{userId}`) which are dynamically replaced by values in the input payload. It supports:
 - **Users**: Create, Update, Delete.
-- **Workspaces**: Create, Update, Delete.
+- **Workspaces**: Create (renamed to `createWorkspaces`), Update, Delete.
 - **Distributors**: Create, Update, Add Workspace, Add/Remove User.
 - **Memberships**: Add/Delete (Linkage between Users and Workspaces).
 
@@ -78,7 +78,7 @@ A global `try...catch` block handles execution runtime errors. In both runtime f
 > When adding new endpoints to the `config` map, ensure the parameter names in the URL path (e.g., `{workspaceId}`) exactly match the keys being passed in the payload from the calling script.
 
 > [!CAUTION]
-> If an API endpoint requires the same ID to be present in both the URL path and the JSON body, this script's interpolation logic will fail to include it in the body. In such cases, the script logic would need to be modified to clone the key before removal.
+> **Action Name Change:** The action key for creating workspaces has been updated from `createWorkspace` to `createWorkspaces` (plural). Any calling scripts must be updated to use the pluralized key, or they will receive an "Invalid action specified" error.
 
 > [!NOTE]
 > The script currently returns a Map literal while the signature is defined as `string`. While Deluge handles this loosely, if you experience type-mismatch errors in calling scripts, ensure you handle the response as a Map.
@@ -89,3 +89,4 @@ A global `try...catch` block handles execution runtime errors. In both runtime f
 - **2026-03-19T17:36:25.111Z:** Documentation audit and verification. Script code remains unchanged; verified logic for endpoint handling and connection parameters. No logic changes detected in this revision.
 - **2026-03-19T18:31:35.916Z:** Documentation update. Compared script versions; confirmed no functional changes in the logic or endpoint configuration. Logic remains stable.
 - **2026-03-27T21:03:10.201Z:** Documentation sync and logic validation. Verified the dynamic URL interpolation logic and confirmed the removal of path parameters from the body payload. Identified potential edge case where an ID might be needed in both path and body. No logic changes were made to the script code in this revision.
+- **2026-03-27T21:27:34.353Z:** Updated `config` map for Workspaces. Changed action key `createWorkspace` to `createWorkspaces`. This is a breaking change for any scripts using the old singular key. Verified that logic for dynamic URL path replacement remains intact.
