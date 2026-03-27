@@ -30,6 +30,7 @@ try
 	distributorName = body.get("distributorName");
 	priceListId = body.get("priceListId");
 	customerAccountId = body.get("customerId").toLong();
+	info customerAccountId;
 	customerEmail = body.get("customerEmail");
 	phone = body.get("phone");
 	companyName = body.get("companyName");
