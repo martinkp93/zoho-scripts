@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001245001"
 Name: delugeSubscriptionHandler
-Revision Timestamp: 2026-03-27T11:41:12.956Z
+Revision Timestamp: 2026-03-27T11:45:14.160Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -97,6 +97,9 @@ The script begins by extracting the `body` from the `crmAPIRequest`. It performs
 > [!TIP]
 > **Improved Customer Matching:** The update implemented on 2026-03-27 switched from searching by email to searching by `zcrm_account_id`. This prevents duplicate customer creation when a CRM account already has a billing profile linked via a different email address.
 
+> [!TIP]
+> **Diagnostic Logging:** Added `info` statement for the Billing Customer response (`findBillingCustomerResp`) to help debug data mapping issues when the reference lookup returns unexpected results.
+
 > [!WARNING]
 > **Hardcoded Credentials:** The Sales Order generation section uses a hardcoded `zapikey` in the `invokeurl`. This should be migrated to a Connection or an Encrypted Variable for security.
 
@@ -109,3 +112,4 @@ The script begins by extracting the `body` from the `crmAPIRequest`. It performs
 ## Change Log
 - **2026-03-19T16:03:22.676Z:** Initial creation of documentation via DeluluDocu.
 - **2026-03-27T11:41:12.956Z:** Refactored Zoho Billing customer lookup logic. Switched from email-based search to `zcrm_account_id` reference lookup via the Billing `/customers/reference/` endpoint to improve matching accuracy for existing CRM accounts. Removed redundant email search logic when `customerAccountId` is present.
+- **2026-03-27T11:45:14.160Z:** Added diagnostic logging for the Zoho Billing customer reference lookup response to assist in troubleshooting intermittent API connectivity issues during the subscription flow.
