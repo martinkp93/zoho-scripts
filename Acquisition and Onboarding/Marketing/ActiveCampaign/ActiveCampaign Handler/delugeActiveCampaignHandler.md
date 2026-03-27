@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001249001"
 Name: delugeActiveCampaignHandler
-Revision Timestamp: 2026-03-19T15:33:47.979Z
+Revision Timestamp: 2026-03-27T13:28:49.726Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -9,19 +9,17 @@ Status: Functional
 ---
 
 ## Overview
-The `delugeActiveCampaignHandler` function is a centralized utility designed to synchronize Zoho CRM Contact data with ActiveCampaign. It performs a multi-step orchestration: syncing contact details (including custom fields and UTM parameters), updating the Zoho CRM record with the external ActiveCampaign ID, subscribing the contact to a specific mailing list, and dynamically managing contact tags (searching for or creating tags as needed).
+The `delugeActiveCampaignHandler` function is a centralized utility designed to synchronize Zoho CRM Contact data with ActiveCampaign. It performs a multi-step orchestration: syncing contact details (including extensive custom fields, marketing attribution, and pricing data), updating the Zoho CRM record with the external ActiveCampaign ID, subscribing the contact to a specific mailing list, and dynamically managing contact tags.
 
 ## Technical Contract
 - **Input:** 
-    - `contactId` (Int): Zoho CRM Contact Record ID.
-    - `accountId` (String): Associated Account ID.
-    - `firstName`/`lastName`/`email`/`phone` (String): Standard identity fields.
-    - `country`/`distributorName` (String): Geographic and organizational metadata.
-    - `activeCampaignContactId` (String): Existing AC ID if known.
-    - `tagsInput` (List/String): A collection of tag names to apply.
-    - `conversionName`/`conversionId` (String): Marketing conversion tracking.
-    - `utmSource`/`utmMedium`/`utmCampaign` (String): Standard UTM parameters.
-    - `targetListId` (String): The ActiveCampaign List ID for subscription.
+    - `payload` (String/Map): A comprehensive JSON object containing:
+        - Identity: `email`, `phone`, `firstName`, `lastName`.
+        - CRM Metadata: `contactId`, `accountId`, `country`.
+        - Distribution: `distributorName`, `distributorPrimaryContact`.
+        - Marketing: `utmSource`, `utmMedium`, `utmCampaign`, `conversionName`, `conversionId`.
+        - Pricing (Optional Map): Nested details from Sales Sprints (`salesSprint`, `priceList`, `savings`).
+        - Configuration: `tags` (List), `targetListId` (String).
 - **Output:** Returns a Map `{"success":true, "acContactId": "..."}` on success, or a string error message on failure.
 - **Primary Entities:** Zoho CRM Contacts, ActiveCampaign API (v3).
 
@@ -38,14 +36,15 @@ This script orchestrates the following internal functions and external services:
 
 ```mermaid
 graph TD
-    Start(["Start"]) --> Sync["Sync Contact via /contact/sync"]
+    Start(["Start"]) --> Parse["Parse Payload & Pricing Data"]
+    Parse --> Sync["Sync Contact via /contact/sync"]
     Sync --> CheckSync{Success?}
     
     CheckSync -- "No" --> Err1["[[delugeSendErrorAlert]]"]
     CheckSync -- "Yes" --> UpdateCRM["Update CRM: ActiveCampaign_Contact_ID"]
     
     UpdateCRM --> ListAdd["Add Contact to List (targetListId)"]
-    ListAdd --> TagLoop["For Each tagName in tagsInput"]
+    ListAdd --> TagLoop["For Each tagName in tags"]
     
     TagLoop --> SearchTag["Search Tag by Name"]
     SearchTag -- "Not Found" --> CreateTag["Create New Tag"]
@@ -60,31 +59,37 @@ graph TD
 
 ## Core Logic Sections
 
-### 1. Contact Synchronization & Custom Field Mapping
-The script uses the ActiveCampaign `/contact/sync` endpoint, which acts as an "upsert" mechanism based on the email address. It maps a significant number of custom fields (IDs 1, 3, 4, 11, 5, 2, 47, 48, 49, 60) to capture CRM IDs, distributor info, and marketing attribution data.
+### 1. Payload Extraction & Pricing Logic
+The script transitioned from individual arguments to a single `payload` Map. It includes specialized logic to extract pricing information (Startup Prices, Subscription Prices, and Savings) from a nested `pricing` object, typically sourced from a Sales Sprint or Quote tool.
 
-### 2. CRM ID Write-back
-Immediately following a successful sync, the script extracts the ActiveCampaign Contact ID and updates the `ActiveCampaign_Contact_ID` field in the Zoho CRM Contacts module. This ensures future parity and easier lookups.
+### 2. Contact Synchronization & Custom Field Mapping
+The script uses the ActiveCampaign `/contact/sync` endpoint. It maps a significant number of custom fields:
+- **CRM/Base:** IDs 1 (Account), 3 (CRM ID), 4 (Country).
+- **Distribution:** IDs 11 (Name), 68 (Primary Contact).
+- **Attribution:** IDs 5, 2, 47, 48, 49, 60 (UTMs and Conversion details).
+- **Pricing:** IDs 64 (Offer Startup), 62 (Default Startup), 63 (Default Sub), 65 (Offer Sub), 66 (Offer Type), 67 (Total Savings).
 
-### 3. List Subscription
-The contact is subscribed to the `targetListId` provided in the arguments. The status is explicitly set to `"1"` (Active/Subscribed).
+### 3. CRM ID Write-back
+Immediately following a successful sync, the script extracts the ActiveCampaign Contact ID and updates the `ActiveCampaign_Contact_ID` field in the Zoho CRM Contacts module.
 
 ### 4. Dynamic Tag Management
-The script iterates through the `tagsInput`. For each tag:
-1. It searches the AC system for an existing tag matching the name.
-2. If no exact match is found, it creates the tag via the API.
-3. It associates the (found or created) Tag ID with the contact.
+The script iterates through the `tags` list. It performs a lookup for each tag name; if the tag does not exist in ActiveCampaign, it is created on-the-fly before being associated with the contact.
 
 ## Developer Notes
 
 > [!IMPORTANT]
-> This function requires a valid Zoho CRM Connection named `activecampaign`. Ensure the connection has scopes for both `invokeurl` and CRM record updates.
-
-> [!CAUTION]
-> The `tagsInput` parameter is defined as a `String` in the function signature but is iterated over as a `List`. Ensure the calling script passes a List object, or Deluge may throw a runtime error during the `for each` loop.
+> **Breaking Change:** The function signature has changed from 16 individual arguments to a single `payload` string/map. All calling scripts must be updated to wrap parameters into a Map.
 
 > [!TIP]
-> The UTM Source is specifically mapped twice if the `conversionName` contains the word "Request" (Field ID 60), facilitating specific reporting for Quote Requests.
+> The pricing logic handles `null` values gracefully via `ifnull`. If the `pricing` map is missing from the payload, the associated ActiveCampaign custom fields will simply be omitted from the sync request.
+
+> [!CAUTION]
+> Ensure the Zoho CRM Connection `activecampaign` remains active. If the `responseCode` is not 200 or 201 during the contact sync, the script triggers an alert and halts further processing (List/Tag additions).
 
 ## Change Log
+- **2026-03-27T13:28:49.726Z:** 
+    - Refactored function signature to accept a single `payload` Map.
+    - Added support for 7 new custom fields related to Pricing and Distributor Contacts (IDs 62-68).
+    - Implemented nested logic for `pricing` data extraction.
+    - Updated error handling to pass the entire payload to [[delugeSendErrorAlert]].
 - **2026-03-19T15:33:47.979Z:** Initial creation of documentation via DeluluDocu.
