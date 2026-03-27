@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001374109"
 Name: delugeSalesIQMissedChat
-Revision Timestamp: 2026-03-19T19:56:51.243Z
+Revision Timestamp: 2026-03-27T08:28:49.165Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -40,7 +40,7 @@ graph TD
 ## Core Logic Sections
 
 ### 1. Data Extraction & Parsing
-The script expects a map-like structure within the `crmAPIRequest`. It converts the body to a Map and extracts specific SalesIQ attributes: `message`, `visitor_email`, `visitor_name`, `country`, and `chat_id`.
+The script expects a map-like structure within the `crmAPIRequest`. It converts the body to a Map using `.toMap()` and extracts specific SalesIQ attributes: `message`, `visitor_email`, `visitor_name`, `country`, and `chat_id`.
 
 ### 2. Content Construction
 It dynamically generates an HTML email body using the extracted visitor data. This step formats the technical chat data into a readable format for support staff, including a "Chat Reference" for traceability.
@@ -61,3 +61,4 @@ The script builds a structured Map matching the MailerSend API requirements (def
 
 ## Change Log
 - **2026-03-19T19:56:51.243Z:** Initial creation of documentation via DeluluDocu.
+- **2026-03-27T08:28:49.165Z:** Documentation update to ensure template compliance. No changes were made to the core logic; script remains functional and identical to the previous version. Verified Mermaid syntax and callout formatting.
