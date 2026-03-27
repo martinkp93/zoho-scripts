@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001170034"
 Name: delugePopulaceConnector
-Revision Timestamp: 2026-03-27T21:32:14.169Z
+Revision Timestamp: 2026-03-27T21:56:34.506Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -15,7 +15,7 @@ This script is triggered by other standalone scripts or automation workflows tha
 
 ## Technical Contract
 - **Input:** 
-    - `String action`: The logical operation name (e.g., `createUser`, `createWorkspaces`).
+    - `String action`: The logical operation name (e.g., `createUser`, `updateUser`, `createWorkspaces`).
     - `Map payload`: A key-value map containing both the body data and any URL path parameters (e.g., `userId`).
 - **Output:** A Map (returned as string/map literal) containing `{"success": true/false, "data": "response text", "error_message": "details"}`.
 - **Primary Entities:** 
@@ -55,7 +55,7 @@ graph TD
 
 ### 1. Action Configuration Map
 The script maintains an internal registry of supported actions. Each entry defines the HTTP verb and the URL path template. Path templates use curly braces (e.g., `{userId}`) which are dynamically replaced by values in the input payload. It supports:
-- **Users**: Create, Update, Delete.
+- **Users**: Create (`createUser`), Update (`updateUser`), Delete (`deleteUser`).
 - **Workspaces**: Create (`createWorkspaces`), Update, Delete.
 - **Distributors**: Create, Update, Add Workspace, Add/Remove User.
 - **Memberships**: Add/Delete (Linkage between Users and Workspaces).
@@ -78,7 +78,10 @@ A global `try...catch` block handles execution runtime errors. In both runtime f
 > When adding new endpoints to the `config` map, ensure the parameter names in the URL path (e.g., `{workspaceId}`) exactly match the keys being passed in the payload from the calling script.
 
 > [!CAUTION]
-> **Action Name Updated:** The action key for creating workspaces has been updated from `createWorkspace` (singular) to `createWorkspaces` (plural). Ensure all calling scripts are updated to use the plural key to avoid "Invalid action specified" errors.
+> **Action Name Updated (Users):** The action key for updating users has been updated from `updateUsers` (plural) to `updateUser` (singular). This aligns with the individual resource update pattern. Ensure all calling scripts are updated.
+
+> [!CAUTION]
+> **Action Name Updated (Workspaces):** The action key for creating workspaces is `createWorkspaces` (plural). Ensure all calling scripts use the plural key to avoid "Invalid action specified" errors.
 
 > [!NOTE]
 > The script currently returns a Map literal while the signature is defined as `string`. While Deluge handles this loosely, if you experience type-mismatch errors in calling scripts, ensure you handle the response as a Map.
@@ -92,3 +95,4 @@ A global `try...catch` block handles execution runtime errors. In both runtime f
 - **2026-03-27T21:27:34.353Z:** Updated `config` map for Workspaces. Changed action key `createWorkspace` to `createWorkspaces`. This is a breaking change for any scripts using the old singular key. Verified that logic for dynamic URL path replacement remains intact.
 - **2026-03-27T21:31:38.235Z:** Reverted Workspace action key from `createWorkspaces` (plural) back to `createWorkspace` (singular) to ensure compatibility with standard naming conventions across the integration. Verified that the internal path `/workspaces` remains unchanged.
 - **2026-03-27T21:32:14.169Z:** Updated Workspace action key from `createWorkspace` (singular) to `createWorkspaces` (plural). This update ensures alignment with the pluralized API resource naming convention. Calling scripts must now use the key `createWorkspaces`.
+- **2026-03-27T21:56:34.506Z:** Updated User update action key from `updateUsers` (plural) to `updateUser` (singular). This ensures consistency across the mapping where singular resource updates use singular keys. Calling scripts must update their references to `updateUser`.
