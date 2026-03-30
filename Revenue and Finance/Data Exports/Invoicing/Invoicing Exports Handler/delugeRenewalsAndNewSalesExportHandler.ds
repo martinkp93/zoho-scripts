@@ -1,4 +1,4 @@
-string standalone.delugeRenewalsAndNewSalesExportHandler(String task, String segment)
+string standalone.delugeRenewalsAndNewSalesExportHandler(String task,String segment)
 {
 variables = invokeurl
 [
@@ -359,6 +359,6 @@ for each  rowDistributorName in finalSheetData.keys()
 // 6. SEND FINAL SLACK NOTIFICATION
 // ============================================================
 slackChannelId = "C09PTU8KKT3";
-// standalone.delugePostSuccessMessageToSlack(slackSummary,slackChannelId);
+standalone.delugePostSuccessMessageToSlack(slackSummary,slackChannelId);
 return "";
 }
