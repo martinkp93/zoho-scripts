@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001307001"
 Name: delugeRenewalsAndNewSalesExportHandler
-Revision Timestamp: 2026-03-19T21:12:49.368Z
+Revision Timestamp: 2026-03-30T04:54:50.981Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -30,7 +30,7 @@ This script orchestrates the following internal functions and external services:
 | Function / Service | Purpose | Criticality |
 | --- | --- | --- |
 | [[delugeSendErrorAlert]] | Handles error reporting to administrators if sheet creation or data clearing fails. | High |
-| [[delugePostSuccessMessageToSlack]] | Sends a summary breakdown of processed quantities to Slack (Currently Commented Out). | Low |
+| [[delugePostSuccessMessageToSlack]] | Sends a summary breakdown of processed quantities to the designated Slack channel. | Medium |
 | **Zoho Analytics API** | Source of truth for the processed data records via Export Jobs. | Blockers |
 | **Google Sheets API** | Target destination for data visualization and distribution. | Blockers |
 | **Mailersend API** | Used to deliver XLSX exports to Cropline distributors. | Medium |
@@ -60,7 +60,7 @@ graph TD
     IsCropline -- "No" --> NextDist["Next Distributor"]
     Email --> NextDist
     
-    NextDist --> End(["End / Post Slack Summary"])
+    NextDist --> End(["Post Slack Summary & End"])
 ```
 
 ## Core Logic Sections
@@ -82,6 +82,9 @@ The data is filtered by `allowedProducts` (e.g., "Cordulus Farm" for the Cordulu
 ### 5. Master Dashboard Synchronization
 The script locates the correct row in the "Master Tracking Dashboard" by matching the Distributor Name and Task. It calculates the total quantity of subscriptions/units and updates the specific cell corresponding to the target month. It also attaches a **Google Sheets Note** to the cell containing a timestamp of the update.
 
+### 6. Notifications & Export
+For the "Cropline" segment, the script generates an XLSX export of the newly updated tab and sends it via Mailersend to specified recipients. Finally, a summary of all processed quantities per distributor is posted to Slack.
+
 ## Developer Notes
 
 > [!IMPORTANT]
@@ -94,9 +97,10 @@ The script locates the correct row in the "Master Tracking Dashboard" by matchin
 > **Performance**: The script fetches the Master Dashboard row values once per execution (`dashboardMeta`) rather than per-distributor to avoid hitting Google Sheets API rate limits during large batch runs.
 
 > [!NOTE]
-> **Slack Notifications**: The call to `standalone.delugePostSuccessMessageToSlack` is currently commented out at the end of the script. This can be re-enabled to provide real-time visibility into successful runs.
+> **Slack Notifications**: As of the latest update, the call to `[[delugePostSuccessMessageToSlack]]` is fully enabled, providing the operations team with a real-time summary of the quantities pushed to the sheets.
 
 ## Change Log
 - **2026-03-19T19:39:37.540Z:** Initial creation of documentation via DeluluDocu. Added logic for dynamic Year/Month tab targeting and Mailersend integration for Cropline.
 - **2026-03-19T20:30:02.120Z:** Re-validation of script logic. Confirmed identical operational logic for both "Renewals" and "New Sales" modes regarding Google Sheet clearing and dashboard note updates. Verified no functional changes in this revision code block.
 - **2026-03-19T21:12:49.368Z:** Logic verification pass. Confirmed consistency across API endpoints (CRM v8 and Analytics v2). No functional code changes; updated documentation to reflect "commented out" status of Slack notifications and added standard developer notes for observability.
+- **2026-03-30T04:54:50.981Z:** Enabled final Slack success notification. The `[[delugePostSuccessMessageToSlack]]` function is now active at the end of the script to provide a summary breakdown of quantities processed for the task and segment. No other functional changes were made to the core data processing or sheet update logic.
