@@ -23,8 +23,6 @@ try
 		standalone.delugeSendErrorAlert(functionName,crmAPIRequest,errorMessage);
 		return "{\"crmAPIResponse\":{\"status_code\":400,\"body\":{\"code\":\"failure\",\"message\":\"" + errorMessage + "\"}}}";
 	}
-
-	
 	orgId = body.get("orgId");
 	customerId = body.get("customerId");
 	zcrmAccId = body.get("zcrmAccId");
@@ -246,6 +244,7 @@ try
 			if(credentialsResponse.get("success"))
 			{
 				password = credentialsResponse.get("data").get("password");
+				info "Password: " + password;
 				// --- Update the CRM Contact to reflect the new status ---
 				zoho.crm.updateRecord("Contacts",zcrmContactId,{"Credentials_Active":true});
 				info "Password created successfully.";
@@ -331,10 +330,8 @@ try
 		payload.put("existingAcId",activeCampaignContactId);
 		payload.put("targetListId",targetListId);
 		payload.put("tags",tags);
-		
 		info "Syncing Contact to ActiveCampaign List: " + targetListId + " with Tag: Onboarding";
 		syncAcContactResp = standalone.delugeActiveCampaignHandler(payload);
-		
 		activeCampaignContactId = syncAcContactResp.get("acContactId");
 		info "Synced Contact with ActiveCampaign Contact ID: " + activeCampaignContactId;
 	}
