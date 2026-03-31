@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001303005"
 Name: delugeProcessRenewalsOrNewSalesForInvoicingV2
-Revision Timestamp: 2026-03-31T06:49:01.769Z
+Revision Timestamp: 2026-03-31T06:50:35.304Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -29,8 +29,8 @@ This script orchestrates the following internal functions and external services:
 | --- | --- | --- |
 | Google Sheets API | Fetches the raw product/renewal data from the distributor's spreadsheet. | High |
 | E-conomic REST API | Fetches customer metadata and creates the Draft Invoice. | High |
-| [[delugePostSuccessMessageToSlack]] | Posts a formatted success message (including links) to Slack. | Medium |
-| [[delugeSendErrorAlert]] | Alerts the development team if the process fails mid-execution. | Medium |
+| [[delugePostSuccessMessageToSlack]] | Posts a formatted success message or specific API error message to Slack. | Medium |
+| [[delugeSendErrorAlert]] | Alerts the development team if the process fails due to a script exception. | Medium |
 
 ## Logic Flow
 ```mermaid
@@ -48,11 +48,11 @@ graph TD
     
     Build --> CreateDraft["Create E-conomic Draft Invoice"]
     CreateDraft -- "Success" --> SlackSuccess["Post Draft Link to Slack"]
-    CreateDraft -- "API Error" --> AlertError["[[delugeSendErrorAlert]] with E-conomic Error details"]
+    CreateDraft -- "API Error" --> SlackErrSpecific["Post specific E-conomic error to Slack via [[delugePostSuccessMessageToSlack]]"]
     
     SlackEmpty --> End(["End"])
     SlackSuccess --> End
-    AlertError --> End
+    SlackErrSpecific --> End
     
     Parse -- "Exception" --> HandleError["Global Error Handler"]
     HandleError --> SlackErr["[[delugeSendErrorAlert]]"]
@@ -86,10 +86,11 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 > There is a potential syntax error or logic bug on line 146: `if(summaryMap.contains(discountCode))`. In Deluge, the correct method to check for a key in a Map is `.containsKey()`. This may cause the discount aggregation to fail or return false incorrectly.
 
 > [!TIP]
-> The script now includes enhanced error reporting for E-conomic API failures. Instead of just logging the error to the console, it captures the specific `errors` object from the E-conomic response and triggers an automated alert via `delugeSendErrorAlert`.
+> The script now reports E-conomic API validation errors directly to the operational Slack channel using `[[delugePostSuccessMessageToSlack]]`. This allows the team to see exactly why an invoice failed (e.g., "Product code not found") without needing to check administrative error logs via `[[delugeSendErrorAlert]]`.
 
 ## Change Log
 - **2026-03-19T19:40:08.390Z:** Initial creation of documentation via DeluluDocu. 
 - **2024-05-22:** Refactored to V2 to include discount aggregation logic and refined business rules for Consignment vs Sales stock types.
 - **2026-03-19T20:29:30.290Z:** Updated documentation to reflect V2 logic: added dynamic header discovery, `summaryMap` aggregation for products and discounts, and implemented exchange rate math on `unitNetPrice`. Documented potential `.contains()` bug in Map logic.
 - **2026-03-31T06:49:01.769Z:** Enhanced error handling for E-conomic draft creation. The script now explicitly checks for a null `draftInvoiceNumber` and extracts detailed error messages from the API response to send via `delugeSendErrorAlert`.
+- **2026-03-31T06:50:35.304Z:** Modified specific E-conomic API error handling to post directly to the distributor Slack channel via [[delugePostSuccessMessageToSlack]] instead of triggering a system-wide [[delugeSendErrorAlert]]. This ensures business-level validation errors are seen by the operational team immediately.
