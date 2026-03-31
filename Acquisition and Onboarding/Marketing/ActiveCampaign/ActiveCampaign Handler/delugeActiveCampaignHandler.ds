@@ -170,7 +170,7 @@ try
 				type :GET
 				connection:"activecampaign"
 			];
-			// info searchTagResp;
+			info searchTagResp;
 			if(searchTagResp.get("tags") != null)
 			{
 				// Try to find an exact match
