@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001307001"
 Name: delugeRenewalsAndNewSalesExportHandler
-Revision Timestamp: 2026-03-31T13:21:50.259Z
+Revision Timestamp: 2026-03-31T21:45:05.250Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -19,10 +19,10 @@ Furthermore, it updates a centralized "Master Tracking Dashboard" for internal C
     - `String segment`: Determines the product filtering and target spreadsheet columns. Accepted values: `"Cordulus"` or `"Cropline"`.
 - **Output:** `String` (Returns an empty string upon completion).
 - **Primary Entities:** 
-    - **Zoho CRM**: Accounts (Distributors) and Settings Variables (Job IDs).
-    - **Zoho Analytics**: Bulk Export API v2.
-    - **Google Sheets**: Individual Distributor spreadsheets and Master Dashboard (`1iM5nTGy...` or `15NpCTxm...`).
-    - **Mailersend**: External email delivery service.
+    - **Zoho CRM**: Accounts (Distributors).
+    - **Zoho Analytics**: REST API v2 (Views: 188580000008023658 / 188580000008023872).
+    - **Google Sheets**: Individual Distributor spreadsheets and Master Dashboards (`1iM5nTGy...` or `15NpCTxm...`).
+    - **Mailersend**: External email delivery service for Cropline exports.
 
 ## Dependency Map
 This script orchestrates the following internal functions and external services:
@@ -30,77 +30,80 @@ This script orchestrates the following internal functions and external services:
 | Function / Service | Purpose | Criticality |
 | --- | --- | --- |
 | [[delugeSendErrorAlert]] | Handles error reporting to administrators if sheet creation or data clearing fails. | High |
-| [[delugePostSuccessMessageToSlack]] | Sends a summary breakdown of processed quantities to the designated Slack channel. | Medium |
-| **Zoho Analytics API** | Source of truth for the processed data records via Export Jobs. | Blockers |
-| **Google Sheets API** | Target destination for data visualization and distribution. | Blockers |
+| [[delugePostSuccessMessageToSlack]] | (Optional) Sends a summary breakdown of processed quantities to Slack. | Medium |
+| **Zoho Analytics API** | Source of truth for the processed data records via REST API v2 Export. | Blockers |
+| **Google Sheets API** | Target destination for data visualization and master dashboard tracking. | Blockers |
 | **Mailersend API** | Used to deliver XLSX exports to Cropline distributors. | Medium |
 
 ## Logic Flow
 
 ```mermaid
 graph TD
-    Start(["Start (Task, Segment)"]) --> FetchVars["Fetch Analytics JobID from CRM Variables"]
-    FetchVars --> FetchCRM["Fetch Accounts with 'Renewals_and_New_Sales_Data' URL"]
-    FetchCRM --> AnalyticsExport["Invoke Analytics Export Job Data"]
-    AnalyticsExport --> FilterData["Filter Records by Segment/Allowed Products"]
-    FilterData --> DateCalc["Calculate Target Month/Year for Tab Names"]
-    DateCalc --> LoopDist["Loop each Distributor"]
+    Start(["Start (Task, Segment)"]) --> FetchCRM["Fetch CRM Accounts with valid SS URLs"]
+    FetchCRM --> AnalyticsExport["Invoke Analytics REST API v2 (Export View)"]
+    AnalyticsExport --> FilterData["Filter Records by Segment & Product List"]
+    FilterData --> DateCalc["Calculate Target Month/Year for Tabs"]
+    DateCalc --> SortData["Sort Records Alphabetically by Account Name"]
+    SortData --> LoopDist["Loop each Distributor with Data"]
     
     subgraph GoogleUpdate ["Google Sheets Operations"]
-        LoopDist --> TabCheck{"Tab Exists?"}
+        LoopDist --> TabCheck{"Tab Exists in Target?"}
         TabCheck -- "No" --> CreateTab["Create MMMM yyyy Tab"]
-        TabCheck -- "Yes" --> ClearData["Clear Old Range A1:Z1000"]
+        TabCheck -- "Yes" --> ClearData["Clear A1:Z1000"]
         CreateTab --> ClearData
-        ClearData --> PushData["Push Sorted Data & Summary Formulas"]
-        PushData --> MasterDash["Update Master Dashboard Cell & Note"]
+        ClearData --> PushData["Push Sorted Rows & Summary Formulas"]
+        PushData --> MasterDash["Update Master Dashboard Cell Value"]
+        MasterDash --> CellNote["Add Timestamp Note to Master Cell"]
     end
     
-    MasterDash --> IsCropline{"Is Segment Cropline?"}
+    CellNote --> IsCropline{"Is Segment Cropline?"}
     IsCropline -- "Yes" --> Email["Export XLSX & Send via Mailersend"]
     IsCropline -- "No" --> NextDist["Next Distributor"]
     Email --> NextDist
     
-    NextDist --> End(["Post Slack Summary & End"])
+    NextDist --> End(["Build Slack Summary & End"])
 ```
 
 ## Core Logic Sections
 
-### 1. Configuration & Data Retrieval
-The script first identifies the `jobId` for the Analytics export by querying CRM Settings Variables. It then identifies all "Distributor" accounts in the CRM that have a spreadsheet URL configured. It dynamically selects either the standard or "Cropline" spreadsheet ID based on the `segment` input.
+### 1. Configuration & CRM Data Fetching
+The script searches CRM Accounts for distributors possessing a `Renewals_and_New_Sales_Data` link. It extracts the Spreadsheet ID from the URL and maps it to the distributor's ID and Name.
 
-### 2. Zoho Analytics Integration
-Using the Zoho Analytics REST API v2, the script fetches the JSON data resulting from a pre-configured Export Job. This job contains the calculated pricing, tiered discounts, and product details for the relevant period.
+### 2. Zoho Analytics Data Retrieval
+Using the Analytics REST API v2, the script pulls JSON records from specific views based on the `task`. 
+- **Renewals**: View ID `188580000008023658`
+- **New Sales**: View ID `188580000008023872`
 
-### 3. Data Transformation & Filtering
-The data is filtered by `allowedProducts` (e.g., "Cordulus Farm" for the Cordulus segment). The script organizes the flat list of records into a Map where keys are Distributor names and values are lists of rows, including a standardized header row. 
+### 3. Data Processing & Sorting
+The data is filtered by `allowedProducts` (e.g., "Cordulus Farm" for Cordulus, "Cropline" for Cropline). Rows are organized into a Map by distributor. Before being pushed to Google Sheets, the rows are sorted alphabetically by "Account Name" (Column C). A unique suffix is added to keys during sorting to prevent data loss if multiple rows share the same account name.
 
-### 4. Tab & Row Management
-- **Target Dates**: If the task is "Renewals", it targets next month. If "New Sales", it targets the previous month.
-- **Sorting**: Rows are sorted alphabetically by "Account Name" (Column C) using a temporary Map to ensure consistent presentation in the Google Sheet.
-- **Formulas**: The script injects Google Sheets formulas at the top of the sheet for real-time summary calculations. 
-
-> [!NOTE]
-> As of the latest update, the formulas target column **P** for Quantity (`=SUM(P8:P)`) and column **R** for Total Price (`=SUM(R8:R)`).
+### 4. Google Sheets Updates (Individual Tabs)
+- **Tab Creation**: Checks for a tab named like "January 2026 (Renewals)". If missing, it creates it using `batchUpdate`.
+- **Formulas**: Injects summary formulas at the top (Rows 2-3) to calculate totals for Quantity (`P`) and Price (`R`).
+- **Cleaning**: Always clears `A1:Z1000` before pushing fresh data to ensure no ghost rows remain.
 
 ### 5. Master Dashboard Synchronization
-The script locates the correct row in the "Master Tracking Dashboard" by matching the Distributor Name and Task. It calculates the total quantity of subscriptions/units and updates the specific cell corresponding to the target month. It also attaches a **Google Sheets Note** to the cell containing a timestamp of the update.
+The script performs a lookup on the Internal Tracking Dashboard spreadsheet.
+- **Cell Selection**: Matches Distributor Name (Col A) and Task (Col B). The column is determined by a Month-to-Column map (e.g., May -> Col G).
+- **Updates**: Pushes the `totalQty` of subscriptions (filtered by "Subscription" or "Cropline" keywords).
+- **Notes**: Attaches a Google Sheets note to the updated cell with a detailed timestamp of the last update.
 
-### 6. Notifications & Export
-For the "Cropline" segment, the script generates an XLSX export of the newly updated tab and sends it via Mailersend to specified recipients. Finally, a summary of all processed quantities per distributor is posted to Slack.
+### 6. Cropline Emailing (Mailersend)
+Specifically for the Cropline segment, the script exports the newly updated tab as an `.xlsx` file via the Google Sheets export endpoint, converts it to Base64, and sends it to a hardcoded recipient (`dela@danishagro.dk`) via the Mailersend API.
 
 ## Developer Notes
 
 > [!IMPORTANT]
-> This script relies on exact matching of "Account Name" between Zoho CRM and the "Master Tracking Dashboard" spreadsheet. If a distributor's name is changed in CRM without updating the dashboard, the Master Dashboard update will fail (though the individual sheet will still update).
+> **Account Name Matching**: The script relies on an exact string match for "Account Name" between Zoho CRM and the Master Tracking Dashboard. Any mismatch prevents the master dashboard cell from updating.
 
 > [!WARNING]
-> **Hardcoded IDs**: The script contains hardcoded Workspace IDs, Org IDs, and Dashboard Spreadsheet IDs. If the Analytics workspace or the Master spreadsheets are recreated, these variables must be updated manually.
+> **Hardcoded Parameters**: The script contains hardcoded IDs for Analytics Workspaces, Google Dashboard IDs, and Slack Channel IDs. If these resources are moved or recreated, these constants must be updated.
+
+> [!CAUTION]
+> **Slack Notification Status**: In the current version of the code, the call to `[[delugePostSuccessMessageToSlack]]` is commented out. The logic to build the summary string exists, but the final delivery is disabled.
 
 > [!TIP]
-> **Formula Column Shift**: The summary formulas injected into the distributor sheets have been updated from columns O/Q to P/R. This adjustment ensures that "Quantity" and "Total Price" calculations remain accurate based on the current Analytics export mapping.
-
-> [!NOTE]
-> **Slack Notifications**: The call to `[[delugePostSuccessMessageToSlack]]` is fully enabled, providing the operations team with a real-time summary of the quantities pushed to the sheets.
+> **Handling Empty Values**: The script explicitly converts null or empty strings in the Analytics data to "0" to prevent potential calculation errors within the Google Sheets environment.
 
 ## Change Log
 - **2026-03-19T19:39:37.540Z:** Initial creation of documentation via DeluluDocu. Added logic for dynamic Year/Month tab targeting and Mailersend integration for Cropline.
@@ -108,3 +111,4 @@ For the "Cropline" segment, the script generates an XLSX export of the newly upd
 - **2026-03-19T21:12:49.368Z:** Logic verification pass. Confirmed consistency across API endpoints (CRM v8 and Analytics v2). No functional code changes; updated documentation to reflect "commented out" status of Slack notifications and added standard developer notes for observability.
 - **2026-03-30T04:54:50.981Z:** Enabled final Slack success notification. The `[[delugePostSuccessMessageToSlack]]` function is now active at the end of the script to provide a summary breakdown of quantities processed for the task and segment.
 - **2026-03-31T13:21:50.259Z:** Adjusted Google Sheets summary formulas. Updated column indices from O and Q to **P** and **R** respectively to align with updated export data mapping. Confirmed that the `[[delugePostSuccessMessageToSlack]]` function remains active.
+- **2026-03-31T21:45:05.250Z:** Updated documentation to reflect code-level changes where `[[delugePostSuccessMessageToSlack]]` was commented out in the latest script source. Verified internal sorting logic and the addition of automated Google Sheets cell notes with timestamps for auditability. Verified column indices for summary formulas (P8 and R8).
