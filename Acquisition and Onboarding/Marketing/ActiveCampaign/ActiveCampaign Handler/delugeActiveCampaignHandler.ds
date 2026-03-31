@@ -179,6 +179,7 @@ try
 					if(tagObj.get("tag") == tagName)
 					{
 						tagIdToAdd = tagObj.get("id");
+						info "Tag Found:" + tagIdToAdd;
 						break;
 					}
 				}
