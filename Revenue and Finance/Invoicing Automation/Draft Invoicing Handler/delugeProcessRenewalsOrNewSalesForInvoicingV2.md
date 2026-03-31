@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001303005"
 Name: delugeProcessRenewalsOrNewSalesForInvoicingV2
-Revision Timestamp: 2026-03-31T20:28:38.107Z
+Revision Timestamp: 2026-03-31T20:31:24.809Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -90,7 +90,7 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 > A critical logic bug persists in the discount aggregation section: `if(summaryMap.contains(discountCode))`. In Deluge, the correct method to check for a key in a Map is `.containsKey()`. Use of `.contains()` on a Map may result in incorrect evaluation or failures when processing tiered discounts.
 
 > [!TIP]
-> This revision adds a proactive validation check for the `E_conomic_Customer_Number`. If missing from the CRM Account, the script now immediately triggers [[delugeSendErrorAlert]] and terminates, preventing subsequent API calls from failing with ambiguous errors.
+> This script uses proactive validation for both input payload data and Zoho CRM record existence. If required IDs are missing or a CRM record cannot be found, the script terminates immediately via [[delugeSendErrorAlert]].
 
 ## Change Log
 - **2026-03-19T19:40:08.390Z:** Initial creation of documentation via DeluluDocu. 
@@ -102,3 +102,4 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 - **2026-03-31T10:48:16.844Z:** Updated E-conomic draft creation error handling to utilize [[delugeSendErrorAlert]] instead of [[delugePostSuccessMessageToSlack]]. This routes API validation failures back to the technical error monitoring system for better developer visibility.
 - **2026-03-31T20:25:24.578Z:** Optimized the row iteration logic in the Google Sheets parsing section. The script now uses an active `continue` statement to skip the header and pre-header rows, removing unnecessary nested `else` blocks for better readability.
 - **2026-03-31T20:28:38.107Z:** Hardened validation logic for the E-conomic Customer Number. The script now explicitly checks if `economicCustomerNumber` is null immediately after fetching the CRM account, returning an error via [[delugeSendErrorAlert]] if the data is missing to prevent downstream processing failures.
+- **2026-03-31T20:31:24.809Z:** Hardened input validation. The script now proactively terminates and sends a [[delugeSendErrorAlert]] if the input payload is missing required distributor IDs/links or if the Zoho CRM account lookup fails, rather than just logging the information.
