@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000000988006"
 Name: delugeMobileAppRequestAQuote
-Revision Timestamp: 2026-03-27T13:29:10.785Z
+Revision Timestamp: 2026-03-31T09:27:32.895Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -45,7 +45,7 @@ graph TD
     FindCont -- "Found" --> CheckAC{"Has ActiveCampaign ID?"}
     CheckAC -- "No" --> Err404_4["Return 404: Missing AC ID"]
     CheckAC -- "Yes" --> CreateConv["Create 'Conversions' Record with UTM Source/Traffic"]
-    CreateConv --> CallAC["Invoke [[delugeActiveCampaignHandler]] with Map Payload"]
+    CreateConv --> CallAC["Invoke [[delugeActiveCampaignHandler]] with Map Payload (including Names)"]
     CallAC --> Success(["Return 200 Success"])
 ```
 
@@ -64,7 +64,7 @@ A new record is created in the **Conversions** module with the following attribu
 - **UTM_Traffic:** "Organic"
 
 ### 4. ActiveCampaign Integration
-The script constructs a `payload` Map containing contact details, tags, and conversion metadata. This Map is passed to [[delugeActiveCampaignHandler]]. Passing a single Map object instead of individual parameters improves script maintainability and reduces signature errors.
+The script constructs a `payload` Map containing contact details (including `firstName` and `lastName` retrieved from the CRM), tags, and conversion metadata. This Map is passed to [[delugeActiveCampaignHandler]]. Passing a single Map object instead of individual parameters improves script maintainability and ensures all relevant contact identity data is synchronized.
 
 ## Developer Notes
 
@@ -75,8 +75,9 @@ The script constructs a `payload` Map containing contact details, tags, and conv
 > The call to [[delugeActiveCampaignHandler]] has been refactored. It no longer accepts positional arguments; it now requires a single `Map` containing the keys `contactId`, `accountId`, `email`, `tags`, etc.
 
 > [!TIP]
-> `UTM_Traffic` is now explicitly set to "Organic" for all requests originating from this script, providing more granular attribution data in the CRM.
+> The script now extracts `First_Name` and `Last_Name` from the CRM Contact and includes them in the ActiveCampaign payload. This ensures that the marketing automation platform has the most up-to-date name information when processing the quote request.
 
 ## Change Log
 - **2026-03-19T16:07:07.587Z:** Initial creation of documentation via DeluluDocu.
 - **2026-03-27T13:29:10.785Z:** Updated script to refactor the ActiveCampaign handler call to use a Map-based payload. Added `UTM_Traffic` ("Organic") tracking to the CRM Conversion record creation and initialized variables at the top of the script for better readability.
+- **2026-03-31T09:27:32.895Z:** Refactored ActiveCampaign integration to include Contact `firstName` and `lastName` in the payload passed to [[delugeActiveCampaignHandler]]. This ensures name data consistency between Zoho CRM and ActiveCampaign during the quote request process.
