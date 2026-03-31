@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001303005"
 Name: delugeProcessRenewalsOrNewSalesForInvoicingV2
-Revision Timestamp: 2026-03-31T20:25:24.578Z
+Revision Timestamp: 2026-03-31T20:28:38.107Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -37,7 +37,11 @@ This script orchestrates the following internal functions and external services:
 graph TD
     Start(["Start Script"]) --> Parse["Parse & Validate Payload"]
     Parse --> GetCRM["Fetch CRM Account & Sheet ID"]
-    GetCRM --> FetchSheet["Fetch Data via Google Sheets API"]
+    GetCRM --> CheckCustNum{"Check E-conomic<br/>Customer Number"}
+    
+    CheckCustNum -- "Missing" --> ErrMissing["Trigger [[delugeSendErrorAlert]] & Terminate"]
+    CheckCustNum -- "Exists" --> FetchSheet["Fetch Data via Google Sheets API"]
+    
     FetchSheet --> FindHeaders["Identify Header Row Dynamically"]
     FindHeaders --> Agg["Aggregate Items by Product Code<br/>(via summaryMap)"]
     Agg --> GetEcon["Fetch E-conomic Customer Record"]
@@ -83,10 +87,10 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 > The script relies on a hardcoded Slack Channel ID `C09PTU8KKT3`. If the notification channel needs to change, this variable must be updated.
 
 > [!CAUTION]
-> There is a potential syntax error or logic bug on line 155: `if(summaryMap.contains(discountCode))`. In Deluge, the correct method to check for a key in a Map is `.containsKey()`. This may cause the discount aggregation to fail or return false incorrectly.
+> A critical logic bug persists in the discount aggregation section: `if(summaryMap.contains(discountCode))`. In Deluge, the correct method to check for a key in a Map is `.containsKey()`. Use of `.contains()` on a Map may result in incorrect evaluation or failures when processing tiered discounts.
 
 > [!TIP]
-> The error handling for E-conomic draft creation failures has been reverted/changed to use [[delugeSendErrorAlert]]. This ensures that API-level rejection (such as invalid product codes or locked periods) is treated with high priority and captured in the technical error logs.
+> This revision adds a proactive validation check for the `E_conomic_Customer_Number`. If missing from the CRM Account, the script now immediately triggers [[delugeSendErrorAlert]] and terminates, preventing subsequent API calls from failing with ambiguous errors.
 
 ## Change Log
 - **2026-03-19T19:40:08.390Z:** Initial creation of documentation via DeluluDocu. 
@@ -97,3 +101,4 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 - **2026-03-31T06:51:57.411Z:** Improved the context of E-conomic error messages sent to Slack by including the distributor's account name, invoice type, and month. This helps the operations team identify which specific batch failed creation.
 - **2026-03-31T10:48:16.844Z:** Updated E-conomic draft creation error handling to utilize [[delugeSendErrorAlert]] instead of [[delugePostSuccessMessageToSlack]]. This routes API validation failures back to the technical error monitoring system for better developer visibility.
 - **2026-03-31T20:25:24.578Z:** Optimized the row iteration logic in the Google Sheets parsing section. The script now uses an active `continue` statement to skip the header and pre-header rows, removing unnecessary nested `else` blocks for better readability.
+- **2026-03-31T20:28:38.107Z:** Hardened validation logic for the E-conomic Customer Number. The script now explicitly checks if `economicCustomerNumber` is null immediately after fetching the CRM account, returning an error via [[delugeSendErrorAlert]] if the data is missing to prevent downstream processing failures.
