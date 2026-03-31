@@ -196,6 +196,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/script_1774956409598/script_1774956409598.ds",
+    "scripts/script_1774956409598/script_1774956409598.md",
+    "scripts/script_1774956409598",
     "scripts/script_1774946955932/script_1774946955932.md",
     "scripts/script_1774946955932/script_1774946955932.ds",
     "scripts/script_1774946955932",
@@ -217,7 +220,6 @@
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
     "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.md",
     "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.ds",
-    "scripts/delugeActiveCampaignHandlerTest",
     "Environment Lifecycle/Delete/Delete Populace Workspace/delugeTriggerDeletePopulaceWorkspace.md",
     "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
     "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.md",
@@ -229,8 +231,6 @@
     "scripts/script_1774364493009/script_1774364493009.md",
     "scripts/script_1774364035530/script_1774364035530.md",
     "scripts/script_1774363242002/script_1774363242002.md",
-    "scripts/delugeSendToActiveCampaignLimit/delugeSendToActiveCampaignLimit.md",
-    "scripts/script_1774359008075/script_1774359008075.md",
-    "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md"
+    "scripts/delugeSendToActiveCampaignLimit/delugeSendToActiveCampaignLimit.md"
   ]
 }
