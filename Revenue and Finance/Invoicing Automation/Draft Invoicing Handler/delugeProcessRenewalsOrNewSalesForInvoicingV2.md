@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001303005"
 Name: delugeProcessRenewalsOrNewSalesForInvoicingV2
-Revision Timestamp: 2026-03-19T20:29:30.290Z
+Revision Timestamp: 2026-03-31T06:49:01.769Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -47,12 +47,14 @@ graph TD
     Rules -- "No Valid Lines" --> SlackEmpty["Post 'No Items' to Slack"]
     
     Build --> CreateDraft["Create E-conomic Draft Invoice"]
-    CreateDraft --> SlackSuccess["Post Draft Link to Slack"]
+    CreateDraft -- "Success" --> SlackSuccess["Post Draft Link to Slack"]
+    CreateDraft -- "API Error" --> AlertError["[[delugeSendErrorAlert]] with E-conomic Error details"]
     
     SlackEmpty --> End(["End"])
     SlackSuccess --> End
+    AlertError --> End
     
-    Parse -- "Error" --> HandleError["Global Error Handler"]
+    Parse -- "Exception" --> HandleError["Global Error Handler"]
     HandleError --> SlackErr["[[delugeSendErrorAlert]]"]
     SlackErr --> End
 ```
@@ -84,9 +86,10 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 > There is a potential syntax error or logic bug on line 146: `if(summaryMap.contains(discountCode))`. In Deluge, the correct method to check for a key in a Map is `.containsKey()`. This may cause the discount aggregation to fail or return false incorrectly.
 
 > [!TIP]
-> The aggregation logic significantly improves invoice readability by consolidating items that appear multiple times in the source spreadsheet into a single line item with a summed quantity.
+> The script now includes enhanced error reporting for E-conomic API failures. Instead of just logging the error to the console, it captures the specific `errors` object from the E-conomic response and triggers an automated alert via `delugeSendErrorAlert`.
 
 ## Change Log
 - **2026-03-19T19:40:08.390Z:** Initial creation of documentation via DeluluDocu. 
 - **2024-05-22:** Refactored to V2 to include discount aggregation logic and refined business rules for Consignment vs Sales stock types.
 - **2026-03-19T20:29:30.290Z:** Updated documentation to reflect V2 logic: added dynamic header discovery, `summaryMap` aggregation for products and discounts, and implemented exchange rate math on `unitNetPrice`. Documented potential `.contains()` bug in Map logic.
+- **2026-03-31T06:49:01.769Z:** Enhanced error handling for E-conomic draft creation. The script now explicitly checks for a null `draftInvoiceNumber` and extracts detailed error messages from the API response to send via `delugeSendErrorAlert`.
