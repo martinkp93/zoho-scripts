@@ -1,7 +1,7 @@
 ---
 | Function ID | Name | Revision Timestamp | Status |
 | --- | --- | --- | --- |
-| 157805000001362019 | delugeResolveRaQPricing | 2026-03-20T11:59:42.480Z | Functional |
+| 157805000001362019 | delugeResolveRaQPricing | 2026-03-31T12:41:27.507Z | Functional |
 
 **Postman Documentation:** [Link to API Collection Placeholder]
 
@@ -82,7 +82,11 @@ All numeric values are converted to strings prefixed with the `Currency` code re
 > [!TIP]
 > The `sprintType` is dynamically determined: an `Accrual_Period_in_Months` of 12 is treated as "standard", while 24 (implied by non-12 logic) is treated as "two for one".
 
+> [!TIP]
+> **Auditability Update (2026-03-31):** The info logs now explicitly output the `priceListId` when an individual price list is found, making it easier to trace pricing sources in the execution logs.
+
 ## Change Log
 - **2026-03-19T20:12:07.388Z:** Initial creation of documentation via DeluluDocu.
 - **2026-03-20T11:57:02.240Z:** Logic confirmed/updated. Ensured correct handling of multi-year Accrual Periods (12 vs 24 months) and standardized currency prefixing for returned price maps. Added explicit COQL field selection to documentation.
 - **2026-03-20T11:59:42.480Z:** Updated the output map key for the savings data from `totalSavings` to `savings` to maintain naming convention consistency across API responses. No changes to core calculation logic.
+- **2026-03-31T12:41:27.507Z:** Minor update to logging statements. Added the resolved `priceListId` to the `info` output when processing distributor-specific price lists to improve debugging and audit capabilities.
