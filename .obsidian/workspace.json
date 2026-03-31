@@ -196,6 +196,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/script_1774946754964/script_1774946754964.md",
+    "scripts/script_1774946754964/script_1774946754964.ds",
+    "scripts/script_1774946754964",
     "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
     "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
@@ -219,9 +222,7 @@
     "scripts/script_1774365008976/script_1774365008976.md",
     "scripts/script_1774365008976/script_1774365008976.ds",
     "scripts/script_1774365008976",
-    "scripts/script_1774364996550/script_1774364996550.ds",
     "scripts/script_1774364996550/script_1774364996550.md",
-    "scripts/script_1774364996550",
     "scripts/script_1774364968033/script_1774364968033.md",
     "scripts/script_1774364493009/script_1774364493009.md",
     "scripts/script_1774364035530/script_1774364035530.md",
@@ -230,7 +231,6 @@
     "scripts/script_1774359008075/script_1774359008075.md",
     "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md",
     "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md",
-    "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md",
-    "Colleague Setup Guide - DeluluDocu & GitHub Sync.md"
+    "Acquisition and Onboarding/Marketing/ActiveCampaign/Visits Data to ActiveCampaign/delugeVisitsToActiveCampaign.md"
   ]
 }
