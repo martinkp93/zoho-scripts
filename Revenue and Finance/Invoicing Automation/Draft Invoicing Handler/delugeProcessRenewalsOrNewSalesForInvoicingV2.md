@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001303005"
 Name: delugeProcessRenewalsOrNewSalesForInvoicingV2
-Revision Timestamp: 2026-03-31T06:51:57.411Z
+Revision Timestamp: 2026-03-31T10:48:16.844Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -29,8 +29,8 @@ This script orchestrates the following internal functions and external services:
 | --- | --- | --- |
 | Google Sheets API | Fetches the raw product/renewal data from the distributor's spreadsheet. | High |
 | E-conomic REST API | Fetches customer metadata and creates the Draft Invoice. | High |
-| [[delugePostSuccessMessageToSlack]] | Posts a formatted success message or specific API error message to Slack. | Medium |
-| [[delugeSendErrorAlert]] | Alerts the development team if the process fails due to a script exception. | Medium |
+| [[delugePostSuccessMessageToSlack]] | Posts a formatted success message or "No items" notification to Slack. | Medium |
+| [[delugeSendErrorAlert]] | Alerts the development team if the process fails due to exceptions or E-conomic API errors. | High |
 
 ## Logic Flow
 ```mermaid
@@ -44,15 +44,15 @@ graph TD
     GetEcon --> Rules{"Apply Invoicing Rules<br/>(Stock vs Task Type)"}
     
     Rules -- "Valid Lines" --> Build["Build E-conomic Invoice Object<br/>(Apply Exchange Rate)"]
-    Rules -- "No Valid Lines" --> SlackEmpty["Post 'No Items' to Slack"]
+    Rules -- "No Valid Lines" --> SlackEmpty["Post 'No Items' to Slack via [[delugePostSuccessMessageToSlack]]"]
     
     Build --> CreateDraft["Create E-conomic Draft Invoice"]
-    CreateDraft -- "Success" --> SlackSuccess["Post Draft Link to Slack"]
-    CreateDraft -- "API Error" --> SlackErrSpecific["Post specific E-conomic error to Slack via [[delugePostSuccessMessageToSlack]]"]
+    CreateDraft -- "Success" --> SlackSuccess["Post Draft Link to Slack via [[delugePostSuccessMessageToSlack]]"]
+    CreateDraft -- "API Error" --> EconErrAlert["Trigger [[delugeSendErrorAlert]] with API error details"]
     
     SlackEmpty --> End(["End"])
     SlackSuccess --> End
-    SlackErrSpecific --> End
+    EconErrAlert --> End
     
     Parse -- "Exception" --> HandleError["Global Error Handler"]
     HandleError --> SlackErr["[[delugeSendErrorAlert]]"]
@@ -86,7 +86,7 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 > There is a potential syntax error or logic bug on line 146: `if(summaryMap.contains(discountCode))`. In Deluge, the correct method to check for a key in a Map is `.containsKey()`. This may cause the discount aggregation to fail or return false incorrectly.
 
 > [!TIP]
-> The script now reports E-conomic API validation errors directly to the operational Slack channel using `[[delugePostSuccessMessageToSlack]]`. This allows the team to see exactly why an invoice failed (e.g., "Product code not found") without needing to check administrative error logs via `[[delugeSendErrorAlert]]`.
+> The error handling for E-conomic draft creation failures has been reverted/changed to use [[delugeSendErrorAlert]]. This ensures that API-level rejection (such as invalid product codes or locked periods) is treated with high priority and captured in the technical error logs.
 
 ## Change Log
 - **2026-03-19T19:40:08.390Z:** Initial creation of documentation via DeluluDocu. 
@@ -95,3 +95,4 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 - **2026-03-31T06:49:01.769Z:** Enhanced error handling for E-conomic draft creation. The script now explicitly checks for a null `draftInvoiceNumber` and extracts detailed error messages from the API response to send via `delugeSendErrorAlert`.
 - **2026-03-31T06:50:35.304Z:** Modified specific E-conomic API error handling to post directly to the distributor Slack channel via [[delugePostSuccessMessageToSlack]] instead of triggering a system-wide [[delugeSendErrorAlert]]. This ensures business-level validation errors are seen by the operational team immediately.
 - **2026-03-31T06:51:57.411Z:** Improved the context of E-conomic error messages sent to Slack by including the distributor's account name, invoice type, and month. This helps the operations team identify which specific batch failed creation.
+- **2026-03-31T10:48:16.844Z:** Updated E-conomic draft creation error handling to utilize [[delugeSendErrorAlert]] instead of [[delugePostSuccessMessageToSlack]]. This routes API validation failures back to the technical error monitoring system for better developer visibility.
