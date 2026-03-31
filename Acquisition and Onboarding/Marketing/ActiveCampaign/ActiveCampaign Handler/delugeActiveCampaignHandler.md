@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001249001"
 Name: delugeActiveCampaignHandler
-Revision Timestamp: 2026-03-27T13:28:49.726Z
+Revision Timestamp: 2026-03-31T11:51:10.389Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -38,10 +38,10 @@ This script orchestrates the following internal functions and external services:
 graph TD
     Start(["Start"]) --> Parse["Parse Payload & Pricing Data"]
     Parse --> Sync["Sync Contact via /contact/sync"]
-    Sync --> CheckSync{Success?}
+    Sync --> CheckSync{"Check Response Code"}
     
-    CheckSync -- "No" --> Err1["[[delugeSendErrorAlert]]"]
-    CheckSync -- "Yes" --> UpdateCRM["Update CRM: ActiveCampaign_Contact_ID"]
+    CheckSync -- "Failure" --> Err1["[[delugeSendErrorAlert]]"]
+    CheckSync -- "Success (200/201)" --> UpdateCRM["Update CRM: ActiveCampaign_Contact_ID"]
     
     UpdateCRM --> ListAdd["Add Contact to List (targetListId)"]
     ListAdd --> TagLoop["For Each tagName in tags"]
@@ -60,7 +60,7 @@ graph TD
 ## Core Logic Sections
 
 ### 1. Payload Extraction & Pricing Logic
-The script transitioned from individual arguments to a single `payload` Map. It includes specialized logic to extract pricing information (Startup Prices, Subscription Prices, and Savings) from a nested `pricing` object, typically sourced from a Sales Sprint or Quote tool.
+The script extracts identity, attribution, and configuration metadata from the `payload`. It includes specialized logic to handle pricing information (Startup Prices, Subscription Prices, and Savings) from a nested `pricing` object.
 
 ### 2. Contact Synchronization & Custom Field Mapping
 The script uses the ActiveCampaign `/contact/sync` endpoint. It maps a significant number of custom fields:
@@ -73,7 +73,7 @@ The script uses the ActiveCampaign `/contact/sync` endpoint. It maps a significa
 Immediately following a successful sync, the script extracts the ActiveCampaign Contact ID and updates the `ActiveCampaign_Contact_ID` field in the Zoho CRM Contacts module.
 
 ### 4. Dynamic Tag Management
-The script iterates through the `tags` list. It performs a lookup for each tag name; if the tag does not exist in ActiveCampaign, it is created on-the-fly before being associated with the contact.
+The script iterates through the `tags` list. It performs a lookup for each tag name. If the tag is not found, the script creates it dynamically before associating it with the contact.
 
 ## Developer Notes
 
@@ -84,9 +84,12 @@ The script iterates through the `tags` list. It performs a lookup for each tag n
 > The pricing logic handles `null` values gracefully via `ifnull`. If the `pricing` map is missing from the payload, the associated ActiveCampaign custom fields will simply be omitted from the sync request.
 
 > [!CAUTION]
-> Ensure the Zoho CRM Connection `activecampaign` remains active. If the `responseCode` is not 200 or 201 during the contact sync, the script triggers an alert and halts further processing (List/Tag additions).
+> There is a logic syntax error in the response code check: `if(responseCode == 200 || responseCode = 201)`. The use of a single `=` performs an assignment rather than a comparison. While Deluge often evaluates this as true, it should be corrected to `== 201` to prevent unpredictable behavior.
 
 ## Change Log
+- **2026-03-31T11:51:10.389Z:** 
+    - Minor maintenance update. 
+    - Enabled `info` logging for `searchTagResp` to assist in debugging Tag lookup failures.
 - **2026-03-27T13:28:49.726Z:** 
     - Refactored function signature to accept a single `payload` Map.
     - Added support for 7 new custom fields related to Pricing and Distributor Contacts (IDs 62-68).
