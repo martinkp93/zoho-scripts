@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001307001"
 Name: delugeRenewalsAndNewSalesExportHandler
-Revision Timestamp: 2026-03-31T21:45:05.250Z
+Revision Timestamp: 2026-03-31T21:49:21.468Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -19,8 +19,8 @@ Furthermore, it updates a centralized "Master Tracking Dashboard" for internal C
     - `String segment`: Determines the product filtering and target spreadsheet columns. Accepted values: `"Cordulus"` or `"Cropline"`.
 - **Output:** `String` (Returns an empty string upon completion).
 - **Primary Entities:** 
-    - **Zoho CRM**: Accounts (Distributors).
-    - **Zoho Analytics**: REST API v2 (Views: 188580000008023658 / 188580000008023872).
+    - **Zoho CRM**: Accounts (Distributors) and Settings Variables (for Job IDs).
+    - **Zoho Analytics**: REST API v2 Bulk Export (Jobs dynamically fetched via CRM variables).
     - **Google Sheets**: Individual Distributor spreadsheets and Master Dashboards (`1iM5nTGy...` or `15NpCTxm...`).
     - **Mailersend**: External email delivery service for Cropline exports.
 
@@ -30,8 +30,9 @@ This script orchestrates the following internal functions and external services:
 | Function / Service | Purpose | Criticality |
 | --- | --- | --- |
 | [[delugeSendErrorAlert]] | Handles error reporting to administrators if sheet creation or data clearing fails. | High |
-| [[delugePostSuccessMessageToSlack]] | (Optional) Sends a summary breakdown of processed quantities to Slack. | Medium |
-| **Zoho Analytics API** | Source of truth for the processed data records via REST API v2 Export. | Blockers |
+| [[delugePostSuccessMessageToSlack]] | Sends a summary breakdown of processed quantities to Slack upon successful execution. | Medium |
+| **Zoho CRM API** | Used to fetch global settings variables and distributor account details. | Blockers |
+| **Zoho Analytics API** | Source of truth for the processed data records via REST API v2 Bulk Export Jobs. | Blockers |
 | **Google Sheets API** | Target destination for data visualization and master dashboard tracking. | Blockers |
 | **Mailersend API** | Used to deliver XLSX exports to Cropline distributors. | Medium |
 
@@ -39,8 +40,9 @@ This script orchestrates the following internal functions and external services:
 
 ```mermaid
 graph TD
-    Start(["Start (Task, Segment)"]) --> FetchCRM["Fetch CRM Accounts with valid SS URLs"]
-    FetchCRM --> AnalyticsExport["Invoke Analytics REST API v2 (Export View)"]
+    Start(["Start (Task, Segment)"]) --> GetJobVar["Fetch CRM Variable: Temporary {Task} Export Job"]
+    GetJobVar --> FetchCRM["Fetch CRM Accounts with valid SS URLs"]
+    FetchCRM --> AnalyticsExport["Invoke Analytics Bulk Export API (Job ID)"]
     AnalyticsExport --> FilterData["Filter Records by Segment & Product List"]
     FilterData --> DateCalc["Calculate Target Month/Year for Tabs"]
     DateCalc --> SortData["Sort Records Alphabetically by Account Name"]
@@ -61,18 +63,19 @@ graph TD
     IsCropline -- "No" --> NextDist["Next Distributor"]
     Email --> NextDist
     
-    NextDist --> End(["Build Slack Summary & End"])
+    NextDist --> End(["Send Slack Summary & End"])
 ```
 
 ## Core Logic Sections
 
-### 1. Configuration & CRM Data Fetching
-The script searches CRM Accounts for distributors possessing a `Renewals_and_New_Sales_Data` link. It extracts the Spreadsheet ID from the URL and maps it to the distributor's ID and Name.
+### 1. Configuration & Job ID Fetching
+The script now begins by querying Zoho CRM Variables. It looks for a variable named `Temporary Renewals Export Job` or `Temporary New Sales Export Job` to retrieve the `jobId` required for the Zoho Analytics Bulk Export API. It also fetches distributor spreadsheet links from CRM Accounts.
 
-### 2. Zoho Analytics Data Retrieval
-Using the Analytics REST API v2, the script pulls JSON records from specific views based on the `task`. 
-- **Renewals**: View ID `188580000008023658`
-- **New Sales**: View ID `188580000008023872`
+### 2. Zoho Analytics Data Retrieval (Bulk API)
+The script has transitioned from standard View exports to the **Zoho Analytics Bulk Export API**. 
+- It uses the `jobId` fetched in step 1.
+- Endpoint: `.../bulk/workspaces/{workspaceId}/exportjobs/{jobId}/data`.
+- This approach is optimized for larger datasets and asynchronous processing handled by Analytics.
 
 ### 3. Data Processing & Sorting
 The data is filtered by `allowedProducts` (e.g., "Cordulus Farm" for Cordulus, "Cropline" for Cropline). Rows are organized into a Map by distributor. Before being pushed to Google Sheets, the rows are sorted alphabetically by "Account Name" (Column C). A unique suffix is added to keys during sorting to prevent data loss if multiple rows share the same account name.
@@ -88,21 +91,22 @@ The script performs a lookup on the Internal Tracking Dashboard spreadsheet.
 - **Updates**: Pushes the `totalQty` of subscriptions (filtered by "Subscription" or "Cropline" keywords).
 - **Notes**: Attaches a Google Sheets note to the updated cell with a detailed timestamp of the last update.
 
-### 6. Cropline Emailing (Mailersend)
-Specifically for the Cropline segment, the script exports the newly updated tab as an `.xlsx` file via the Google Sheets export endpoint, converts it to Base64, and sends it to a hardcoded recipient (`dela@danishagro.dk`) via the Mailersend API.
+### 6. Notifications & Cropline Delivery
+- **Slack**: Calls `[[delugePostSuccessMessageToSlack]]` to post a distributor-by-distributor breakdown of processed quantities.
+- **Mailersend (Cropline Only)**: Exports the updated tab as an `.xlsx` file and emails it to `dela@danishagro.dk`.
 
 ## Developer Notes
 
 > [!IMPORTANT]
-> **Account Name Matching**: The script relies on an exact string match for "Account Name" between Zoho CRM and the Master Tracking Dashboard. Any mismatch prevents the master dashboard cell from updating.
-
-> [!WARNING]
-> **Hardcoded Parameters**: The script contains hardcoded IDs for Analytics Workspaces, Google Dashboard IDs, and Slack Channel IDs. If these resources are moved or recreated, these constants must be updated.
-
-> [!CAUTION]
-> **Slack Notification Status**: In the current version of the code, the call to `[[delugePostSuccessMessageToSlack]]` is commented out. The logic to build the summary string exists, but the final delivery is disabled.
+> **CRM Variable Dependency**: This script will fail if the CRM Variables `Temporary Renewals Export Job` or `Temporary New Sales Export Job` are missing or contain expired/invalid Job IDs. These variables must be populated by the pre-processing script that triggers the Analytics Export Job.
 
 > [!TIP]
+> **Bulk Export Optimization**: The shift to the `/bulk/` API endpoint improves performance for segments with high record volumes, as it avoids standard API pagination limits found in the basic `/data` endpoint.
+
+> [!CAUTION]
+> **Hardcoded Parameters**: The script contains hardcoded IDs for Analytics Workspaces, Google Dashboard IDs, and Slack Channel IDs. If these resources are moved or recreated, these constants must be updated.
+
+> [!NOTE]
 > **Handling Empty Values**: The script explicitly converts null or empty strings in the Analytics data to "0" to prevent potential calculation errors within the Google Sheets environment.
 
 ## Change Log
@@ -112,3 +116,4 @@ Specifically for the Cropline segment, the script exports the newly updated tab 
 - **2026-03-30T04:54:50.981Z:** Enabled final Slack success notification. The `[[delugePostSuccessMessageToSlack]]` function is now active at the end of the script to provide a summary breakdown of quantities processed for the task and segment.
 - **2026-03-31T13:21:50.259Z:** Adjusted Google Sheets summary formulas. Updated column indices from O and Q to **P** and **R** respectively to align with updated export data mapping. Confirmed that the `[[delugePostSuccessMessageToSlack]]` function remains active.
 - **2026-03-31T21:45:05.250Z:** Updated documentation to reflect code-level changes where `[[delugePostSuccessMessageToSlack]]` was commented out in the latest script source. Verified internal sorting logic and the addition of automated Google Sheets cell notes with timestamps for auditability. Verified column indices for summary formulas (P8 and R8).
+- **2026-03-31T21:49:21.468Z:** Migrated data retrieval logic to use **Zoho Analytics Bulk Export API**. Added logic to fetch dynamic `jobId` from Zoho CRM Settings Variables based on the current task. Re-enabled `[[delugePostSuccessMessageToSlack]]` for final reporting.
