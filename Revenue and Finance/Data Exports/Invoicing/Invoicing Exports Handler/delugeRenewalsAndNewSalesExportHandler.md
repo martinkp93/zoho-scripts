@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001307001"
 Name: delugeRenewalsAndNewSalesExportHandler
-Revision Timestamp: 2026-03-30T04:54:50.981Z
+Revision Timestamp: 2026-03-31T13:21:50.259Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -77,7 +77,10 @@ The data is filtered by `allowedProducts` (e.g., "Cordulus Farm" for the Cordulu
 ### 4. Tab & Row Management
 - **Target Dates**: If the task is "Renewals", it targets next month. If "New Sales", it targets the previous month.
 - **Sorting**: Rows are sorted alphabetically by "Account Name" (Column C) using a temporary Map to ensure consistent presentation in the Google Sheet.
-- **Formulas**: The script injects Google Sheets formulas (e.g., `=SUM(O8:O)`) at the top of the sheet for real-time summary calculations.
+- **Formulas**: The script injects Google Sheets formulas at the top of the sheet for real-time summary calculations. 
+
+> [!NOTE]
+> As of the latest update, the formulas target column **P** for Quantity (`=SUM(P8:P)`) and column **R** for Total Price (`=SUM(R8:R)`).
 
 ### 5. Master Dashboard Synchronization
 The script locates the correct row in the "Master Tracking Dashboard" by matching the Distributor Name and Task. It calculates the total quantity of subscriptions/units and updates the specific cell corresponding to the target month. It also attaches a **Google Sheets Note** to the cell containing a timestamp of the update.
@@ -94,13 +97,14 @@ For the "Cropline" segment, the script generates an XLSX export of the newly upd
 > **Hardcoded IDs**: The script contains hardcoded Workspace IDs, Org IDs, and Dashboard Spreadsheet IDs. If the Analytics workspace or the Master spreadsheets are recreated, these variables must be updated manually.
 
 > [!TIP]
-> **Performance**: The script fetches the Master Dashboard row values once per execution (`dashboardMeta`) rather than per-distributor to avoid hitting Google Sheets API rate limits during large batch runs.
+> **Formula Column Shift**: The summary formulas injected into the distributor sheets have been updated from columns O/Q to P/R. This adjustment ensures that "Quantity" and "Total Price" calculations remain accurate based on the current Analytics export mapping.
 
 > [!NOTE]
-> **Slack Notifications**: As of the latest update, the call to `[[delugePostSuccessMessageToSlack]]` is fully enabled, providing the operations team with a real-time summary of the quantities pushed to the sheets.
+> **Slack Notifications**: The call to `[[delugePostSuccessMessageToSlack]]` is fully enabled, providing the operations team with a real-time summary of the quantities pushed to the sheets.
 
 ## Change Log
 - **2026-03-19T19:39:37.540Z:** Initial creation of documentation via DeluluDocu. Added logic for dynamic Year/Month tab targeting and Mailersend integration for Cropline.
 - **2026-03-19T20:30:02.120Z:** Re-validation of script logic. Confirmed identical operational logic for both "Renewals" and "New Sales" modes regarding Google Sheet clearing and dashboard note updates. Verified no functional changes in this revision code block.
 - **2026-03-19T21:12:49.368Z:** Logic verification pass. Confirmed consistency across API endpoints (CRM v8 and Analytics v2). No functional code changes; updated documentation to reflect "commented out" status of Slack notifications and added standard developer notes for observability.
-- **2026-03-30T04:54:50.981Z:** Enabled final Slack success notification. The `[[delugePostSuccessMessageToSlack]]` function is now active at the end of the script to provide a summary breakdown of quantities processed for the task and segment. No other functional changes were made to the core data processing or sheet update logic.
+- **2026-03-30T04:54:50.981Z:** Enabled final Slack success notification. The `[[delugePostSuccessMessageToSlack]]` function is now active at the end of the script to provide a summary breakdown of quantities processed for the task and segment.
+- **2026-03-31T13:21:50.259Z:** Adjusted Google Sheets summary formulas. Updated column indices from O and Q to **P** and **R** respectively to align with updated export data mapping. Confirmed that the `[[delugePostSuccessMessageToSlack]]` function remains active.
