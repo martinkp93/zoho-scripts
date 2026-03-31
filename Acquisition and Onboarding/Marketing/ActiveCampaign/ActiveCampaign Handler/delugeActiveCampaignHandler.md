@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001249001"
 Name: delugeActiveCampaignHandler
-Revision Timestamp: 2026-03-31T11:51:10.389Z
+Revision Timestamp: 2026-03-31T12:15:28.194Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -73,7 +73,7 @@ The script uses the ActiveCampaign `/contact/sync` endpoint. It maps a significa
 Immediately following a successful sync, the script extracts the ActiveCampaign Contact ID and updates the `ActiveCampaign_Contact_ID` field in the Zoho CRM Contacts module.
 
 ### 4. Dynamic Tag Management
-The script iterates through the `tags` list. It performs a lookup for each tag name. If the tag is not found, the script creates it dynamically before associating it with the contact.
+The script iterates through the `tags` list. It performs a lookup for each tag name. If the tag is not found, the script creates it dynamically before associating it with the contact. 
 
 ## Developer Notes
 
@@ -87,6 +87,8 @@ The script iterates through the `tags` list. It performs a lookup for each tag n
 > There is a logic syntax error in the response code check: `if(responseCode == 200 || responseCode = 201)`. The use of a single `=` performs an assignment rather than a comparison. While Deluge often evaluates this as true, it should be corrected to `== 201` to prevent unpredictable behavior.
 
 ## Change Log
+- **2026-03-31T12:15:28.194Z:** 
+    - Added debug logging (`info`) to the Tag Management loop to display the `tagIdToAdd` when an existing tag is successfully found during search.
 - **2026-03-31T11:51:10.389Z:** 
     - Minor maintenance update. 
     - Enabled `info` logging for `searchTagResp` to assist in debugging Tag lookup failures.
