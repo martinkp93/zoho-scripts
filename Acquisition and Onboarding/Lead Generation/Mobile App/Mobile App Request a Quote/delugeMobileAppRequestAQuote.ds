@@ -2,7 +2,6 @@ string standalone.delugeMobileAppRequestAQuote(String crmAPIRequest)
 {
 crmAPIRequestMap = crmAPIRequest.toMap();
 request_body = crmAPIRequestMap.get("body");
-
 // Initialise variables
 workspaceId = request_body.get("workspaceId");
 userId = request_body.get("userId");
@@ -10,7 +9,6 @@ distributorId = request_body.get("distributorId");
 conversionName = "Request a Quote Conversion";
 utmSource = "Mobile App";
 utmTraffic = "Organic";
-
 // Get ZCRM accountId from workspaceId 
 account = zoho.crm.searchRecords("Accounts","(Kanisa_Farm_ID:equals:" + workspaceId + ")");
 if(account.isEmpty())
@@ -69,6 +67,8 @@ if(contact.isEmpty())
 contactMap = contact.toMap();
 contactId = contactMap.get("id");
 contactEmail = contactMap.get("Email");
+firstName = contactMap.get("First_Name");
+lastName = contactMap.get("Last_Name");
 contactActiveCampaignId = contactMap.get("ActiveCampaign_Contact_ID");
 // info "Contact Email: " + contactEmail;
 // info "Contact ActiveCampaign ID: " + contactActiveCampaignId;
@@ -80,6 +80,8 @@ if(contactActiveCampaignId.isNull())
 	info response;
 	return {"crmAPIResponse":response};
 }
+
+
 // 
 // Proceed to create Request a Quote Conversion in ZCRM
 raqMap = Map();
@@ -93,10 +95,8 @@ createConversionResponse = zoho.crm.createRecord("Conversions",raqMap);
 conversionId = createConversionResponse.get("id");
 info "Create Conversion Response: " + createConversionResponse;
 info "Created Request a Quote Conversion.";
-
 //
 // Add tag to ActiveCampaign Contact
-
 if(contactId != null)
 {
 	tags = {conversionName,utmSource};
@@ -112,6 +112,8 @@ if(contactId != null)
 	// Call the standalone handler. 
 	// It will handle creating the AC contact, adding tags, and return the ActiveCampaign Contact ID
 	payload = Map();
+	payload.put("firstName",firstName);
+	payload.put("lastName",lastName);
 	payload.put("contactId",contactId.toLong());
 	payload.put("accountId",accountId.toLong());
 	payload.put("email",contactEmail);
@@ -122,7 +124,6 @@ if(contactId != null)
 	payload.put("utmSource",utmSource);
 	payload.put("utmTraffic",utmTraffic);
 	payload.put("tags",finalTags);
-
 	syncAcContactResp = standalone.delugeActiveCampaignHandler(payload);
 	info syncAcContactResp;
 	info "Called ActiveCampaign Handler";
