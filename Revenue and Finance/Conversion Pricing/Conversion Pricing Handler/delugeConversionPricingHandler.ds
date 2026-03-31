@@ -16,7 +16,8 @@ try
 	country = acc.get("Billing_Country");
 	orgId = 20087400261;
 	subscription = zoho.billing.retrieve("Subscriptions",orgId,conv.get("Subscription_ID"),"zohobillingconnection");
-	renewalDate = subscription.get("subscription").get("next_billing_at").toDate();
+	renewalDate = if(subscription.get("subscription").get("next_billing_at") != "",subscription.get("subscription").get("next_billing_at"), subscription.get("subscription").get("expires_at")).toDate();
+	info renewalDate;
 	// 2. Fetch Data & Safely Initialize Maps
 	// Empty maps to prevent ".get() on null" errors
 	defaultMap = {"initial":Map(),"regular":Map(),"upcoming":Map(),"addon":Map(),"scheduled":Map(),"info":Map()};
