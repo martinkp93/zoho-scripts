@@ -38,7 +38,7 @@ try
 			return {"success":false,"error_message":errorMsg};
 		}
 		priceListId = priceListSearch.get(0).get("id");
-		info "Distributor Price List found. Continuing with Distributor Price List ID.";
+		info "Distributor Price List found. Continuing with Distributor Price List ID: " + priceListId;
 	}
 	priceList = zoho.crm.getRecordById("Price_Lists",priceListId);
 	priceListCurrency = priceList.get("Currency");
