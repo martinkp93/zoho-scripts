@@ -18,17 +18,17 @@ try
 	}
 	/*
 	body = {
-		"distributor_id": "520877000020669012",
-		"distributor_name": "Baltic Agro Latvia",
+		"distributor_id": "520877000013008020",
+		"distributor_name": "Hankkija Oy",
 		"exchange_rate": "",
 		"exchange_pair": "",
 		"task_type": "Renewals",
 		"month": "April",
 		"year": "2026",
 		"quantity_expected": 7,
-		"download_link": "https://docs.google.com/spreadsheets/d/1OluT8be5ZIYGhpc5RCEBKHnDrIyNzkD1X7gMPFMZWk4/export?format=xlsx&gid=594742517"
+		"download_link": "https://docs.google.com/spreadsheets/d/12KvmvFHcPjY_ouQM3OKuUXSczpJMbGguzWT4TJ02F2k/export?format=xlsx&gid=886775259"
 		};
-	*/
+		*/
 	// Validate all required fields from the payload
 	distributor_id = body.get("distributor_id");
 	download_link = body.get("download_link");
@@ -85,6 +85,7 @@ try
 		{
 			headerRowIndex = i.toLong();
 			headers = sheetRow;
+			info headers;
 			break;
 		}
 	}
@@ -105,69 +106,70 @@ try
 	summaryMap = Map();
 	info summaryMap;
 	// Loop through data rows (skipping the header)
-	info sheetValues;
+	// info sheetValues;
 	for each index i in sheetValues
 	{
-		// no need to format index as Long 
 		rowIdx = i.toLong();
 		if(rowIdx <= headerRowIndex)
 		{
 			continue;
 		}
-		row = sheetValues.get(i);
+			row = sheetValues.get(i);
+			// info row;
+			if(row.size() > priceIdx && !ifnull(row.get(codeIdx),"").isEmpty())
+			{
+				pCode = row.get(codeIdx).toString();
+				// Use code as the unique key
+				qty = ifnull(row.get(qtyIdx),"0").toDecimal();
+				price = ifnull(row.get(priceIdx),"0").toDecimal();
+				// Discounts
+				discountCode = row.get(discountCodeIdx);
+				discountPrice = ifnull(row.get(discountPriceIdx),"0").toDecimal();
+				if(qty != 0 && price != 0.00)
+				{
+					if(summaryMap.containsKey(pCode))
+					{
+						// Product already exists: Update existing totals
+						existingData = summaryMap.get(pCode);
+						existingData.put("quantity",existingData.get("quantity") + qty);
+						existingData.put("total_line_price",existingData.get("total_line_price") + price);
+						summaryMap.put(pCode,existingData);
+					}
+					else
+					{
+						// New product: Create new entry
+						newData = Map();
+						newData.put("product_code",pCode);
+						newData.put("item_name",row.get(nameIdx));
+						newData.put("quantity",qty);
+						newData.put("total_line_price",price);
+						summaryMap.put(pCode,newData);
+					}
+				}
+				if(discountCode != 0)
+				{
+					if(summaryMap.contains(discountCode))
+					{
+						// Discount line already exists: Update existing totals
+						existingData = summaryMap.get(discountCode);
+						existingData.put("quantity",existingData.get("quantity") + qty);
+						existingData.put("total_line_discount",existingData.get("total_line_discount") + discountPrice);
+						summaryMap.put(discountCode,existingData);
+					}
+					else
+					{
+						// New discount line: Create new entry
+						newData = Map();
+						newData.put("product_code",discountCode);
+						newData.put("item_name",row.get(nameIdx) + " - " + discountCode.getSuffix("-") + "% Discount");
+						newData.put("quantity",qty);
+						newData.put("total_line_discount",discountPrice);
+						summaryMap.put(discountCode,newData);
+					}
+				}
+			}
+		
 		// Ensure row has enough columns and a valid product code
-		if(row.size() > priceIdx && !ifnull(row.get(codeIdx),"").isEmpty())
-		{
-			pCode = row.get(codeIdx).toString();
-			// Use code as the unique key
-			qty = ifnull(row.get(qtyIdx),"0").toDecimal();
-			price = ifnull(row.get(priceIdx),"0").toDecimal();
-			// Discounts
-			discountCode = row.get(discountCodeIdx);
-			discountPrice = ifnull(row.get(discountPriceIdx),"0").toDecimal();
-			if(qty != 0 && price != 0.00)
-			{
-				if(summaryMap.containsKey(pCode))
-				{
-					// Product already exists: Update existing totals
-					existingData = summaryMap.get(pCode);
-					existingData.put("quantity",existingData.get("quantity") + qty);
-					existingData.put("total_line_price",existingData.get("total_line_price") + price);
-					summaryMap.put(pCode,existingData);
-				}
-				else
-				{
-					// New product: Create new entry
-					newData = Map();
-					newData.put("product_code",pCode);
-					newData.put("item_name",row.get(nameIdx));
-					newData.put("quantity",qty);
-					newData.put("total_line_price",price);
-					summaryMap.put(pCode,newData);
-				}
-			}
-			if(discountCode != 0)
-			{
-				if(summaryMap.contains(discountCode))
-				{
-					// Discount line already exists: Update existing totals
-					existingData = summaryMap.get(discountCode);
-					existingData.put("quantity",existingData.get("quantity") + qty);
-					existingData.put("total_line_discount",existingData.get("total_line_discount") + discountPrice);
-					summaryMap.put(discountCode,existingData);
-				}
-				else
-				{
-					// New discount line: Create new entry
-					newData = Map();
-					newData.put("product_code",discountCode);
-					newData.put("item_name",row.get(nameIdx) + " - " + discountCode.getSuffix("-") + "% Discount");
-					newData.put("quantity",qty);
-					newData.put("total_line_discount",discountPrice);
-					summaryMap.put(discountCode,newData);
-				}
-			}
-		}
 	}
 	info summaryMap;
 	// 2. Convert the summary Map back into the productLines List
@@ -309,7 +311,7 @@ try
 		try 
 		{
 			downloadLink = "<" + download_link + "|" + "Download " + body.get("invoice_type") + " data" + ">";
-			successMessage = "No items to invoice for " + distributorRecord.get("Account_Name") + " (" + body.get("invoice_type") + " for " + body.get("month") + "). All items were filtered by business rules. | " + downloadLink;
+			successMessage = "No items to invoice for " + distributorRecord.get("Account_Name") + " (" + body.get("task_type") + " for " + body.get("month") + "). All items were filtered by business rules. | " + downloadLink;
 			standalone.delugePostSuccessMessageToSlack(successMessage,slackChannelId);
 		}
 		catch (slackErr)
