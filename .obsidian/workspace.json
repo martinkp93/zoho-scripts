@@ -196,6 +196,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/script_1774946955932/script_1774946955932.md",
+    "scripts/script_1774946955932/script_1774946955932.ds",
+    "scripts/script_1774946955932",
     "scripts/script_1774946898924/script_1774946898924.md",
     "scripts/script_1774946898924/script_1774946898924.ds",
     "scripts/script_1774946898924",
@@ -218,8 +221,6 @@
     "Environment Lifecycle/Delete/Delete Populace Workspace/delugeTriggerDeletePopulaceWorkspace.md",
     "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
     "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.md",
-    "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.ds",
-    "scripts/delugeManualUpdateAttributableConversionData",
     "scripts/delugeWeatherStationQuantityUpdate/delugeWeatherStationQuantityUpdate.md",
     "conflict-files-obsidian-git.md",
     "scripts/script_1774365008976/script_1774365008976.md",
@@ -230,7 +231,6 @@
     "scripts/script_1774363242002/script_1774363242002.md",
     "scripts/delugeSendToActiveCampaignLimit/delugeSendToActiveCampaignLimit.md",
     "scripts/script_1774359008075/script_1774359008075.md",
-    "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md",
-    "Acquisition and Onboarding/Marketing/Attribution/Marketing Attribution Handler/getVisits1.md"
+    "Support/Subscription Cancellation/Immediate Cancellation/delugeCancellationImmediately.md"
   ]
 }
