@@ -38,13 +38,17 @@ try
 	info "Exchange rate: " + exchange_rate;
 	if(distributor_id == null || download_link == null)
 	{
-		info "Payload missing data: distributor_id or download_link Payload: " + body;
+		errorMessage = "Payload missing data: distributor_id or download_link Payload: " + body;
+		info errorMessage;
+		return standalone.delugeSendErrorAlert(functionName,requestBody,errorMessage);
 	}
 	// --- 2. Get Zoho CRM Record ---
 	distributorRecord = zoho.crm.getRecordById("Accounts",distributor_id);
 	if(distributorRecord.get("id") == null)
 	{
-		info "Failed to find CRM Account with ID: " + distributor_id;
+		errorMessage = "Failed to find CRM Account with ID: " + distributor_id;
+		info errorMessage;
+		return standalone.delugeSendErrorAlert(functionName,requestBody,errorMessage);
 	}
 	economicCustomerNumber = distributorRecord.get("E_conomic_Customer_Number");
 	distributorStockType = ifnull(distributorRecord.get("Stock_Type"),"").toLowerCase();
@@ -201,9 +205,7 @@ try
 	recipient = {"name":customerRecord.get("name"),"address":customerRecord.get("address"),"zip":customerRecord.get("zip"),"city":customerRecord.get("city"),"vatZone":vatZone};
 	textLine2 = if(distributorRecord.get("Billing_Country") == "United Kingdom","Terms and Conditions: Reverse Charge Transaction","");
 	notes = {"heading":invoice_type_raw + " " + body.get("month") + " " + body.get("year"),"textLine2":textLine2};
-	//
 	// --- SET INVOICING RULES based on invoice type and stock type ---
-	//
 	creditNegativeItems = false;
 	invoicePositiveItems = false;
 	invoice_type = invoice_type_raw.toLowerCase();
@@ -259,7 +261,7 @@ try
 			info "A product line has a quantity of 0, cannot calculate unit price: " + productLine;
 		}
 		//
-		// --- APPLY THE BOOLEAN LOGIC ---
+		// --- Apply sales/consignment stock logic
 		//
 		addThisLine = false;
 		if(creditNegativeItems == true && line_total_price < 0)
@@ -284,7 +286,6 @@ try
 			unitDiscountPrice = line_total_discount / line_quantity;
 			finalUnitPrice = if(unitNetPrice != 0,unitNetPrice,unitDiscountPrice * -1);
 			finalLineTotalPrice = if(line_total_price != 0,line_total_price,line_total_discount * -1);
-			info finalLineTotalPrice;
 			// Build the E-conomic line item map
 			lineMap = Map();
 			productMap = Map();
@@ -302,10 +303,7 @@ try
 			lineNumber = lineNumber + 1;
 		}
 	}
-	info linesList;
-	// --- End of loop ---
-	//
-	// --- CHECK IF ANY LINES WERE ADDED ---
+	// --- Check if any lines were added
 	if(linesList.isEmpty())
 	{
 		// All items were filtered out by the rules. Send a Slack message and exit.
