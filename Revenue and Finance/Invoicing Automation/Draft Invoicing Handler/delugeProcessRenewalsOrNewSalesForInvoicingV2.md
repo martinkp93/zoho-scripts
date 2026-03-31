@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001303005"
 Name: delugeProcessRenewalsOrNewSalesForInvoicingV2
-Revision Timestamp: 2026-03-31T10:48:16.844Z
+Revision Timestamp: 2026-03-31T20:25:24.578Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -83,7 +83,7 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 > The script relies on a hardcoded Slack Channel ID `C09PTU8KKT3`. If the notification channel needs to change, this variable must be updated.
 
 > [!CAUTION]
-> There is a potential syntax error or logic bug on line 146: `if(summaryMap.contains(discountCode))`. In Deluge, the correct method to check for a key in a Map is `.containsKey()`. This may cause the discount aggregation to fail or return false incorrectly.
+> There is a potential syntax error or logic bug on line 155: `if(summaryMap.contains(discountCode))`. In Deluge, the correct method to check for a key in a Map is `.containsKey()`. This may cause the discount aggregation to fail or return false incorrectly.
 
 > [!TIP]
 > The error handling for E-conomic draft creation failures has been reverted/changed to use [[delugeSendErrorAlert]]. This ensures that API-level rejection (such as invalid product codes or locked periods) is treated with high priority and captured in the technical error logs.
@@ -96,3 +96,4 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 - **2026-03-31T06:50:35.304Z:** Modified specific E-conomic API error handling to post directly to the distributor Slack channel via [[delugePostSuccessMessageToSlack]] instead of triggering a system-wide [[delugeSendErrorAlert]]. This ensures business-level validation errors are seen by the operational team immediately.
 - **2026-03-31T06:51:57.411Z:** Improved the context of E-conomic error messages sent to Slack by including the distributor's account name, invoice type, and month. This helps the operations team identify which specific batch failed creation.
 - **2026-03-31T10:48:16.844Z:** Updated E-conomic draft creation error handling to utilize [[delugeSendErrorAlert]] instead of [[delugePostSuccessMessageToSlack]]. This routes API validation failures back to the technical error monitoring system for better developer visibility.
+- **2026-03-31T20:25:24.578Z:** Optimized the row iteration logic in the Google Sheets parsing section. The script now uses an active `continue` statement to skip the header and pre-header rows, removing unnecessary nested `else` blocks for better readability.
