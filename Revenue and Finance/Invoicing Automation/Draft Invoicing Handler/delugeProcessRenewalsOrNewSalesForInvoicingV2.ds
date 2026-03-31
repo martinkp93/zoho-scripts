@@ -336,8 +336,8 @@ try
 	if(draftInvoice.get("draftInvoiceNumber") == null)
 	{
 		info "Failed to create E-conomic draft invoice. Response: " + draftInvoice.toString();
-		errorMessage = "Failed to create invoice for " +  distributorRecord.get("Account_Name") + " (" + invoice_type + " for " + body.get("month") + ")" + " due to E-conomic error: " + draftInvoice.get("errors");
-		standalone.delugePostSuccessMessageToSlack(errorMessage,slackChannelId);
+		errorMessage = "Failed to create invoice due to E-conomic error: " + draftInvoice.get("errors");
+		standalone.delugeSendErrorAlert(functionName,requestBody,errorMessage);
 	}
 	// --- 6. Post Success Message to Slack ---
 	try 
