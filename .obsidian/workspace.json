@@ -196,6 +196,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/script_1774956684790/script_1774956684790.md",
+    "scripts/script_1774956684790/script_1774956684790.ds",
+    "scripts/script_1774956684790",
     "scripts/script_1774956626120/script_1774956626120.md",
     "scripts/script_1774956626120/script_1774956626120.ds",
     "scripts/script_1774956626120",
@@ -209,8 +212,6 @@
     "scripts/script_1774946898924/script_1774946898924.ds",
     "scripts/script_1774946898924",
     "scripts/script_1774946754964/script_1774946754964.md",
-    "scripts/script_1774946754964/script_1774946754964.ds",
-    "scripts/script_1774946754964",
     "Environment Lifecycle/Create/Trigger Workspace and Permissions Handler (Billing)/triggerWorkspaceAndPermissionsHandlerCrm.md",
     "Environment Lifecycle/Create/Workspace and Permissions Handler/delugeWorkspaceAndPermissionsHandler.md",
     "Acquisition and Onboarding/Lead Ingestion/Trial Handler/delugeTrialHandler.md",
@@ -230,7 +231,6 @@
     "scripts/script_1774364968033/script_1774364968033.md",
     "scripts/script_1774364493009/script_1774364493009.md",
     "scripts/script_1774364035530/script_1774364035530.md",
-    "scripts/script_1774363242002/script_1774363242002.md",
-    "scripts/delugeSendToActiveCampaignLimit/delugeSendToActiveCampaignLimit.md"
+    "scripts/script_1774363242002/script_1774363242002.md"
   ]
 }
