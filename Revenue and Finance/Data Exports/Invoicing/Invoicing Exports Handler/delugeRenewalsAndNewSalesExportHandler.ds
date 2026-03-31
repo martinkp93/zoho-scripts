@@ -1,18 +1,5 @@
-string standalone.delugeRenewalsAndNewSalesExportHandler(String task,String segment)
+string standalone.delugeRenewalsAndNewSalesExportHandler(String task, String segment)
 {
-variables = invokeurl
-[
-	url :"https://www.zohoapis.eu/crm/v8/settings/variables"
-	type :GET
-	connection:"zohocrmconnection"
-];
-for each  variable in variables.get("variables")
-{
-	if(variable.get("name") == "Temporary " + task + " Export Job")
-	{
-		jobId = variable.get("value");
-	}
-}
 type = if(task == "Renewals","Upcoming","Current");
 // ============================================================
 // 1. INITIAL CONFIGURATION & CRM DATA FETCHING
@@ -32,7 +19,6 @@ for each  d in distributors
 	innerMap.put("name",d.get("Account_Name"));
 	distributorConfig.put(d.get("id").toString(),innerMap);
 }
-info distributorConfig;
 // ============================================================
 // 2. ZOHO ANALYTICS DATA RETRIEVAL
 // ============================================================
@@ -40,20 +26,18 @@ workspaceId = 188580000000003017;
 orgId = 20087400271;
 headers = Map();
 headers.put("ZANALYTICS-ORGID",orgId);
-config = Map();
-config.put("responseFormat","json");
-paramsMap = Map();
-paramsMap.put("CONFIG",config.toString());
-// Fetch the data from the Export Job
+config = {"responseFormat":"json"};
+viewId = if(task == "Renewals",188580000008023658,188580000008023872);
+// Fetch the data from the export tables
 fetchData = invokeurl
 [
-	url :"https://analytics.zoho.eu/restapi/v2/bulk/workspaces/" + workspaceId + "/exportjobs/" + jobId + "/data"
+	url :"https://analytics.zoho.eu/restapi/v2/workspaces/" + workspaceId + "/views/" + viewId + "/data?CONFIG=" + config
 	type :GET
-	parameters:paramsMap
 	headers:headers
 	connection:"zohooauth"
 ];
-jsonRecords = fetchData.get("data");
+jsonRecords = fetchData.get("data").toList();
+info jsonRecords;
 // ============================================================
 // 3. DATA PROCESSING & CURRENCY CONVERSION
 // ============================================================
@@ -72,7 +56,7 @@ finalSheetData = Map();
 for each  record in jsonRecords
 {
 	rowDistId = record.get("Invoiced By ID");
-	rowProductName = record.get("Product Name");
+	rowProductName = record.get("Product Name").toString();
 	// Only process if distributor is valid and product is in allowed list
 	if(distributorConfig.containsKey(rowDistId) && allowedProducts.contains(rowProductName))
 	{
@@ -99,6 +83,7 @@ for each  record in jsonRecords
 		finalSheetData.put(distName,currentData);
 	}
 }
+info finalSheetData;
 // ============================================================
 // 4. MASTER DASHBOARD GID LOOKUP
 // ============================================================
@@ -359,6 +344,6 @@ for each  rowDistributorName in finalSheetData.keys()
 // 6. SEND FINAL SLACK NOTIFICATION
 // ============================================================
 slackChannelId = "C09PTU8KKT3";
-standalone.delugePostSuccessMessageToSlack(slackSummary,slackChannelId);
+// standalone.delugePostSuccessMessageToSlack(slackSummary,slackChannelId);
 return "";
 }
