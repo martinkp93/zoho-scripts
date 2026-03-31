@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001335017"
 Name: delugeConversionPricingHandler
-Revision Timestamp: 2026-03-19T20:13:46.867Z
+Revision Timestamp: 2026-03-31T07:05:38.279Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -30,7 +30,7 @@ This script orchestrates the following internal functions and external services:
 | --- | --- | --- |
 | [[delugeSalesSprintPricingHandler]] | Retrieves pricing overrides defined within a specific Sales Sprint. | High |
 | [[delugePriceListPricingHandler]] | Retrieves standard pricing based on the account's assigned price list and country. | High |
-| `Zoho Billing API` | Fetches subscription details (e.g., `next_billing_at`) using the `zohobillingconnection`. | High |
+| `Zoho Billing API` | Fetches subscription details using the `zohobillingconnection`. | High |
 
 ## Logic Flow
 
@@ -55,7 +55,10 @@ graph TD
 ## Core Logic Sections
 
 ### 1. Data Context & External Fetching
-The script first identifies the organizational structure. It retrieves the "Invoiced By" account to determine the applicable `Price List`. Crucially, it fetches the subscription record directly from **Zoho Billing** to get the `next_billing_at` date, which dictates whether "Upcoming Cycle" pricing or "Scheduled" price changes should apply.
+The script identifies the organizational structure and retrieves the "Invoiced By" account to determine the applicable `Price List`. It fetches the subscription record from **Zoho Billing**. 
+
+> [!NOTE]
+> The script now includes fallback logic for the renewal date: it checks `next_billing_at` first, and if empty, falls back to `expires_at`. This ensures pricing logic remains valid for subscriptions set to cancel at the end of the term.
 
 ### 2. Pricing Hierarchy (The "Waterfall")
 The script follows a strict priority order:
@@ -84,6 +87,10 @@ Discounts are calculated based on the `Tiered_Discount` field on the Account.
 > [!TIP]
 > The variable `cycle` determines if the product code should use the "Initial" code or the "Regular" code from the pricing handlers. `cycle == 0` is treated as the initial setup/conversion.
 
+> [!TIP]
+> The logic for `renewalDate` was updated to ensure that one-time or non-renewing subscriptions still calculate "Upcoming" pricing correctly by using the expiration date as the threshold.
+
 ## Change Log
 - **2026-03-19T20:13:46.867Z:** Initial creation of documentation via DeluluDocu. 
 - **Current Version:** Added logic to handle scheduled price increases and tiered discount exclusions for active sprints.
+- **2026-03-31T07:05:38.279Z:** Updated data fetching logic for Zoho Billing subscriptions. Added a fallback condition for `renewalDate` to use `expires_at` if `next_billing_at` is an empty string, preventing null-pointer errors during date conversion for specific subscription states.
