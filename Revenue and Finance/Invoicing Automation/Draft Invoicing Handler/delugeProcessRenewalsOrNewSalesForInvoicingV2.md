@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001303005"
 Name: delugeProcessRenewalsOrNewSalesForInvoicingV2
-Revision Timestamp: 2026-03-31T20:31:24.809Z
+Revision Timestamp: 2026-03-31T20:32:33.582Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -86,8 +86,8 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 > [!IMPORTANT]
 > The script relies on a hardcoded Slack Channel ID `C09PTU8KKT3`. If the notification channel needs to change, this variable must be updated.
 
-> [!CAUTION]
-> A critical logic bug persists in the discount aggregation section: `if(summaryMap.contains(discountCode))`. In Deluge, the correct method to check for a key in a Map is `.containsKey()`. Use of `.contains()` on a Map may result in incorrect evaluation or failures when processing tiered discounts.
+> [!TIP]
+> The discount aggregation logic has been corrected. The script now uses `.containsKey()` instead of `.contains()` to check for existing entries in the `summaryMap`, ensuring tiered discounts are correctly summed.
 
 > [!TIP]
 > This script uses proactive validation for both input payload data and Zoho CRM record existence. If required IDs are missing or a CRM record cannot be found, the script terminates immediately via [[delugeSendErrorAlert]].
@@ -103,3 +103,4 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 - **2026-03-31T20:25:24.578Z:** Optimized the row iteration logic in the Google Sheets parsing section. The script now uses an active `continue` statement to skip the header and pre-header rows, removing unnecessary nested `else` blocks for better readability.
 - **2026-03-31T20:28:38.107Z:** Hardened validation logic for the E-conomic Customer Number. The script now explicitly checks if `economicCustomerNumber` is null immediately after fetching the CRM account, returning an error via [[delugeSendErrorAlert]] if the data is missing to prevent downstream processing failures.
 - **2026-03-31T20:31:24.809Z:** Hardened input validation. The script now proactively terminates and sends a [[delugeSendErrorAlert]] if the input payload is missing required distributor IDs/links or if the Zoho CRM account lookup fails, rather than just logging the information.
+- **2026-03-31T20:32:33.582Z:** Fixed a logic bug in the discount aggregation section where `.contains()` was incorrectly used instead of `.containsKey()` for Map lookups. This ensures the script correctly identifies and aggregates existing discount line items.
