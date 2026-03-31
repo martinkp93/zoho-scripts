@@ -154,7 +154,7 @@ try
 				}
 				if(discountCode != 0)
 				{
-					if(summaryMap.contains(discountCode))
+					if(summaryMap.containsKey(discountCode))
 					{
 						// Discount line already exists: Update existing totals
 						existingData = summaryMap.get(discountCode);
