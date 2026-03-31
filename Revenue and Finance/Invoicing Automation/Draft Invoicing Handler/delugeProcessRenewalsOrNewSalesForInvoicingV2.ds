@@ -337,7 +337,7 @@ try
 	{
 		info "Failed to create E-conomic draft invoice. Response: " + draftInvoice.toString();
 		errorMessage = "Failed to create invoice due to E-conomic error: " + draftInvoice.get("errors");
-		standalone.delugeSendErrorAlert(functionName,requestBody,errorMessage);
+		standalone.delugePostSuccessMessageToSlack(errorMessage,slackChannelId);
 	}
 	// --- 6. Post Success Message to Slack ---
 	try 
