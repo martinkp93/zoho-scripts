@@ -232,8 +232,8 @@ for each  rowDistributorName in finalSheetData.keys()
 		}
 		payloadRows = List();
 		payloadRows.add({monthDate.toString("MMMM yyyy") + " " + task});
-		payloadRows.add({"Quantity","=SUM(O8:O)"});
-		payloadRows.add({"Total Price","=SUM(Q8:Q)"});
+		payloadRows.add({"Quantity","=SUM(P8:P)"});
+		payloadRows.add({"Total Price","=SUM(R8:R)"});
 		payloadRows.add({});
 		payloadRows.add({});
 		payloadRows.add({});
