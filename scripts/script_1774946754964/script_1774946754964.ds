@@ -1,0 +1,13 @@
+string standalone.ResyncDaggers()
+{
+	
+	orgId = 20087400261;
+	country = "Denmark";
+	
+
+	
+	//response = standalone.delugeFeatureAggregator(orgId,customerId,country);
+	// info response;
+	
+return "";
+}
