@@ -50,7 +50,9 @@ try
 	distributorStockType = ifnull(distributorRecord.get("Stock_Type"),"").toLowerCase();
 	if(economicCustomerNumber == null)
 	{
-		info "CRM Account '" + distributorRecord.get("Account_Name") + "' is missing 'E_conomic_Customer_Number'.";
+		errorMessage = "CRM Account '" + distributorRecord.get("Account_Name") + "' is missing 'E_conomic_Customer_Number'.";
+		info errorMessage;
+		return standalone.delugeSendErrorAlert(functionName,requestBody,errorMessage);
 	}
 	// --- 2.1 Get Spreadsheet ID & Construct Tab Name ---
 	ssId = distributorRecord.get("Renewals_and_New_Sales_Data").getSuffix("/d/").getPrefix("/");
