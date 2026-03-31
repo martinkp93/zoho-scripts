@@ -1,7 +1,7 @@
 ---
 Function ID: "157805000001303005"
 Name: delugeProcessRenewalsOrNewSalesForInvoicingV2
-Revision Timestamp: 2026-03-31T06:50:35.304Z
+Revision Timestamp: 2026-03-31T06:51:57.411Z
 Status: Functional
 ---
 **Postman Documentation:** [Link to API Collection Placeholder]
@@ -94,3 +94,4 @@ It maps E-conomic layout numbers, VAT zones, and payment terms from the customer
 - **2026-03-19T20:29:30.290Z:** Updated documentation to reflect V2 logic: added dynamic header discovery, `summaryMap` aggregation for products and discounts, and implemented exchange rate math on `unitNetPrice`. Documented potential `.contains()` bug in Map logic.
 - **2026-03-31T06:49:01.769Z:** Enhanced error handling for E-conomic draft creation. The script now explicitly checks for a null `draftInvoiceNumber` and extracts detailed error messages from the API response to send via `delugeSendErrorAlert`.
 - **2026-03-31T06:50:35.304Z:** Modified specific E-conomic API error handling to post directly to the distributor Slack channel via [[delugePostSuccessMessageToSlack]] instead of triggering a system-wide [[delugeSendErrorAlert]]. This ensures business-level validation errors are seen by the operational team immediately.
+- **2026-03-31T06:51:57.411Z:** Improved the context of E-conomic error messages sent to Slack by including the distributor's account name, invoice type, and month. This helps the operations team identify which specific batch failed creation.
