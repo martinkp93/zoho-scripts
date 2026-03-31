@@ -1,0 +1,383 @@
+string standalone.delugeProcessRenewalsOrNewSalesForInvoicingV2(String crmAPIRequest)
+{
+// --- Configuration --- 
+slackChannelId = "C09PTU8KKT3";
+functionName = "Deluge: Process Renewals or New Sales for Invoicing";
+requestBody = crmAPIRequest;
+try 
+{
+	
+	// --- 1. Get and Validate Payload ---
+	body = crmAPIRequest.get("body");
+	if(body == null)
+	{
+		body = crmAPIRequest;
+	}
+	if(body == null)
+	{
+		info "Request body is null or empty.";
+	}
+/*
+	body = {
+		"distributor_id": "520877000013008020",
+		"distributor_name": "Hankkija Oy",
+		"exchange_rate": "",
+		"exchange_pair": "",
+		"task_type": "Renewals",
+		"month": "April",
+		"year": "2026",
+		"quantity_expected": 7,
+		"download_link": "https://docs.google.com/spreadsheets/d/12KvmvFHcPjY_ouQM3OKuUXSczpJMbGguzWT4TJ02F2k/export?format=xlsx&gid=886775259"
+		};
+		*/
+	// Validate all required fields from the payload
+	distributor_id = body.get("distributor_id");
+	download_link = body.get("download_link");
+	// productLines = body.get("lines");
+	invoice_type_raw = body.get("task_type");
+	exchange_rate = if(!body.get("exchange_rate") = "",body.get("exchange_rate"),1);
+	info "Exchange rate: " + exchange_rate;
+	if(distributor_id == null || download_link == null)
+	{
+		info "Payload missing data: distributor_id or download_link Payload: " + body;
+	}
+	// --- 2. Get Zoho CRM Record ---
+	distributorRecord = zoho.crm.getRecordById("Accounts",distributor_id);
+	if(distributorRecord.get("id") == null)
+	{
+		info "Failed to find CRM Account with ID: " + distributor_id;
+	}
+	economicCustomerNumber = distributorRecord.get("E_conomic_Customer_Number");
+	distributorStockType = ifnull(distributorRecord.get("Stock_Type"),"").toLowerCase();
+	if(economicCustomerNumber == null)
+	{
+		info "CRM Account '" + distributorRecord.get("Account_Name") + "' is missing 'E_conomic_Customer_Number'.";
+	}
+	// --- 2.1 Get Spreadsheet ID & Construct Tab Name ---
+	ssId = distributorRecord.get("Renewals_and_New_Sales_Data").getSuffix("/d/").getPrefix("/");
+	// Construct tab name e.g., "January 2026 (Renewals)"
+	targetTabName = body.get("month") + " " + body.get("year") + " (" + body.get("task_type") + ")";
+	// --- 2.2 Fetch Data from Google Sheets ---
+	// We fetch the whole sheet
+	sheetDataResponse = invokeurl
+	[
+		url :"https://sheets.googleapis.com/v4/spreadsheets/" + ssId + "/values/'" + targetTabName + "'!A1:Z500"
+		type :GET
+		connection:"googlesheets"
+	];
+	sheetValues = sheetDataResponse.get("values");
+	if(sheetValues == null || sheetValues.isEmpty())
+	{
+		info "Could not find data in tab: " + targetTabName;
+		return "error: Tab not found or empty";
+	}
+	// --- 2.3 Parse Spreadsheet Rows into productLines ---
+	productLines = List();
+	headerRowIndex = null;
+	productNameHeader = "Item Name";
+	totalLinePriceHeader = if(body.get("task_type") == "Renewals","Total Price (Upcoming Renewal)","Total Price (Current Renewal)");
+	discountHeader = if(body.get("task_type") == "Renewals","Total Discount End-User (Upcoming Renewal)","Total Discount End-User (Current Renewal)");
+	// info sheetValues;
+	// Find the header row dynamically
+	for each index i in sheetValues
+	{
+		sheetRow = sheetValues.get(i);
+		if(sheetRow.contains(productNameHeader) && sheetRow.contains("E-conomic Product Code") && sheetRow.contains("Quantity"))
+		{
+			headerRowIndex = i.toLong();
+			headers = sheetRow;
+			info headers;
+			break;
+		}
+	}
+	if(headerRowIndex == null)
+	{
+		info "Could not find required headers in tab: " + targetTabName;
+		return "error: Headers not found";
+	}
+	// Get column indices
+	nameIdx = headers.indexOf("Item Name");
+	codeIdx = headers.indexOf("E-conomic Product Code");
+	qtyIdx = headers.indexOf("Quantity");
+	priceIdx = headers.indexOf(totalLinePriceHeader);
+	// Discount indices
+	discountCodeIdx = headers.indexOf("E-conomic Product Code (Discount Tier)");
+	discountPriceIdx = headers.indexOf(discountHeader);
+	// 1. Initialize a temporary Map to group by product code
+	summaryMap = Map();
+	info summaryMap;
+	// Loop through data rows (skipping the header)
+	// info sheetValues;
+	
+	
+	for each index i in sheetValues
+	{
+		rowIdx = i.toLong();
+		if(rowIdx <= headerRowIndex)
+		{
+			// continue;
+		} else 
+        {
+			row = sheetValues.get(i);
+			// info row;
+			if(row.size() > priceIdx && !ifnull(row.get(codeIdx),"").isEmpty())
+			{
+				pCode = row.get(codeIdx).toString();
+				// Use code as the unique key
+				qty = ifnull(row.get(qtyIdx),"0").toDecimal();
+				price = ifnull(row.get(priceIdx),"0").toDecimal();
+				// Discounts
+				discountCode = row.get(discountCodeIdx);
+				discountPrice = ifnull(row.get(discountPriceIdx),"0").toDecimal();
+				if(qty != 0 && price != 0.00)
+				{
+					if(summaryMap.containsKey(pCode))
+					{
+						// Product already exists: Update existing totals
+						existingData = summaryMap.get(pCode);
+						existingData.put("quantity",existingData.get("quantity") + qty);
+						existingData.put("total_line_price",existingData.get("total_line_price") + price);
+						summaryMap.put(pCode,existingData);
+						}
+						else
+						{
+							// New product: Create new entry
+							newData = Map();
+							newData.put("product_code",pCode);
+							newData.put("item_name",row.get(nameIdx));
+							newData.put("quantity",qty);
+							newData.put("total_line_price",price);
+							summaryMap.put(pCode,newData);
+							}
+							}
+							if(discountCode != 0)
+							{
+								if(summaryMap.contains(discountCode))
+								{
+									// Discount line already exists: Update existing totals
+									existingData = summaryMap.get(discountCode);
+									existingData.put("quantity",existingData.get("quantity") + qty);
+									existingData.put("total_line_discount",existingData.get("total_line_discount") + discountPrice);
+									summaryMap.put(discountCode,existingData);
+									}
+									else
+									{
+										// New discount line: Create new entry
+										newData = Map();
+										newData.put("product_code",discountCode);
+										newData.put("item_name",row.get(nameIdx) + " - " + discountCode.getSuffix("-") + "% Discount");
+										newData.put("quantity",qty);
+										newData.put("total_line_discount",discountPrice);
+										summaryMap.put(discountCode,newData);
+										}
+										}
+										}
+        }
+
+		// Ensure row has enough columns and a valid product code
+		
+	}
+	info summaryMap;
+	// 2. Convert the summary Map back into the productLines List
+	productLines = List();
+	for each  code in summaryMap.keys()
+	{
+		productLines.add(summaryMap.get(code));
+	}
+	info "Product Lines: " + productLines;
+	// --- 3. Get E-conomic Customer Record ---
+	customerRecord = invokeurl
+	[
+		url :"https://restapi.e-conomic.com/customers/" + economicCustomerNumber
+		type :GET
+		connection:"economic"
+	];
+	if(customerRecord.get("customerNumber") == null)
+	{
+		info "Failed to fetch E-conomic customer with number: " + economicCustomerNumber + ". Response: " + customerRecord.toString();
+	}
+	// info "Customer Record: " + customerRecord;
+	// --- 4. Build E-conomic Invoice Object ---
+	customer = {"customerNumber":customerRecord.get("customerNumber")};
+	paymentTerms = {"paymentTermsNumber":customerRecord.get("paymentTerms").get("paymentTermsNumber")};
+	layout = {"layoutNumber":customerRecord.get("layout").get("layoutNumber")};
+	vatZone = {"vatZoneNumber":customerRecord.get("vatZone").get("vatZoneNumber")};
+	recipient = {"name":customerRecord.get("name"),"address":customerRecord.get("address"),"zip":customerRecord.get("zip"),"city":customerRecord.get("city"),"vatZone":vatZone};
+	textLine2 = if(distributorRecord.get("Billing_Country") == "United Kingdom","Terms and Conditions: Reverse Charge Transaction","");
+	notes = {"heading":invoice_type_raw + " " + body.get("month") + " " + body.get("year"),"textLine2":textLine2};
+	//
+	// --- SET INVOICING RULES based on invoice type and stock type ---
+	//
+	creditNegativeItems = false;
+	invoicePositiveItems = false;
+	invoice_type = invoice_type_raw.toLowerCase();
+	//
+	if(invoice_type == "new sales")
+	{
+		if(distributorStockType == "sales")
+		{
+			creditNegativeItems = true;
+			invoicePositiveItems = false;
+			// Is it possible to get discounts on new sales? Ask Sanne. 
+		}
+		if(distributorStockType == "consignment")
+		{
+			creditNegativeItems = false;
+			invoicePositiveItems = true;
+		}
+	}
+	else if(invoice_type == "renewals")
+	{
+		if(distributorStockType == "sales")
+		{
+			creditNegativeItems = false;
+			invoicePositiveItems = true;
+			creditDiscountItems = true;
+		}
+		if(distributorStockType == "consignment")
+		{
+			creditNegativeItems = false;
+			invoicePositiveItems = true;
+		}
+	}
+	//
+	// --- Iterate through the 'lines' array and APPLY RULES ---
+	//
+	linesList = List();
+	lineNumber = 1;
+	for each  productLine in productLines
+	{
+		// Get data for this specific line
+		line_product_code = productLine.get("product_code");
+		line_item_name = productLine.get("item_name");
+		line_quantity = productLine.get("quantity");
+		line_total_price = ifnull(productLine.get("total_line_price"),0);
+		line_total_discount = ifnull(productLine.get("total_line_discount"),0);
+		// Validate line data
+		if(line_product_code == null || line_item_name == null || line_quantity == null || line_total_price == null)
+		{
+			info "A product line in the payload is missing data: " + productLine;
+		}
+		if(line_quantity == 0)
+		{
+			info "A product line has a quantity of 0, cannot calculate unit price: " + productLine;
+		}
+		//
+		// --- APPLY THE BOOLEAN LOGIC ---
+		//
+		addThisLine = false;
+		if(creditNegativeItems == true && line_total_price < 0)
+		{
+			// Rule: We are crediting negative items, and this item is negative
+			addThisLine = true;
+		}
+		else if(invoicePositiveItems == true && line_total_price > 0)
+		{
+			// Rule: We are invoicing positive items, and this item is positive
+			addThisLine = true;
+		}
+		else if(creditDiscountItems == true && line_total_discount > 0)
+		{
+			addThisLine = true;
+		}
+		// --- If the line is approved by the rules, add it to the list ---
+		if(addThisLine == true)
+		{
+			// Calculate unit price for this line
+			unitNetPrice = line_total_price / line_quantity;
+			unitDiscountPrice = line_total_discount / line_quantity;
+			finalUnitPrice = if(unitNetPrice != 0,unitNetPrice,unitDiscountPrice * -1);
+			finalLineTotalPrice = if(line_total_price != 0,line_total_price,line_total_discount * -1);
+			info finalLineTotalPrice;
+			// Build the E-conomic line item map
+			lineMap = Map();
+			productMap = Map();
+			productMap.put("productNumber",line_product_code.toString());
+			lineMap.put("lineNumber",lineNumber);
+			lineMap.put("sortKey",lineNumber);
+			lineMap.put("product",productMap);
+			lineMap.put("description",line_item_name);
+			lineMap.put("quantity",line_quantity);
+			lineMap.put("unitNetPrice",(finalUnitPrice / exchange_rate).round(2));
+			// lineMap.put("totalNetAmount",(finalLineTotalPrice / exchange_rate).round(2));
+			// Add this line to the main list
+			linesList.add(lineMap);
+			// Increment line number for the next item
+			lineNumber = lineNumber + 1;
+		}
+	}
+	info linesList;
+	// --- End of loop ---
+	//
+	// --- CHECK IF ANY LINES WERE ADDED ---
+	if(linesList.isEmpty())
+	{
+		// All items were filtered out by the rules. Send a Slack message and exit.
+		info "No items to invoice for " + distributorRecord.get("Account_Name") + " after filtering rules were applied.";
+		try 
+		{
+			downloadLink = "<" + download_link + "|" + "Download " + body.get("invoice_type") + " data" + ">";
+			successMessage = "No items to invoice for " + distributorRecord.get("Account_Name") + " (" + body.get("invoice_type") + " for " + body.get("month") + "). All items were filtered by business rules. | " + downloadLink;
+			standalone.delugePostSuccessMessageToSlack(successMessage,slackChannelId);
+		}
+		catch (slackErr)
+		{
+			info "Slack 'No items' message failed: " + slackErr;
+		}
+		return "success: No items to invoice";
+	}
+	//
+	// Get current date for the invoice in YYYY-MM-DD format
+	invoiceDate = zoho.currentdate.toString("yyyy-MM-dd");
+	// Build final invoice
+	invoice = {"currency":customerRecord.get("currency"),"customer":customer,"date":invoiceDate,"layout":layout,"paymentTerms":paymentTerms,"recipient":recipient,"lines":linesList,"notes":notes};
+	info "Invoice: " + invoice;
+	// --- 5. Create E-conomic Draft Invoice ---
+	draftInvoice = invokeurl
+	[
+		url :"https://restapi.e-conomic.com/invoices/drafts"
+		type :POST
+		body:invoice.toString()
+		connection:"economic"
+	];
+	info "Draft Invoice Response: " + draftInvoice;
+	if(draftInvoice.get("draftInvoiceNumber") == null)
+	{
+		info "Failed to create E-conomic draft invoice. Response: " + draftInvoice.toString();
+		errorMessage = "Failed to create invoice due to E-conomic error: " + draftInvoice.get("errors");
+		standalone.delugeSendErrorAlert(functionName,requestBody,errorMessage);
+	}
+	// --- 6. Post Success Message to Slack ---
+	try 
+	{
+		draftInvoiceId = draftInvoice.get("soap").get("currentInvoiceHandle").get("id");
+		invoiceLink = "<https://secure.e-conomic.com/sales/invoicing/invoices/" + draftInvoiceId + "|" + "Invoice " + draftInvoice.get("draftInvoiceNumber") + ">";
+		downloadLink = "<" + download_link + "|" + "Download " + invoice_type + " data" + ">";
+		successMessage = invoiceLink + " created as draft for " + distributorRecord.get("Account_Name") + " (" + invoice_type + " for " + body.get("month") + ")" + " | " + downloadLink;
+		standalone.delugePostSuccessMessageToSlack(successMessage,slackChannelId);
+	}
+	catch (slackErr)
+	{
+		// Log the error, but don't fail the whole function
+		info "Slack success message failed: " + slackErr;
+	}
+	return "success";
+}
+catch (e)
+{
+	// --- 7. Global Error Handler ---
+	errorMessage = "Error in " + functionName + ": " + e.toString();
+	info errorMessage;
+	// Post error to Slack
+	try 
+	{
+		standalone.delugeSendErrorAlert(functionName,requestBody,errorMessage);
+	}
+	catch (slackErr)
+	{
+		info "Slack error message *also* failed to send: " + slackErr;
+	}
+	return "error: " + e.toString();
+}
+return "";
+}
