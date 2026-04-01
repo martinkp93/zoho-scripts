@@ -196,6 +196,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/script_1775043814504/script_1775043814504.md",
+    "scripts/script_1775043814504/script_1775043814504.ds",
+    "scripts/script_1775043814504",
     "Connectors/Populace/delugePopulaceConnector.md",
     "scripts/script_1775043214582/script_1775043214582.md",
     "scripts/script_1775043214582/script_1775043214582.ds",
@@ -210,8 +213,6 @@
     "scripts/testdeletapikey/testdeletapikey.ds",
     "scripts/testdeletapikey",
     "scripts/ResyncDaggers/ResyncDaggers.md",
-    "scripts/ResyncDaggers/ResyncDaggers.ds",
-    "scripts/ResyncDaggers",
     "scripts/script_1774993384324/script_1774993384324.md",
     "scripts/script_1774956684790/script_1774956684790.md",
     "scripts/script_1774956626120/script_1774956626120.md",
@@ -230,7 +231,6 @@
     "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.md",
     "Environment Lifecycle/Delete/Delete Populace Workspace/delugeTriggerDeletePopulaceWorkspace.md",
     "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
-    "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.md",
-    "scripts/delugeWeatherStationQuantityUpdate/delugeWeatherStationQuantityUpdate.md"
+    "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.md"
   ]
 }
