@@ -196,6 +196,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/test/test.md",
+    "scripts/test/test.ds",
+    "scripts/test",
     "scripts/delugeTieredDiscountsHandler2/delugeTieredDiscountsHandler2.md",
     "scripts/delugeTieredDiscountsHandler2/delugeTieredDiscountsHandler2.ds",
     "scripts/delugeTieredDiscountsHandler2",
@@ -209,8 +212,6 @@
     "scripts/script_1774993384324/script_1774993384324.ds",
     "scripts/script_1774993384324",
     "scripts/script_1774956684790/script_1774956684790.md",
-    "scripts/script_1774956684790/script_1774956684790.ds",
-    "scripts/script_1774956684790",
     "scripts/script_1774956626120/script_1774956626120.md",
     "scripts/script_1774956409598/script_1774956409598.md",
     "scripts/script_1774946955932/script_1774946955932.md",
@@ -230,7 +231,6 @@
     "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.md",
     "scripts/delugeWeatherStationQuantityUpdate/delugeWeatherStationQuantityUpdate.md",
     "conflict-files-obsidian-git.md",
-    "scripts/script_1774365008976/script_1774365008976.md",
-    "scripts/script_1774364996550/script_1774364996550.md"
+    "scripts/script_1774365008976/script_1774365008976.md"
   ]
 }
