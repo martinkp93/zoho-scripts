@@ -1,0 +1,51 @@
+string standalone.delugeTieredDiscountsHandler2(Int zbCustomerId)
+{
+// --- 1. CONFIGURATION ---
+orgId = "20087400261";
+// zbCustomerId = "389902000076274145";
+// zcrmAccountId = "520877000001872151";
+allowedPlanCodes = {"1200","1200-SM"};
+updateMap = Map();
+// Use a List of Maps to ensure ordered threshold checking
+// Tier 1: 3-4 units | Tier 2: 5-9 units | Tier 3: 10+ units
+tiers = {{"name":"Tier_1_3","lower":3,"upper":4,"code":"1200-10"},{"name":"Tier_2_5","lower":5,"upper":9,"code":"1200-15"},{"name":"Tier_3_10","lower":10,"upper":9999,"code":"1200-20"}};
+resp = invokeapi
+[
+	service :zohobilling
+	path :"billing/v1/customers/" + zbCustomerId
+	type :GET
+	connection:"zohobillingconnection"
+];
+if(resp.get("customer").get("billing_address").get("country") != "Denmark")
+{
+	return "Country is not Denmark. Exiting script.";
+}
+zcrmAccountId = resp.get("customer").get("zcrm_account_id");
+// --- 2. FETCH SUBSCRIPTIONS ---
+// Fetch all active subscriptions for the customer
+resp = invokeapi
+[
+	service :zohobilling
+	path :"billing/v1/subscriptions?filter_by=SubscriptionStatus.ACTIVE&customer_id=" + zbCustomerId
+	type :GET
+	connection:"zohobillingconnection"
+];
+// info resp;
+subs = ifnull(resp.get("subscriptions"),List());
+quantitySum = 0;
+// --- 3. CALCULATE QUANTITY SUM ---
+// info subs;
+for each  sub in subs
+{
+	planCode = sub.get("plan_code");
+	if(allowedPlanCodes.contains(planCode))
+	{
+		// info planCode;
+		subId = sub.get("subscription_id");
+		subRecord = zoho.billing.retrieve("Subscriptions",orgId,subId,"zohobillingconnection").get("subscription");
+		subQty = ifnull(subRecord.get("plan").get("quantity"),0).toLong();
+		quantitySum = quantitySum + subQty;
+	}
+}
+return "Total: " + quantitySum;
+}
