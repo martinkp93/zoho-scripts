@@ -1,0 +1,13 @@
+string standalone.ResyncDaggers(int customerId, int workspaceId)
+{
+orgId = 20087400261;
+country = "Denmark";
+response = standalone.delugeFeatureAggregator(orgId,customerId,country);
+info response;
+finalProcessedSubscriptions = response.get("daggersPayloadList");
+info "Daggers Handler Payload: " + finalProcessedSubscriptions;
+// --- Call the standalone daggers_handler function ---
+daggersSyncResponse = standalone.delugeDaggersConnector("syncSubscriptions",workspaceId,finalProcessedSubscriptions);
+info daggersSyncResponse;
+return daggersSyncResponse.get("message");
+}
