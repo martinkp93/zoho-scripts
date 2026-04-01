@@ -1,0 +1,302 @@
+string standalone.delugeLeadHandler(String crmAPIRequest)
+{
+try 
+{
+	crmAPIRequest = {"body":{"vertical":"Farm","fullName":"Test Testersen","email":"mp+test+new+ac+setup+97@cordulus.com","phone":"12345678","utmSource":"Mobile App","utmTraffic":"Organic","utmMedium":"Mobile App","country":"Denmark","conversionType":"Request a Quote Conversion","distributor":"Danish Agro"}};
+	
+	info "CRM API Request:" + crmAPIRequest;
+	// =============================================================================
+	// 1. PARSE INPUT DATA
+	// =============================================================================
+
+	body = Map();
+	if(crmAPIRequest != null && crmAPIRequest != "")
+	{
+		// Check if the request is a JSON string or map and extract body
+		requestMap = crmAPIRequest.toMap();
+		if(requestMap.containKey("body"))
+		{
+			body = requestMap.get("body");
+		}
+	}
+	if(body.isEmpty())
+	{
+		return "Error: No data received in body.";
+	}
+
+	// =============================================================================
+	// 2. PREPARE VARIABLES
+	// =============================================================================
+	email = if(body.get("email") != null,body.get("email"),"");
+	fullName = if(body.get("fullName") != null,body.get("fullName"),"Unknown");
+	firstName = "";
+	lastName = "";
+	if(fullName.contains(" "))
+	{
+		firstName = fullName.subString(0,fullName.indexOf(" "));
+		lastName = fullName.subString(fullName.indexOf(" ") + 1);
+	}
+	else
+	{
+		firstName = fullName;
+		lastName = "-";
+		// Fallback if no last name
+	}
+	country = if(body.get("country") != null,body.get("country"),"");
+	phone = if(body.get("phone") != null,body.get("phone"),"");
+	conversionName = body.get("conversionType");
+	// =============================================================================
+	// 3. FIND DISTRIBUTOR
+	// =============================================================================
+	distributorId = null;
+	distributorName = body.get("distributor");
+	if(distributorName != null && distributorName != "")
+	{
+		// Search for the distributor account
+		distributorSearch = zoho.crm.searchRecords("Accounts","(Account_Name:equals:" + distributorName + ")");
+		info distributorSearch;
+		if(distributorSearch != null)
+		{
+			if(distributorSearch.size() > 0)
+			{
+				distributorId = distributorSearch.get(0).get("id");
+				distributorPrimaryContact = distributorSearch.get(0).get("Primary_Contact");
+			}
+		}
+	}
+	else
+	{
+		if(country != null || country != "")
+		{
+			distributorSearch = zoho.crm.searchRecords("Accounts","(Billing_Country:equals:" + country + ") and (Default_Distributor_for_Country:equals:true)");
+			info distributorSearch;
+			if(distributorSearch != null)
+			{
+				if(distributorSearch.size() > 0)
+				{
+					// info "Distributor Search:" + distributorSearch;
+					distributorId = distributorSearch.get(0).get("id");
+					distributorPrimaryContact = distributorSearch.get(0).get("Primary_Contact");
+				}
+			}
+		}
+	}
+	if(distributorId == null)
+	{
+		defaultDistributorId = 520877000145481486;
+		// Default Distributor: Cordulus A/S
+		distributorId = defaultDistributorId;
+		info "Defaulted to 'Cordulus A/S' as Distributor";
+	}
+	info distributorId;
+	// =============================================================================
+	// 4. FIND OR CREATE CONTACT & ACCOUNT
+	// =============================================================================
+	contactId = null;
+	accountId = null;
+	existingAcId = null;
+	// Search for existing contact by email
+	searchContact = zoho.crm.searchRecords("Contacts","(Email:equals:" + email + ")");
+	if(searchContact.size() > 0)
+	{
+		// Contact Exists
+		existingContact = searchContact.get(0);
+		contactId = existingContact.get("id");
+		// Get the related Account ID if it exists
+		accountLookup = existingContact.get("Account_Name");
+		if(accountLookup != null)
+		{
+			accountId = accountLookup.get("id");
+			info "Found existing Account: " + accountId;
+		}
+		// Get the existing ActiveCampaign ID to pass to the handler
+		existingAcId = existingContact.get("ActiveCampaign_Contact_ID");
+		info "Found existing Contact: " + contactId;
+	}
+	else
+	{
+		// Contact Does Not Exist -> Create New Account & Contact
+		info "Contact not found. Creating new records.";
+		// A. Create Account
+		createAccountMap = Map();
+		createAccountMap.put("Account_Name",fullName);
+		createAccountMap.put("Billing_Country",country);
+		if(distributorId != null)
+		{
+			createAccountMap.put("Distributor_Lookup",distributorId);
+		}
+		createAccountResp = zoho.crm.createRecord("Accounts",createAccountMap);
+		if(createAccountResp.get("id") != null)
+		{
+			accountId = createAccountResp.get("id");
+			info "Created Account: " + accountId;
+			// getAccount = zoho.crm.getRecordById("Accounts", accountId);
+		}
+		// B. Create Contact
+		createContactMap = Map();
+		createContactMap.put("First_Name",firstName);
+		createContactMap.put("Last_Name",lastName);
+		createContactMap.put("Email",email);
+		createContactMap.put("Phone",phone);
+		createContactMap.put("Mobile",phone);
+		if(accountId != null)
+		{
+			createContactMap.put("Account_Name",accountId);
+		}
+		createContactResp = zoho.crm.createRecord("Contacts",createContactMap);
+		if(createContactResp.get("id") != null)
+		{
+			contactId = createContactResp.get("id");
+			info "Created Contact: " + contactId;
+		}
+	}
+	subscriptionCreated = false;
+	createConversion = true;
+	// =============================================================================
+	// 5. CREATE TRIAL SUBSCRIPTION
+	// =============================================================================		
+	if(conversionName.contains("Demo"))
+	{
+		info "Called Trial Handler";
+		trialHandlerResp = standalone.delugeTrialHandler(accountId,contactId,email);
+		info "Trial Handler Response: " + trialHandlerResp;
+		subscriptionCreated = if(trialHandlerResp.get("status") == "SubscriptionCreated",true,false);
+		createConversion = if(subscriptionCreated == true,true,false);
+	}
+	// =============================================================================
+	// 6. CREATE CONVERSION RECORD
+	// =============================================================================
+	conversionId = null;
+	utmTraffic = if(body.get("utmTraffic") != null,body.get("utmTraffic"),null);
+	utmSource = if(body.get("utmSource") != null,body.get("utmSource"),null);
+	utmMedium = if(body.get("utmMedium") != null,body.get("utmMedium"),null);
+	utmCampaign = if(body.get("campaignName") != null,body.get("campaignName"),null);
+	utmAdsetName = if(body.get("adsetName") != null,body.get("adsetName"),null);
+	conversionUrl = if(body.get("conversionUrl") != null,body.get("conversionUrl"),null);
+	vertical = if(body.get("vertical") != null,body.get("vertical"),null);
+	farmSize = if(body.get("farmSize") != null,body.get("farmSize"),null);
+	leadType = if(body.get("leadType") != null,body.get("leadType"),null);
+	salesStatus = "Call Now";
+	if(contactId != null && accountId != null && createConversion == true)
+	{
+		createConversionMap = Map();
+		createConversionMap.put("Name",conversionName);
+		createConversionMap.put("Account",accountId);
+		createConversionMap.put("Contact_Name",contactId);
+		if(distributorId != null)
+		{
+			createConversionMap.put("Related_Distributor",distributorId);
+		}
+		// Marketing Data
+		createConversionMap.put("UTM_Traffic",utmTraffic);
+		createConversionMap.put("UTM_Source",utmSource);
+		createConversionMap.put("UTM_Medium",utmMedium);
+		createConversionMap.put("UTM_Campaign",utmCampaign);
+		createConversionMap.put("UTM_Ad_Set_Name",utmAdsetName);
+		createConversionMap.put("Conversion_URL",conversionUrl);
+		createConversionMap.put("Conversion_Category",vertical);
+		createConversionMap.put("Farm_Size",farmSize);
+		createConversionMap.put("Sales_Status",salesStatus);
+		createConversionMap.put("Lead_Type",leadType);
+		createConversionResp = zoho.crm.createRecord("Conversions",createConversionMap);
+		if(createConversionResp.get("id") != null)
+		{
+			conversionId = createConversionResp.get("id");
+			info "Created Conversion: " + conversionId;
+		}
+	}
+	// =============================================================================
+	// 6. RESOLVE PRICING
+	// =============================================================================
+	allowedUtmSource = {"Website","Mobile App"};
+	pricing = null;
+	if(conversionName.contains("Request a Quote") && allowedUtmSource.contains(utmSource))
+	{
+		pricingResponse = standalone.delugeResolveRaQPricing(distributorId);
+		if(pricingResponse.get("success") == false)
+		{
+			return "";
+		}
+		info pricingResponse;
+		pricing = if(pricingResponse.get("data").isEmpty() == false,pricingResponse.get("data"),null);
+		info "Pricing: " + pricing;
+	}
+	// =============================================================================
+	// 6. CALL ACTIVECAMPAIGN HANDLER
+	// =============================================================================
+	if(contactId != null)
+	{
+		tags = {conversionName,utmAdsetName,utmTraffic};
+		finalTags = List();
+		for each  tag in tags
+		{
+			if(tag != null)
+			{
+				finalTags.add(tag);
+			}
+		}
+		// info "Final Tags: " + finalTags;
+		if(vertical != "")
+		{
+			targetListId = if(vertical == "Farm",35,62);
+			// info "List ID: " + targetListId;
+		}
+		else
+		{
+			targetListId = null;
+		}
+		// Call the standalone handler. 
+		// It handles creating the AC contact, adding tags, and return the ActiveCampaign Contact ID
+		info "Called ActiveCampaign Handler";
+		payload = Map();
+		payload.put("contactId",contactId.toLong());
+		payload.put("accountId",accountId.toLong());
+		payload.put("firstName",firstName);
+		payload.put("lastName",lastName);
+		payload.put("email",email);
+		payload.put("phone",phone);
+		payload.put("country",country);
+		payload.put("distributorName",distributorName);
+		payload.put("distributorPrimaryContact",distributorPrimaryContact);
+		payload.put("existingAcId",existingAcId);
+		payload.put("conversionName",conversionName);
+		payload.put("conversionId",conversionId);
+		payload.put("utmSource",utmSource);
+		payload.put("utmMedium",utmMedium);
+		payload.put("utmCampaign",utmCampaign);
+		payload.put("targetListId",targetListId);
+		payload.put("tags",finalTags);
+		payload.put("pricing",pricing);
+		info payload;
+		syncAcContactResp = standalone.delugeActiveCampaignHandler(payload);
+		info "ActiveCampaign Handler response: " + syncAcContactResp;
+	}
+	if(syncAcContactResp.get("acContactId") != null && existingAcId == null)
+	{
+		updateContactMap = Map();
+		updateContactMap.put("ActiveCampaign_Contact_Id",syncAcContactResp.get("acContactId"));
+		updateContactResp = zoho.crm.updateRecord("Contacts",contactId,updateContactMap);
+	}
+	// =============================================================================
+	// 7. CALL LEADSHEET HANDLER
+	// =============================================================================
+	// Call the standalone handler
+	// It handles fetching distributor lead sheet details, pushing leads to sheets, and sending notification emails
+	
+	if(conversionName.contains("Request a Quote") && !allowedUtmSource.contains(utmSource))
+	{
+		info "Called Lead Sheet Handler";
+		leadSheetHandlerResp = standalone.delugeLeadSheetHandler(conversionId);
+		info "Lead Sheet Handler response: " + leadSheetHandlerResp;
+	}
+	info "Function executed successfully";
+}
+catch (e)
+{
+	errorMessage = "Critical error in delugeLeadsHandler script: " + e;
+	info errorMessage;
+	standalone.delugeSendErrorAlert("delugeLeadsHandler",crmAPIRequest,errorMessage);
+	return "Error";
+}
+return "";
+}
