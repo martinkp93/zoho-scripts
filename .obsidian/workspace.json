@@ -196,6 +196,9 @@
   },
   "active": "be42622720ea9833",
   "lastOpenFiles": [
+    "scripts/script_1775044555787/script_1775044555787.md",
+    "scripts/script_1775044555787/script_1775044555787.ds",
+    "scripts/script_1775044555787",
     "scripts/script_1775043814504/script_1775043814504.md",
     "scripts/script_1775043814504/script_1775043814504.ds",
     "scripts/script_1775043814504",
@@ -210,8 +213,6 @@
     "scripts/delugeTieredDiscountsHandler2/delugeTieredDiscountsHandler2.ds",
     "scripts/delugeTieredDiscountsHandler2",
     "scripts/testdeletapikey/testdeletapikey.md",
-    "scripts/testdeletapikey/testdeletapikey.ds",
-    "scripts/testdeletapikey",
     "scripts/ResyncDaggers/ResyncDaggers.md",
     "scripts/script_1774993384324/script_1774993384324.md",
     "scripts/script_1774956684790/script_1774956684790.md",
@@ -230,7 +231,6 @@
     "Acquisition and Onboarding/Marketing/ActiveCampaign/Create ActiveCampaign Contact (Employee)/delugeSyncActiveCampaignContact.md",
     "scripts/delugeActiveCampaignHandlerTest/delugeActiveCampaignHandlerTest.md",
     "Environment Lifecycle/Delete/Delete Populace Workspace/delugeTriggerDeletePopulaceWorkspace.md",
-    "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md",
-    "scripts/delugeManualUpdateAttributableConversionData/delugeManualUpdateAttributableConversionData.md"
+    "scripts/sendToActiveCampaignLimit/sendToActiveCampaignLimit.md"
   ]
 }
